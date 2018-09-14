@@ -10,8 +10,6 @@ Note that the wiki is an "evergreen" document that is constantly being updated a
 ## Downloading the Project
 It is important to note that this repository is large and can take a long time and use a lot of space to clone.
 
-[TODO: Example of how to set up the project, and why we use github][2].
-
 ## Getting Help
 ### User Documentation and Tutorials
 *FIRST* maintains an online wiki with information and tutorials on how to use the *FIRST* Tech Challenge software and robot control system.  You can access the wiki at the following address:
@@ -42,4 +40,3 @@ For other questions, contact Stephen.
 This repososity is currently on version 4.0 (released on 18.09.12)
 
 [1]: https://desktop.github.com
-[2]: about:blank
