@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 /**
  * This is a test config file for getting a rough mecanum drive working.
  * We're probably not going to use the for the official robot 😅
@@ -16,13 +18,13 @@ import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
  */
 public class config {
 
+    @SuppressWarnings("WeakerAccess")
     public DcMotor left_front, right_front, left_back, right_back;
 
+    public void init(Telemetry telemetry, HardwareMap hardware) {
 
-    //
-    public void init(HardwareMap hardware) {
-
-        // TODO: Add telemetry
+        telemetry.addData("Status", "Initializing robot. Please wait...");
+        telemetry.update();
 
         left_front = hardware.dcMotor.get("left front");
         left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
@@ -43,6 +45,9 @@ public class config {
         right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_back.setDirection(Direction.REVERSE);
+
+        telemetry.addData("Status", "Ready!");
+        telemetry.update();
 
     }
 
