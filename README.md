@@ -10,6 +10,8 @@ Note that the wiki is an "evergreen" document that is constantly being updated a
 ## Downloading the Project
 It is important to note that this repository is large and can take a long time and use a lot of space to clone.
 
+For a general overview of how the team uses GitHub, GitHub Desktop, and Android Studio, click [here][2] for a quick video
+
 ## Getting Help
 ### User Documentation and Tutorials
 *FIRST* maintains an online wiki with information and tutorials on how to use the *FIRST* Tech Challenge software and robot control system.  You can access the wiki at the following address:
@@ -31,7 +33,7 @@ For technical questions regarding the SDK, please visit the FTC Technology forum
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ftcforum.usfirst.org/forumdisplay.php?156-FTC-Technology
 
-For other questions, contact Stephen.
+For other questions, contact either Ethan or Stephen.
 
 **************************************************************************************
 ## Release Information
@@ -40,3 +42,4 @@ For other questions, contact Stephen.
 This repososity is currently on version 4.0 (released on 18.09.12)
 
 [1]: https://desktop.github.com
+[2]: https://youtu.be/aRTwuaY31eU
