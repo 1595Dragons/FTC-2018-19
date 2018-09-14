@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
@@ -18,7 +19,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 public class config {
 
-    @SuppressWarnings("WeakerAccess")
     public DcMotor left_front, right_front, left_back, right_back;
 
     public void init(Telemetry telemetry, HardwareMap hardware) {
@@ -51,5 +51,14 @@ public class config {
 
     }
 
+    public void updateTelemetry(Telemetry telemetry, Gamepad gamepad) {
+        telemetry.addData("Gamepad left stick (X | Y)", String.format("%s | %s", gamepad.left_stick_x , gamepad.left_stick_y))
+                .addData("Gamepad right stick (X | Y)", String.format("%s | %s", gamepad.right_stick_x , gamepad.right_stick_y))
+                .addData("Front drive power (L | R):", String.format("%s | %s", this.left_front.getPower(), this.right_front.getPower()))
+                .addData("Rear drive power (L | R):", String.format("%s | %s", this.left_back.getPower(), this.right_back.getPower()));
+
+        telemetry.update();
+
+    }
 
 }
