@@ -140,8 +140,8 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = robot.left_front.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newRightTarget = robot.right_front.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+           // newLeftTarget = robot.left_front.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+           // newRightTarget = robot.right_front.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
             newLeftTarget = robot.left_back.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
             newRightTarget = robot.right_back.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
             robot.left_front.setTargetPosition(newLeftTarget);
@@ -168,19 +168,20 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             // always end the motion as soon as possible.
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            /*
+
             while (opModeIsActive() &&
                    (runtime.seconds() < timeoutS) &&
-                   (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())) {
+                   (robot.left_back.isBusy() && robot.right_back.isBusy()
+                           && robot.right_front.isBusy() && robot.left_front.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
                 telemetry.addData("Path2",  "Running at %7d :%7d",
-                                            robot.leftDrive.getCurrentPosition(),
-                                            robot.rightDrive.getCurrentPosition());
+                                            robot.left_front.getCurrentPosition(),
+                                            robot.right_front.getCurrentPosition());
                 telemetry.update();
             }
-            */
+
 
             // Stop all motion;
             robot.left_front.setPower(0);
