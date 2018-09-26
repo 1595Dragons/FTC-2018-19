@@ -53,10 +53,10 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             // rightPower = -gamepad1.right_stick_y ;
 
             // Send calculated power to wheels
-            robot.leftDrive.setPower(left1Power);
-            robot.rightDrive.setPower(right1Power);
-            robot.leftDrive2.setPower(left2Power);
-            robot.rightDrive2.setPower(right2Power);
+            robot.left_front.setPower(left1Power);
+            robot.right_front.setPower(right1Power);
+            robot.left_back.setPower(left2Power);
+            robot.right_back.setPower(right2Power);
 
             // Update telemetry
             robot.updateTelemetry();

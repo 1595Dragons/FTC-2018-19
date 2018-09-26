@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
- * This is the config file for the robot. It also has (or will have) many useful fuctions in it.
+ * This is the config file for the robot. It also has (or will have) many useful functions in it.
  * <p>
  * For example rather than typing: <br>
  * <br>
- * <code>leftDrive = hardware.dcMotor.get("left_drive");<br>
- * rightDrive = hardware.dcMotor.get("right_drive");<br>
+ * <code>left_front = hardware.dcMotor.get("left_drive");<br>
+ * right_front = hardware.dcMotor.get("right_drive");<br>
  * ...</code>
  * <br>
  * <br>
@@ -41,7 +41,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class config {
 
     // DcMotors used on the robot
-    public DcMotor leftDrive, rightDrive, leftDrive2, rightDrive2;
+    public DcMotor left_front, right_front, left_back, right_back;
 
     private Telemetry telemetry;
 
@@ -62,29 +62,29 @@ public class config {
         telemetry.addData("Status", "Initializing robot. Please wait...");
         telemetry.update();
 
-        // Declare and setup leftDrive
-        leftDrive = hardware.dcMotor.get("left_drive");
-        leftDrive.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        leftDrive.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        leftDrive.setDirection(Direction.FORWARD);
+        // Declare and setup left_front
+        left_front = hardware.dcMotor.get("left front");
+        left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        left_front.setDirection(Direction.FORWARD);
 
-        // Declare and setup rightDrive
-        rightDrive = hardware.dcMotor.get("right_drive");
-        rightDrive.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        rightDrive.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setDirection(Direction.REVERSE);
+        // Declare and setup right_front
+        right_front = hardware.dcMotor.get("right front");
+        right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        right_front.setDirection(Direction.REVERSE);
 
-        // Declare and setup leftDrive2
-        leftDrive2 = hardware.dcMotor.get("left_drive2");
-        leftDrive2.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        leftDrive2.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        leftDrive2.setDirection(Direction.FORWARD);
+        // Declare and setup left_back
+        left_back = hardware.dcMotor.get("left back");
+        left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        left_back.setDirection(Direction.FORWARD);
 
-        // Declare and setup rightDrive2
-        rightDrive2 = hardware.dcMotor.get("right_drive2");
-        rightDrive2.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        rightDrive2.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive2.setDirection(Direction.REVERSE);
+        // Declare and setup right_back
+        right_back = hardware.dcMotor.get("right back");
+        right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        right_back.setDirection(Direction.REVERSE);
 
         // Update telemetry to signal done!
         telemetry.addData("Status", "Ready!");
@@ -97,14 +97,15 @@ public class config {
      */
     @SuppressLint("DefaultLocale")
     public void updateTelemetry() {
-        telemetry.addData("Left drive power", String.format("%.2f", this.leftDrive.getPower()))
-                .addData("Right drive power", String.format("%.2f", this.rightDrive.getPower()))
-                .addData("Left 2 drive power", String.format("%.2f", this.leftDrive2.getPower()))
-                .addData("Right 2 drive power", String.format("%.2f", this.rightDrive2.getPower()))
-                .addData("Left target, current location (displacement)", String.format("%s, %s (%s)", this.leftDrive.getTargetPosition(), this.leftDrive.getCurrentPosition(), Math.abs(this.leftDrive.getCurrentPosition() - this.leftDrive.getTargetPosition())))
-                .addData("Right target, current location (displacement)", String.format("%s, %s (%s)", this.rightDrive.getTargetPosition(), this.rightDrive.getCurrentPosition(), Math.abs(this.rightDrive.getCurrentPosition() - this.rightDrive.getTargetPosition())))
-                .addData("Left 2 target, current location (displacement)", String.format("%s, %s (%s)", this.leftDrive2.getTargetPosition(), this.leftDrive2.getCurrentPosition(), Math.abs(this.leftDrive2.getCurrentPosition() - this.rightDrive.getTargetPosition())))
-                .addData("Right 2 target, current location (displacement)", String.format("%s, %s (%s)", this.rightDrive2.getTargetPosition(), this.rightDrive2.getCurrentPosition(), Math.abs(this.rightDrive2.getCurrentPosition() - this.rightDrive2.getTargetPosition())));
+        telemetry.addData("Left front power", String.format("%.2f", this.left_front.getPower()))
+                .addData("Right front power", String.format("%.2f", this.right_front.getPower()))
+                .addData("Left back power", String.format("%.2f", this.left_back.getPower()))
+                .addData("Right back power", String.format("%.2f", this.right_back.getPower()))
+                .addData("","") // Add a space between the drive power and the encoder values
+                .addData("Left target, current location (displacement)", String.format("%s, %s (%s)", this.left_front.getTargetPosition(), this.left_front.getCurrentPosition(), Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition())))
+                .addData("Right target, current location (displacement)", String.format("%s, %s (%s)", this.right_front.getTargetPosition(), this.right_front.getCurrentPosition(), Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition())))
+                .addData("Left 2 target, current location (displacement)", String.format("%s, %s (%s)", this.left_back.getTargetPosition(), this.left_back.getCurrentPosition(), Math.abs(this.left_back.getCurrentPosition() - this.right_front.getTargetPosition())))
+                .addData("Right 2 target, current location (displacement)", String.format("%s, %s (%s)", this.right_back.getTargetPosition(), this.right_back.getCurrentPosition(), Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition())));
         telemetry.update();
 
     }
@@ -116,10 +117,10 @@ public class config {
      * @return -- Whether all motors have reached their targets
      */
     public boolean isAtTarget(int discrepancy) {
-        return ((Math.abs(this.leftDrive.getCurrentPosition() - this.leftDrive.getTargetPosition()) <= discrepancy &&
-                (Math.abs(this.rightDrive.getCurrentPosition() - this.rightDrive.getTargetPosition()) <= discrepancy) &&
-                (Math.abs(this.leftDrive2.getCurrentPosition() - this.leftDrive2.getTargetPosition()) <= discrepancy) &&
-                (Math.abs(this.rightDrive2.getCurrentPosition() - this.rightDrive2.getTargetPosition()) <= discrepancy)));
+        return ((Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition()) <= discrepancy &&
+                (Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition()) <= discrepancy) &&
+                (Math.abs(this.left_back.getCurrentPosition() - this.left_back.getTargetPosition()) <= discrepancy) &&
+                (Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition()) <= discrepancy)));
     }
 
 }

@@ -7,12 +7,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="all sensors", group="Pushbot")
 public class sensors extends LinearOpMode{
-    config robot = new config();
+    private config robot = new config(this.telemetry);
     @Override
     public void runOpMode() {
 
         waitForStart();
-        robot.init(this.telemetry, this.hardwareMap);
+        robot.ConfigureRobtHardware(this.hardwareMap);
         while(opModeIsActive())
         {
             telemetry.addData("encoder left front:%7d",robot.left_front.getCurrentPosition());

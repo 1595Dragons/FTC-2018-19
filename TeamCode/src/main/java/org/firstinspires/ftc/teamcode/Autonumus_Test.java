@@ -20,31 +20,23 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Autonomous(name="Auto_test", group="Pushbot")
 
 public class Autonumus_Test extends LinearOpMode {
-    config robot = new config();
+    private config robot = new config(this.telemetry);
 
-    public DcMotor right;
-    public DcMotor left;
-    public DcMotor right_2;
-    public DcMotor left_2;
     @Override
         public void runOpMode (){
-            robot.init(this.telemetry, this.hardwareMap);
-        right = hardwareMap.dcMotor.get("right front");
-        left = hardwareMap.dcMotor.get("left front");
-        right_2 = hardwareMap.dcMotor.get("right back");
-        left_2 = hardwareMap.dcMotor.get("left back");
+        robot.ConfigureRobtHardware(this.hardwareMap);
 
-        right.setPower(0.5);
-        left.setPower(-0.5);
-        right_2.setPower(0.5);
-        left_2.setPower(-0.5);
+        robot.right_front.setPower(0.5);
+        robot.left_front.setPower(-0.5);
+        robot.right_back.setPower(0.5);
+        robot.left_back.setPower(-0.5);
 
         sleep(3000);
 
-        right.setPower(0);
-        left.setPower(0);
-        right_2.setPower(0);
-        left_2.setPower(0);
+        robot.right_front.setPower(0);
+        robot.left_front.setPower(0);
+        robot.left_back.setPower(0);
+        robot.right_back.setPower(0);
 
 
     }
