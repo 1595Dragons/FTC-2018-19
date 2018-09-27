@@ -33,6 +33,7 @@ public class Autonumus_Test extends LinearOpMode {
                 robot.right_back.setPower(0);
 
             }
+            robot.updateTelemetry();
         }
     }
 }
