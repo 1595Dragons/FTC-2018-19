@@ -90,6 +90,8 @@ public class mechanum_OpMode_Iterative extends OpMode
 
         double driveForward = gamepad1.left_stick_y;
         double driveRightSide = gamepad1.left_stick_x;
+        //double turnRight = gamepad2.right_stick_x;
+
 
 
         left1Power    = Range.clip((-driveRightSide + driveForward)*allPower, -1.0, 1.0) ;

@@ -39,12 +39,13 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             // - This uses basic math to combine motions and is easier to drive straight.
 
             double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x;
+            double turnRight = -gamepad1.right_stick_x;
 
 
-            left1Power = Range.clip((-driveRightSide + driveForward)*allPower, -1.0, 1.0) ;
-            right1Power = Range.clip((driveRightSide + driveForward)*allPower, -1.0, 1.0) ;
-            left2Power = Range.clip((driveRightSide + driveForward)*allPower, -1.0, 1.0) ;
-            right2Power = Range.clip((-driveRightSide + driveForward)*allPower, -1.0, 1.0) ;
+            left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
+            right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
+            left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
+            right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
 
 
             // Tank Mode uses one stick to control each wheel.
