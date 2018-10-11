@@ -223,6 +223,9 @@ public class config {
      */
     public void InitializeVision(HardwareMap hardware) {
 
+        telemetry.addData("Status", "Initializing vision systems. Please wait...");
+        telemetry.update();
+
         // Get the camera monitor id for the app
         int cameraMonitorViewId = hardware.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardware.appContext.getPackageName());
 
@@ -255,6 +258,9 @@ public class config {
         VisionTargets.addAll(pictures);
 
         // TODO: We could also add location data to get the position of the images on the field as well as the robot
+
+        telemetry.addData("Status", "Ready!");
+        telemetry.update();
 
     }
 

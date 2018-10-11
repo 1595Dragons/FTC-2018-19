@@ -32,8 +32,6 @@ public class Stephens_Vision_Code___yay extends LinearOpMode {
             for (VuforiaTrackable Target : robot.VisionTargets) {
                 if (((VuforiaTrackableDefaultListener) Target.getListener()).isVisible()) {
                     robot.target = Target.getName();
-                } else {
-                    robot.target = "None";
                 }
             }
 
