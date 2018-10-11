@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -42,7 +43,7 @@ public class config {
 
     // DcMotors used on the robot
     public DcMotor left_front, right_front, left_back, right_back;
-
+    public Servo IO_Servo_Left, IO_Servo_Right;
     private Telemetry telemetry;
 
     config(Telemetry t) {
@@ -85,6 +86,12 @@ public class config {
         right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_back.setDirection(Direction.REVERSE);
+
+        //
+        IO_Servo_Left = hardware.servo.get("IO Servo Left");
+
+        //
+        IO_Servo_Right = hardware.servo.get("IO Servo Right");
 
         // Update telemetry to signal done!
         telemetry.addData("Status", "Ready!");
