@@ -13,6 +13,7 @@ public class sensors extends LinearOpMode{
 
         waitForStart();
         robot.ConfigureRobtHardware(this.hardwareMap);
+
         while(opModeIsActive())
         {
             telemetry.addData("encoder left front:%7d",robot.left_front.getCurrentPosition());

@@ -21,6 +21,11 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         // Initialize the robot
         robot.ConfigureRobtHardware(this.hardwareMap);
 
+        double IOLeftServoClose = 0.1,IOLeftServoOpen = 0.05;
+        double IORightServoClose = 0.8, IORightServoOpen = 0.9;
+
+        double IOLeftServoPosition = IOLeftServoOpen ,IORightServoPosition = IORightServoOpen;
+
         // Wait for the start button to be pressed
         waitForStart();
 
@@ -31,7 +36,6 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
-            double IOLeftServoPosition = 0.5,IORightServoPosition = 0.5;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -48,15 +52,15 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
             right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
 
-            if(gamepad1.a )
+            if(gamepad1.a )//A intake
             {
-                IOLeftServoPosition=0.05;
-                IORightServoPosition=0.9;
+                IOLeftServoPosition=IOLeftServoClose;
+                IORightServoPosition=IORightServoClose;
             }
-            if(gamepad1.b)
+            if(gamepad1.b)//B outtake
             {
-                IOLeftServoPosition=0.1;
-                IORightServoPosition=0.8;
+                IOLeftServoPosition=IOLeftServoOpen;
+                IORightServoPosition=IORightServoOpen;
             }
 
             // Tank Mode uses one stick to control each wheel.
