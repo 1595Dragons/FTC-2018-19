@@ -64,9 +64,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name = "Pushbot: Auto Drive By Encoder", group = "Pushbot")
 public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
-    private static final double EncoderNumberChangePerInch = 134;
+    private static final double EncoderNumberChangePerInch = 34;
 
-    private static final double DRIVE_SPEED = 0.7;
+    private static final double DRIVE_SPEED = 0.3;
     private static final double TURN_SPEED = 0.6;
 
     // Config for the robot
@@ -112,10 +112,10 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         sleep(2000);
 
-        encoderDrive(DRIVE_SPEED,20,20,4.0);
+        encoderDrive(DRIVE_SPEED,-30,-30,5.0);
 
         sleep(2000);
-        encoderDrive(DRIVE_SPEED, -50, -50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
         /*
         robot.leftClaw.setPosition(1.0);            // S4: Stop and close the claw.

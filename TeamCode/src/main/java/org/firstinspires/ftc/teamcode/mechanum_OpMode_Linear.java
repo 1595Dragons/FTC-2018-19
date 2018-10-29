@@ -80,6 +80,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             // Update telemetry
             robot.updateTelemetry();
+            
         }
 
     }

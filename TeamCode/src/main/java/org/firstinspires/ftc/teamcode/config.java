@@ -43,8 +43,8 @@ public class config {
 
     // DcMotors used on the robot
     public DcMotor left_front, right_front, left_back, right_back;
-    public Servo IO_Servo_Left, IO_Servo_Right, IO_Servo_Main;
-    public DcMotor IO_Intake;
+    public Servo IO_Servo_Left, IO_Servo_Right;
+    //public DcMotor IO_Intake;
     private Telemetry telemetry;
 
     config(Telemetry t) {
@@ -91,13 +91,12 @@ public class config {
         //Declare and setup for IO
         IO_Servo_Left = hardware.servo.get("IO Servo Left");
         IO_Servo_Right = hardware.servo.get("IO Servo Right");
-        IO_Servo_Main = hardware.servo.get("IO Servo Main");
-
+        /*
         IO_Intake = hardware.dcMotor.get("Intake");
         IO_Intake.setZeroPowerBehavior(ZeroPowerBehavior.FLOAT);
         IO_Intake.setMode(RunMode.RUN_WITHOUT_ENCODER);
         IO_Intake.setDirection(Direction.FORWARD);
-
+        */
 
 
         // Update telemetry to signal done!
