@@ -17,7 +17,7 @@ public class VuforiaColorDetection extends LinearOpMode {
 
     public void runOpMode() {
 
-        // robot.InitializeVision(this.hardwareMap);
+        robot.InitializeVision(this.hardwareMap);
 
         waitForStart();
         robot.StartTrackingVisionTargets();
