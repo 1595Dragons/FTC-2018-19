@@ -80,7 +80,10 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             // Update telemetry
             robot.updateTelemetry();
-            
+            telemetry.addData("Forward (ls Y)", String.format("%.2f", gamepad1.left_stick_y))
+                    .addData("Sideway (ls X)", String.format("%.2f", gamepad1.left_stick_x))
+                    .addData("Turn (rs X)", String.format("%.2f", gamepad1.right_stick_x));
+            telemetry.update();
         }
 
     }
