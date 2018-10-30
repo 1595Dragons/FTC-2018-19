@@ -35,7 +35,7 @@ public class VuforiaColorDetection extends LinearOpMode {
         telemetry.addData("Status", "Loading cube from assets");
         telemetry.update();
 
-        VuforiaTrackables cube = vuforia.loadTrackablesFromAsset("Cube_OT.xml");
+        VuforiaTrackables cube = vuforia.loadTrackablesFromAsset("Cube_OT");
 
         telemetry.addData("Status", "Ready");
         telemetry.update();
