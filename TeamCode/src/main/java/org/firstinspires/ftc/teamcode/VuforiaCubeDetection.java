@@ -13,8 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@TeleOp(name = "Vuforia color detection", group = "Test")
-public class VuforiaColorDetection extends LinearOpMode {
+@TeleOp(name = "Vuforia Cube detection", group = "Test")
+public class VuforiaCubeDetection extends LinearOpMode {
 
     public void runOpMode() {
 
