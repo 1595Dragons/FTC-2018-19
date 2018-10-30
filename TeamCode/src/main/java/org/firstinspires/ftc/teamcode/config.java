@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.annotation.SuppressLint;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
-import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -49,6 +48,7 @@ import java.util.Locale;
  * FTC 6128 | 7935
  * FRC 1595
  */
+@SuppressWarnings("WeakerAccess")
 public class config {
 
     // Field measurements
@@ -59,7 +59,6 @@ public class config {
     // DcMotors and servos used on the robot
     public DcMotor left_front, right_front, left_back, right_back;
     public Servo IO_Servo_Left, IO_Servo_Right;
-
 
     // Version 2 color sensor
     ColorSensor sensorColor;
@@ -117,16 +116,14 @@ public class config {
         right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_back.setDirection(Direction.REVERSE);
 
-        //Declare and setup for IO
+        // Declare the left servo for the intake
         IO_Servo_Left = hardware.servo.get("IO Servo Left");
-        IO_Servo_Right = hardware.servo.get("IO Servo Right");
-        /*
-        IO_Intake = hardware.dcMotor.get("Intake");
-        IO_Intake.setZeroPowerBehavior(ZeroPowerBehavior.FLOAT);
-        IO_Intake.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        IO_Intake.setDirection(Direction.FORWARD);
-        */
 
+        // Declare the right servo for the intake
+        IO_Servo_Right = hardware.servo.get("IO Servo Right");
+
+        sensorColor = hardware.colorSensor.get("sensor_color_distance");
+        sensorDistance = hardware.get(DistanceSensor.class, "sensor_color_distance");
 
         // Update telemetry to signal done!
         telemetry.addData("Status", "Ready!");
@@ -135,44 +132,9 @@ public class config {
     }
 
     /**
-     * Updates the telemetry automatically with the current drive power.
+     * Updates the telemetry automatically the appropriate values (basically items that are not null)
      */
-    @SuppressLint("DefaultLocale")
     public void updateTelemetry() {
-        telemetry.addData("Left front power", String.format("%.2f", this.left_front.getPower()))
-                .addData("Right front power", String.format("%.2f", this.right_front.getPower()))
-                .addData("Left back power", String.format("%.2f", this.left_back.getPower()))
-                .addData("Right back power", String.format("%.2f", this.right_back.getPower()))
-                .addData("","") // Add a space between the drive power and the encoder values
-                .addData("Left front target, current location (displacement)", String.format("%s, %s (%s)", this.left_front.getTargetPosition(), this.left_front.getCurrentPosition(), Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition())))
-                .addData("Right front target, current location (displacement)", String.format("%s, %s (%s)", this.right_front.getTargetPosition(), this.right_front.getCurrentPosition(), Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition())))
-                .addData("Left back target, current location (displacement)", String.format("%s, %s (%s)", this.left_back.getTargetPosition(), this.left_back.getCurrentPosition(), Math.abs(this.left_back.getCurrentPosition() - this.right_front.getTargetPosition())))
-                .addData("Right back target, current location (displacement)", String.format("%s, %s (%s)", this.right_back.getTargetPosition(), this.right_back.getCurrentPosition(), Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition())));
-        telemetry.update();
-
-    }
-
-    /**
-     * Checks all the motors have reached their target positions, withing the discrepancy
-     *
-     * @param discrepancy -- The number of ticks the current position is allowed to be within in order to qualify it as at target
-     * @return -- Whether all motors have reached their targets
-     */
-    public boolean isAtTarget(int discrepancy) {
-        return ((Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition()) <= discrepancy &&
-                (Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition()) <= discrepancy) &&
-                (Math.abs(this.left_back.getCurrentPosition() - this.left_back.getTargetPosition()) <= discrepancy) &&
-                (Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition()) <= discrepancy)));
-    }
-
-
-    /**
-     * This function sets up everything you need to run vision. Be sure to call this before calling <code>StartTrackingVisionTargets<code/>.
-     *
-     * @param hardware -- The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
-     */
-    public void InitializeVision(HardwareMap hardware) {
-
 
         if (left_front != null) {
             telemetry.addData("Left front power", String.format(Locale.US, "%.2f", left_front.getPower()));
@@ -237,6 +199,69 @@ public class config {
 
         // Update the telemetry
         telemetry.update();
+
+    }
+
+    /**
+     * Checks all the motors have reached their target positions, withing the discrepancy
+     *
+     * @param discrepancy -- The number of ticks the current position is allowed to be within in order to qualify it as at target
+     * @return -- Whether all motors have reached their targets
+     */
+    public boolean isAtTarget(int discrepancy) {
+        return ((Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition()) <= discrepancy &&
+                (Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition()) <= discrepancy) &&
+                (Math.abs(this.left_back.getCurrentPosition() - this.left_back.getTargetPosition()) <= discrepancy) &&
+                (Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition()) <= discrepancy)));
+    }
+
+
+    /**
+     * This function sets up everything you need to run vision. Be sure to call this before calling <code>StartTrackingVisionTargets<code/>.
+     *
+     * @param hardware -- The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
+     */
+    public void InitializeVision(HardwareMap hardware) {
+
+        telemetry.addData("Status", "Initializing vision systems. Please wait...");
+        telemetry.update();
+
+        // Get the camera monitor id for the app
+        int cameraMonitorViewId = hardware.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardware.appContext.getPackageName());
+
+        // Create a variable for passing parameters, such as the key for vuforia, and what camera we want to use (Back vs Selfie camera)
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "AUgZTU3/////AAAAGaQ5yTo6EkZqvsH9Iel0EktQjXWAZUz3q3FPq22sUTrmsYCccs/mjYiflQBH2u7lofbTxe4BxTca9o2EOnNwA8dLGa/yL3cUgDGjeRfXuwZUCpIG6OEKhiPU5ntOpT2Nr5uVkT3vs2uRr7J6G7YoaGHLw2i1wGncRaw37rZyO03QRh0ZatdKIiK1ItuvJkP3qfUJwQwcpROwa+ZdDNQDbpU6WTL+kPZpnkgR8oLcu+Na1lWrbJ2ZTYG8eUjoIGowbVVGJgORHJazy6/7MbYH268h9ZC4vZ12ItyDK/GlPRTeQWdcZRlWfzAAFwNrjmdjWv9hMuOMoWxo2Y2Rw1Fwii4ohLyRmcQa/wAWY+AOEL14";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        // Create the pictures engine and pass in the provided parameters
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Load the pictures targets from the engine, that way we can track them
+        pictures = vuforia.loadTrackablesFromAsset("RoverRuckus");
+
+        // Setup the images one by one
+        // This *could* be done all at once, but one by one keeps things simple
+        BlueRover = pictures.get(0);
+        BlueRover.setName("Blue rover");
+
+        RedFootprint = pictures.get(1);
+        RedFootprint.setName("Red footprint");
+
+        FrontCraters = pictures.get(2);
+        FrontCraters.setName("Front craters");
+
+        BackSpace = pictures.get(3);
+        BackSpace.setName("Back space");
+
+        // Add all the trackables to a list
+        VisionTargets.addAll(pictures);
+
+        // TODO: We could also add location data to get the position of the images on the field as well as the robot
+
+        telemetry.addData("Status", "Ready!");
+        telemetry.update();
+
     }
 
     /**
