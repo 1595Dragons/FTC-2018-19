@@ -28,6 +28,7 @@ public class teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Copy paste from Henry's Iterative program, with some formatting changes :)
+            //      ~ Stephen
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
@@ -39,7 +40,6 @@ public class teleop extends LinearOpMode {
             // - This uses basic math to combine motions and is easier to drive straight.
 
             double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x, turnRight = -gamepad1.right_stick_x;
-
 
             left1Power = Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
             right1Power = Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
