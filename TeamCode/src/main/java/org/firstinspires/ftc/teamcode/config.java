@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.Locale;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
@@ -41,7 +42,9 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
  */
 class config {
 
-    DcMotor left1, right1, left2, right2;
+    DcMotor left1, right1, left2, right2, climber;
+
+    int maxClimberPos = 10000, minClimberPos = 0;
 
     private Telemetry telemetry;
 
@@ -79,6 +82,14 @@ class config {
         right2.setMode(RUN_USING_ENCODER);
         right2.setDirection(FORWARD);
 
+        // Declare and setup climber motor
+        status("Setting up climber motor");
+        climber = hardware.dcMotor.get("climb");
+        climber.setZeroPowerBehavior(BRAKE);
+        climber.setMode(STOP_AND_RESET_ENCODER);
+        climber.setMode(RUN_USING_ENCODER);
+        climber.setDirection(FORWARD);
+
         // Update telemetry to signal done!
         status("Ready!");
 
@@ -87,22 +98,31 @@ class config {
     void updateTelemetry() {
 
         if (left1 != null) {
-            telemetry.addData("Left1 (target)", String.format(Locale.US, "%.4d (%.4d)", left1.getCurrentPosition(), left1.getTargetPosition()));
+            telemetry.addData("Left1 (target)", String.format(Locale.US, "%d (%d)", left1.getCurrentPosition(), left1.getTargetPosition()));
         }
 
         if (right1 != null) {
-            telemetry.addData("Right1 (target)", String.format(Locale.US, "%.4d (%.4d)", right1.getCurrentPosition(), right1.getTargetPosition()));
+            telemetry.addData("Right1 (target)", String.format(Locale.US, "%d (%d)", right1.getCurrentPosition(), right1.getTargetPosition()));
         }
 
         if (left2 != null) {
-            telemetry.addData("Left2 (target)", left2.getCurrentPosition());
+            telemetry.addData("Left2 (target)", String.format(Locale.US, "%d (%d)", left2.getCurrentPosition(), left2.getTargetPosition()));
         }
 
         if (right2 != null) {
-            telemetry.addData("Right2 (target)", right2.getCurrentPosition());
+            telemetry.addData("Right2 (target)", String.format(Locale.US, "%d (%d)", right2.getCurrentPosition(), right2.getTargetPosition()));
+        }
+
+        if (climber != null) {
+            telemetry.addData("Climber (target)", String.format(Locale.US, "%d (%d)", climber.getCurrentPosition(), climber.getTargetPosition()));
         }
 
         telemetry.update();
+    }
+
+    boolean isThere(DcMotor motor, int error) {
+        int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+        return delta <= error;
     }
 
     private void status(String string) {
