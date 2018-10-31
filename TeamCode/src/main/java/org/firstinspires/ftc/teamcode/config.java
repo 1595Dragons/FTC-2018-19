@@ -39,7 +39,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
  */
 class config {
 
-    DcMotor left1, right1, left2, right2, lift, arm;
+    DcMotor left1, right1, left2, right2;
 
     private Telemetry telemetry;
 
@@ -55,7 +55,7 @@ class config {
         left1 = hardware.dcMotor.get("left1");
         left1.setZeroPowerBehavior(BRAKE);
         left1.setMode(RUN_USING_ENCODER);
-        left1.setDirection(FORWARD);
+        left1.setDirection(REVERSE);
 
         // Declare and setup right1
         telemetry.addData("Status", "Setting up right1");
@@ -63,7 +63,7 @@ class config {
         right1 = hardware.dcMotor.get("right1");
         right1.setZeroPowerBehavior(BRAKE);
         right1.setMode(RUN_USING_ENCODER);
-        right1.setDirection(REVERSE);
+        right1.setDirection(FORWARD);
 
         // Declare and setup left2
         telemetry.addData("Status", "Setting up left2");
@@ -71,7 +71,7 @@ class config {
         left2 = hardware.dcMotor.get("left2");
         left2.setZeroPowerBehavior(BRAKE);
         left2.setMode(RUN_USING_ENCODER);
-        left2.setDirection(FORWARD);
+        left2.setDirection(REVERSE);
 
         // Declare and setup right2
         telemetry.addData("Status", "Setting up right2");
@@ -79,23 +79,7 @@ class config {
         right2 = hardware.dcMotor.get("right2");
         right2.setZeroPowerBehavior(BRAKE);
         right2.setMode(RUN_USING_ENCODER);
-        right2.setDirection(REVERSE);
-
-        // Declare adn setup the lift
-        telemetry.addData("Status", "Setting up lift");
-        telemetry.update();
-        lift = hardware.dcMotor.get("lift");
-        lift.setZeroPowerBehavior(BRAKE);
-        lift.setMode(RUN_USING_ENCODER);
-        lift.setDirection(FORWARD);
-
-        // Declare adn setup the arm
-        telemetry.addData("Status", "Setting up arm");
-        telemetry.update();
-        arm = hardware.dcMotor.get("arm");
-        arm.setZeroPowerBehavior(BRAKE);
-        arm.setMode(RUN_USING_ENCODER);
-        arm.setDirection(FORWARD);
+        right2.setDirection(FORWARD);
 
         // Update telemetry to signal done!
         telemetry.addData("Status", "Ready!");
@@ -119,14 +103,6 @@ class config {
 
         if (right2 != null) {
             telemetry.addData("Right2", right2.getCurrentPosition());
-        }
-
-        if (arm != null) {
-            telemetry.addData("Arm", arm.getCurrentPosition());
-        }
-
-        if (lift != null) {
-            telemetry.addData("Lift", lift.getCurrentPosition());
         }
 
         telemetry.update();

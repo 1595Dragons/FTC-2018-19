@@ -55,14 +55,6 @@ public class teleop extends LinearOpMode {
             robot.left2.setPower(left2Power);
             robot.right2.setPower(right2Power);
 
-            if (gamepad1.dpad_up) {
-                robot.arm.setPower(1);
-            } else if (gamepad1.dpad_down) {
-                robot.arm.setPower(-1);
-            } else {
-                robot.arm.setPower(0);
-            }
-
             // Update telemetry
             robot.updateTelemetry();
         }
