@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@Autonomous(name = "Land", group = "Official")
+@Autonomous(name = "Just land", group = "Official")
 public class landAuto extends LinearOpMode {
 
     private config robot = new config(this.telemetry);
