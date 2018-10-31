@@ -62,21 +62,18 @@ public class config {
     // DcMotors and servos used on the robot
     public DcMotor left_front, right_front, left_back, right_back;
     public Servo IO_Servo_Left, IO_Servo_Right;
-
-    // Version 2 color sensor
-    ColorSensor sensorColor;
-    DistanceSensor sensorDistance;
-
     // Stuff for vision
     public VuforiaTrackables pictures;
     public VuforiaLocalizer vuforia;
     public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
     public boolean VisionIsActive = false;
     public String target = "None";
+    public TFObjectDetector objectDetector;
+    // Version 2 color sensor
+    ColorSensor sensorColor;
+    DistanceSensor sensorDistance;
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
     int cameraViewID;
-    public TFObjectDetector objectDetector;
-
     // Telemetry stuff
     private Telemetry telemetry;
 
@@ -93,47 +90,48 @@ public class config {
      */
     public void ConfigureRobtHardware(HardwareMap hardware) {
 
-        // Update telemetry that robot is initializing...
-        telemetry.addData("Status", "Initializing robot. Please wait...");
-        telemetry.update();
-
         // Declare and setup left_front
+        status("Configuring left front motor");
         left_front = hardware.dcMotor.get("left front");
         left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
         left_front.setDirection(Direction.FORWARD);
 
         // Declare and setup right_front
+        status("Configuring right front motor");
         right_front = hardware.dcMotor.get("right front");
         right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_front.setDirection(Direction.REVERSE);
 
         // Declare and setup left_back
+        status("Configuring left back motor");
         left_back = hardware.dcMotor.get("left back");
         left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         left_back.setDirection(Direction.FORWARD);
 
         // Declare and setup right_back
+        status("Configuring right back motor");
         right_back = hardware.dcMotor.get("right back");
         right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_back.setDirection(Direction.REVERSE);
 
         // Declare the left servo for the intake
+        status("Setting up left servo");
         IO_Servo_Left = hardware.servo.get("IO Servo Left");
 
         // Declare the right servo for the intake
+        status("Setting up right servo");
         IO_Servo_Right = hardware.servo.get("IO Servo Right");
 
+        status("Setting up color/distance sensor");
         sensorColor = hardware.colorSensor.get("sensor_color_distance");
         sensorDistance = hardware.get(DistanceSensor.class, "sensor_color_distance");
 
         // Update telemetry to signal done!
-        telemetry.addData("Status", "Ready!");
-        telemetry.update();
-
+        status("Done!");
     }
 
     /**
@@ -177,7 +175,7 @@ public class config {
             }
         }
 
-        telemetry.addData("",""); // Add a space between encoder values and servo values
+        telemetry.addData("", ""); // Add a space between encoder values and servo values
 
         if (IO_Servo_Left != null) {
             telemetry.addData("IO Servo Left target position", IO_Servo_Left.getPosition());
@@ -186,7 +184,7 @@ public class config {
             telemetry.addData("IO Servo Right target position", IO_Servo_Right.getPosition());
         }
 
-        telemetry.addData("",""); // Add a space between servo values and color sensor stuff
+        telemetry.addData("", ""); // Add a space between servo values and color sensor stuff
 
         if (sensorColor != null) {
             telemetry.addData("A", sensorColor.alpha()).addData("R", sensorColor.red()).addData("G", sensorColor.green()).addData("B", sensorColor.blue());
@@ -196,7 +194,7 @@ public class config {
             telemetry.addData("Distance (mm)", sensorDistance.getDistance(DistanceUnit.MM));
         }
 
-        telemetry.addData("",""); // Add a space between the color sensor stuff and the vision stuff
+        telemetry.addData("", ""); // Add a space between the color sensor stuff and the vision stuff
 
         if (VisionIsActive) {
             telemetry.addData("Current visible target", target);
@@ -228,21 +226,23 @@ public class config {
      */
     public void InitializeVision(HardwareMap hardware, boolean useTF) {
 
-        telemetry.addData("Status", "Initializing vision systems. Please wait...");
-        telemetry.update();
+        status("Setting up vision system");
 
         // Get the camera monitor id for the app
         int cameraMonitorViewId = hardware.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardware.appContext.getPackageName());
 
         // Create a variable for passing parameters, such as the key for vuforia, and what camera we want to use (Back vs Selfie camera)
+        status("Setting up parameters");
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AUgZTU3/////AAAAGaQ5yTo6EkZqvsH9Iel0EktQjXWAZUz3q3FPq22sUTrmsYCccs/mjYiflQBH2u7lofbTxe4BxTca9o2EOnNwA8dLGa/yL3cUgDGjeRfXuwZUCpIG6OEKhiPU5ntOpT2Nr5uVkT3vs2uRr7J6G7YoaGHLw2i1wGncRaw37rZyO03QRh0ZatdKIiK1ItuvJkP3qfUJwQwcpROwa+ZdDNQDbpU6WTL+kPZpnkgR8oLcu+Na1lWrbJ2ZTYG8eUjoIGowbVVGJgORHJazy6/7MbYH268h9ZC4vZ12ItyDK/GlPRTeQWdcZRlWfzAAFwNrjmdjWv9hMuOMoWxo2Y2Rw1Fwii4ohLyRmcQa/wAWY+AOEL14";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         // Create the pictures engine and pass in the provided parameters
+        status("Applying parameters");
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
         // Load the pictures targets from the engine, that way we can track them
+        status("Loading assets");
         pictures = vuforia.loadTrackablesFromAsset("RoverRuckus");
 
         // Setup the images one by one
@@ -262,8 +262,7 @@ public class config {
         // Add all the trackables to a list
         VisionTargets.addAll(pictures);
 
-        telemetry.addData("Status", "Getting camera view id");
-        telemetry.update();
+        status("Getting camera view id");
         cameraViewID = hardware.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardware.appContext.getPackageName());
 
 
@@ -273,9 +272,7 @@ public class config {
             InitTensorFlow();
         }
 
-        telemetry.addData("Status", "Ready!");
-        telemetry.update();
-
+        status("Done!");
     }
 
     /**
@@ -302,15 +299,17 @@ public class config {
     }
 
     private void InitTensorFlow() {
-        telemetry.addData("Status", "Setting parameters");
-        telemetry.update();
+        status("Setting parameters");
         TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(cameraViewID);
-        telemetry.addData("Status", "Creating object detector");
-        telemetry.update();
+        status("Creating object detector");
         objectDetector = ClassFactory.getInstance().createTFObjectDetector(parameters, vuforia);
-        telemetry.addData("Status", "Loading object assets");
-        telemetry.update();
+        status("Loading object assets");
         objectDetector.loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral");
+    }
+
+    private void status(String string) {
+        telemetry.addData("Status", string);
+        telemetry.update();
     }
 
 }
