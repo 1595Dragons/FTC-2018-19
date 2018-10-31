@@ -19,7 +19,7 @@ public class Stephens_Vision_Code___yay extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        robot.InitializeVision(this.hardwareMap);
+        robot.InitializeVision(this.hardwareMap, false);
 
         waitForStart();
 

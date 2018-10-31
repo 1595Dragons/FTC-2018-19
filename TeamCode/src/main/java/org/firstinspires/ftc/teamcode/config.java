@@ -15,6 +15,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.internal.tfod.TFObjectDetectorImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +74,8 @@ public class config {
     public boolean VisionIsActive = false;
     public String target = "None";
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
+    int cameraViewID;
+    public TFObjectDetector objectDetector;
 
     // Telemetry stuff
     private Telemetry telemetry;
@@ -221,7 +226,7 @@ public class config {
      *
      * @param hardware -- The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
      */
-    public void InitializeVision(HardwareMap hardware) {
+    public void InitializeVision(HardwareMap hardware, boolean useTF) {
 
         telemetry.addData("Status", "Initializing vision systems. Please wait...");
         telemetry.update();
@@ -257,7 +262,16 @@ public class config {
         // Add all the trackables to a list
         VisionTargets.addAll(pictures);
 
+        telemetry.addData("Status", "Getting camera view id");
+        telemetry.update();
+        cameraViewID = hardware.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardware.appContext.getPackageName());
+
+
         // TODO: We could also add location data to get the position of the images on the field as well as the robot
+
+        if (useTF) {
+            InitTensorFlow();
+        }
 
         telemetry.addData("Status", "Ready!");
         telemetry.update();
@@ -269,6 +283,9 @@ public class config {
      */
     public void StartTrackingVisionTargets() {
         pictures.activate();
+        if (objectDetector != null) {
+            objectDetector.activate();
+        }
         VisionIsActive = true;
     }
 
@@ -277,7 +294,23 @@ public class config {
      */
     public void StopTrackingVisionTargets() {
         pictures.deactivate();
+        if (objectDetector != null) {
+            objectDetector.deactivate();
+            objectDetector.shutdown();
+        }
         VisionIsActive = false;
+    }
+
+    private void InitTensorFlow() {
+        telemetry.addData("Status", "Setting parameters");
+        telemetry.update();
+        TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(cameraViewID);
+        telemetry.addData("Status", "Creating object detector");
+        telemetry.update();
+        objectDetector = ClassFactory.getInstance().createTFObjectDetector(parameters, vuforia);
+        telemetry.addData("Status", "Loading object assets");
+        telemetry.update();
+        objectDetector.loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral");
     }
 
 }
