@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FTC-Robot-Code.iml" filepath="$PROJECT_DIR$/FTC-Robot-Code.iml" />
-      <module fileurl="file://$PROJECT_DIR$/FtcRobotController/FtcRobotController.iml" filepath="$PROJECT_DIR$/FtcRobotController/FtcRobotController.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TeamCode/TeamCode.iml" filepath="$PROJECT_DIR$/TeamCode/TeamCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FtcRobotController/FTC-Robot-Code-FtcRobotController.iml" filepath="$PROJECT_DIR$/FtcRobotController/FTC-Robot-Code-FtcRobotController.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TeamCode/FTC-Robot-Code-TeamCode.iml" filepath="$PROJECT_DIR$/TeamCode/FTC-Robot-Code-TeamCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GitHub-FTC-Robot-Code.iml" filepath="$PROJECT_DIR$/GitHub-FTC-Robot-Code.iml" />
     </modules>
   </component>
 </project>
