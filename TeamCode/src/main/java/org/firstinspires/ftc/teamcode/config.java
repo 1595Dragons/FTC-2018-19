@@ -15,9 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.robotcore.internal.tfod.TFObjectDetectorImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,29 +49,28 @@ import java.util.Locale;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@SuppressWarnings("WeakerAccess")
-public class config {
+class config {
 
     // Field measurements
-    public final float mmPerInch = 25.4f;
-    public final float mmFTCFieldWidth = (12 * 6) * mmPerInch; // The width of the FTC field (from the center point to the outer panels)
-    public final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
+    private final float mmPerInch = 25.4f;
+    private final float mmFTCFieldWidth = (12 * 6) * mmPerInch; // The width of the FTC field (from the center point to the outer panels)
+    private final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
 
     // DcMotors and servos used on the robot
-    public DcMotor left_front, right_front, left_back, right_back;
-    public Servo IO_Servo_Left, IO_Servo_Right;
-    // Stuff for vision
-    public VuforiaTrackables pictures;
-    public VuforiaLocalizer vuforia;
-    public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
-    public boolean VisionIsActive = false;
-    public String target = "None";
-    public TFObjectDetector objectDetector;
+    DcMotor left_front, right_front, left_back, right_back;
+    Servo IO_Servo_Left, IO_Servo_Right;
+    String target = "None";
+    TFObjectDetector objectDetector;
     // Version 2 color sensor
     ColorSensor sensorColor;
     DistanceSensor sensorDistance;
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
-    int cameraViewID;
+    // Stuff for vision
+    private VuforiaTrackables pictures;
+    private VuforiaLocalizer vuforia;
+    public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
+    private boolean VisionIsActive = false;
+    private int cameraViewID;
     // Telemetry stuff
     private Telemetry telemetry;
 
@@ -88,7 +85,7 @@ public class config {
      *
      * @param hardware - The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
      */
-    public void ConfigureRobtHardware(HardwareMap hardware) {
+    void ConfigureRobtHardware(HardwareMap hardware) {
 
         // Declare and setup left_front
         status("Configuring left front motor");
@@ -137,7 +134,7 @@ public class config {
     /**
      * Updates the telemetry automatically the appropriate values (basically items that are not null)
      */
-    public void updateTelemetry() {
+    void updateTelemetry() {
 
         if (left_front != null) {
             telemetry.addData("Left front power", String.format(Locale.US, "%.2f", left_front.getPower()));
@@ -211,7 +208,7 @@ public class config {
      * @param discrepancy -- The number of ticks the current position is allowed to be within in order to qualify it as at target
      * @return -- Whether all motors have reached their targets
      */
-    public boolean isAtTarget(int discrepancy) {
+    boolean isAtTarget(int discrepancy) {
         return ((Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition()) <= discrepancy &&
                 (Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition()) <= discrepancy) &&
                 (Math.abs(this.left_back.getCurrentPosition() - this.left_back.getTargetPosition()) <= discrepancy) &&
@@ -224,7 +221,7 @@ public class config {
      *
      * @param hardware -- The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
      */
-    public void InitializeVision(HardwareMap hardware, boolean useTF) {
+    void InitializeVision(HardwareMap hardware, boolean useTF) {
 
         status("Setting up vision system");
 
@@ -278,7 +275,7 @@ public class config {
     /**
      * Starts tracking the vision targets. This is quite taxing on the phone, so be sure to end it as soon as you can
      */
-    public void StartTrackingVisionTargets() {
+    void StartTrackingVisionTargets() {
         pictures.activate();
         if (objectDetector != null) {
             objectDetector.activate();
@@ -289,7 +286,7 @@ public class config {
     /**
      * Stops tracking the vision targets
      */
-    public void StopTrackingVisionTargets() {
+    void StopTrackingVisionTargets() {
         pictures.deactivate();
         if (objectDetector != null) {
             objectDetector.deactivate();
