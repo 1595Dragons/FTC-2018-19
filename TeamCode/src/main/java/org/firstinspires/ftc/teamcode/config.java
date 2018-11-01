@@ -42,10 +42,12 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
  */
 class config {
 
+    // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
+    private final int ticksPerRotation = 28;
+    private final double whellRotationPerInch = (1 / (Math.PI * 4));
+    final double drive_equation = ticksPerRotation * whellRotationPerInch;
     DcMotor left1, right1, left2, right2, climber;
-
     int maxClimberPos = 10000, minClimberPos = 0;
-
     private Telemetry telemetry;
 
     config(Telemetry t) {
@@ -123,6 +125,78 @@ class config {
     boolean isThere(DcMotor motor, int error) {
         int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
         return delta <= error;
+    }
+
+    // Returns if the destination was reached
+    void driveDistance(MecanumDriveDirection direction, int inches, double maxPower) {
+        int ticks = (int) Math.round(inches * drive_equation);
+        // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
+        // This only really applies to all but forward and backwards
+        switch (direction) {
+            case FORWARD:
+                left1.setTargetPosition(ticks);
+                left2.setTargetPosition(ticks);
+                right1.setTargetPosition(ticks);
+                right2.setTargetPosition(ticks);
+                left1.setPower(maxPower);
+                left2.setPower(maxPower);
+                right1.setPower(maxPower);
+                right2.setPower(maxPower);
+                break;
+            case BACKWARD:
+                left1.setTargetPosition(-1*ticks);
+                left2.setTargetPosition(-1*ticks);
+                right1.setTargetPosition(-1*ticks);
+                right2.setTargetPosition(-1*ticks);
+                left1.setPower(maxPower);
+                left2.setPower(maxPower);
+                right1.setPower(maxPower);
+                right2.setPower(maxPower);
+                break;
+            case LEFT:
+                left1.setTargetPosition(ticks);
+                left2.setTargetPosition(-1*ticks);
+                right1.setTargetPosition(-1*ticks);
+                right2.setTargetPosition(ticks);
+                left1.setPower(maxPower);
+                left2.setPower(maxPower);
+                right1.setPower(maxPower);
+                right2.setPower(maxPower);
+                break;
+            case RIGHT:
+                left1.setTargetPosition(-1*ticks);
+                left2.setTargetPosition(ticks);
+                right1.setTargetPosition(ticks);
+                right2.setTargetPosition(-1*ticks);
+                left1.setPower(maxPower);
+                left2.setPower(maxPower);
+                right1.setPower(maxPower);
+                right2.setPower(maxPower);
+                break;
+            case DIAGUPLEFT:
+                left1.setTargetPosition(ticks);
+                right2.setTargetPosition(ticks);
+                left1.setPower(maxPower);
+                left2.setPower(0);
+                right1.setPower(0);
+                right2.setPower(maxPower);
+                break;
+            case DIAGDOWNRIGHT:
+                // TODO
+                break;
+            case DIAGUPRIGHT:
+                // TODO
+                break;
+            case DIAGDOWNLEFT:
+                // TODO
+                break;
+            case SPINLEFT:
+                // TODO
+                break;
+            case SPINRIGHT:
+                // TODO
+                break;
+        }
     }
 
     private void status(String string) {
