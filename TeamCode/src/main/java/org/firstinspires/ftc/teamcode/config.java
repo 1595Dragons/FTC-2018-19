@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Locale;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
@@ -46,6 +47,7 @@ class config {
     private final int ticksPerRotation = 28;
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
+
     DcMotor left1, right1, left2, right2, climber;
     int maxClimberPos = 10000, minClimberPos = 0;
     private Telemetry telemetry;
@@ -95,6 +97,10 @@ class config {
         // Update telemetry to signal done!
         status("Ready!");
 
+    }
+
+        right2.setMode(RUN_TO_POSITION);
+        climber.setMode(RUN_TO_POSITION);
     }
 
     void updateTelemetry() {

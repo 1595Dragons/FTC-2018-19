@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by Stephen Ogden on 10/31/18.
@@ -17,12 +16,11 @@ public class landAuto extends LinearOpMode {
     public void runOpMode() {
 
         robot.ConfigureRobot(this.hardwareMap);
+        robot.setupForAuto();
 
         int stage = 0;
 
         waitForStart();
-        robot.climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (opModeIsActive()) {
             switch (stage) {
                 case 0:
@@ -31,7 +29,7 @@ public class landAuto extends LinearOpMode {
                     stage++;
                     break;
                 case 1:
-                    if (robot.isThere(robot.climber, 10)) {
+                    if (robot.isThere(5, robot.climber)) {
                         robot.climber.setPower(0);
                         stage++;
                     }
