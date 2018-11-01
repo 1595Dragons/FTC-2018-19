@@ -99,6 +99,15 @@ class config {
 
     }
 
+    void setupForAuto() {
+        left1.setMode(STOP_AND_RESET_ENCODER);
+        left2.setMode(STOP_AND_RESET_ENCODER);
+        right1.setMode(STOP_AND_RESET_ENCODER);
+        right2.setMode(STOP_AND_RESET_ENCODER);
+        climber.setMode(STOP_AND_RESET_ENCODER);
+        left1.setMode(RUN_TO_POSITION);
+        left2.setMode(RUN_TO_POSITION);
+        right1.setMode(RUN_TO_POSITION);
         right2.setMode(RUN_TO_POSITION);
         climber.setMode(RUN_TO_POSITION);
     }
