@@ -45,7 +45,7 @@ class config {
     // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
     private final int ticksPerRotation = 28;
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
-    final double drive_equation = ticksPerRotation * whellRotationPerInch;
+    private final double drive_equation = ticksPerRotation * whellRotationPerInch;
     DcMotor left1, right1, left2, right2, climber;
     int maxClimberPos = 10000, minClimberPos = 0;
     private Telemetry telemetry;
@@ -122,7 +122,7 @@ class config {
         telemetry.update();
     }
 
-    boolean isThere(DcMotor motor, int error) {
+    boolean isThere(int error, DcMotor motor) {
         int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
         return delta <= error;
     }
@@ -138,70 +138,76 @@ class config {
                 left2.setTargetPosition(ticks);
                 right1.setTargetPosition(ticks);
                 right2.setTargetPosition(ticks);
-                left1.setPower(maxPower);
-                left2.setPower(maxPower);
-                right1.setPower(maxPower);
-                right2.setPower(maxPower);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case BACKWARD:
-                left1.setTargetPosition(-1*ticks);
-                left2.setTargetPosition(-1*ticks);
-                right1.setTargetPosition(-1*ticks);
-                right2.setTargetPosition(-1*ticks);
-                left1.setPower(maxPower);
-                left2.setPower(maxPower);
-                right1.setPower(maxPower);
-                right2.setPower(maxPower);
+                left1.setTargetPosition(-1 * ticks);
+                left2.setTargetPosition(-1 * ticks);
+                right1.setTargetPosition(-1 * ticks);
+                right2.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case LEFT:
                 left1.setTargetPosition(ticks);
-                left2.setTargetPosition(-1*ticks);
-                right1.setTargetPosition(-1*ticks);
+                left2.setTargetPosition(-1 * ticks);
+                right1.setTargetPosition(-1 * ticks);
                 right2.setTargetPosition(ticks);
-                left1.setPower(maxPower);
-                left2.setPower(maxPower);
-                right1.setPower(maxPower);
-                right2.setPower(maxPower);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case RIGHT:
-                left1.setTargetPosition(-1*ticks);
+                left1.setTargetPosition(-1 * ticks);
                 left2.setTargetPosition(ticks);
                 right1.setTargetPosition(ticks);
-                right2.setTargetPosition(-1*ticks);
-                left1.setPower(maxPower);
-                left2.setPower(maxPower);
-                right1.setPower(maxPower);
-                right2.setPower(maxPower);
+                right2.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:
                 left1.setTargetPosition(ticks);
                 right2.setTargetPosition(ticks);
-                left1.setPower(maxPower);
-                left2.setPower(0);
-                right1.setPower(0);
-                right2.setPower(maxPower);
+                setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGDOWNRIGHT:
-                // TODO
+                left1.setTargetPosition(-1 * ticks);
+                right2.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGUPRIGHT:
-                // TODO
+                left2.setTargetPosition(ticks);
+                right1.setTargetPosition(ticks);
+                setMaxPower(maxPower, left2, right1);
                 break;
             case DIAGDOWNLEFT:
-                // TODO
+                left2.setTargetPosition(-1 * ticks);
+                right1.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left2, right1);
                 break;
             case SPINLEFT:
-                // TODO
+                left1.setTargetPosition(-1 * ticks);
+                left2.setTargetPosition(-1 * ticks);
+                right1.setTargetPosition(ticks);
+                right2.setTargetPosition(ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case SPINRIGHT:
-                // TODO
+                left1.setTargetPosition(ticks);
+                left2.setTargetPosition(ticks);
+                right1.setTargetPosition(-1 * ticks);
+                right2.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
         }
+
     }
 
     private void status(String string) {
         telemetry.addData("Status", string);
         telemetry.update();
+    }
+
+    private void setMaxPower(double power, DcMotor... motors) {
+        for (DcMotor motor : motors) {
+            motor.setPower(power);
+        }
     }
 
 }
