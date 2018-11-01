@@ -68,6 +68,8 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     private static final double DRIVE_SPEED = 0.3;
     private static final double TURN_SPEED = 0.6;
+    private double WrongEncoderNumber = 0.2;
+    private double WrongEncoderCorrection = 1;
 
     // Config for the robot
     private config robot = new config(this.telemetry);
@@ -110,12 +112,12 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
         //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        sleep(2000);
+        sleep(3000);
 
         encoderDrive(DRIVE_SPEED,-30,-30,5.0);
 
-        sleep(2000);
-        encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        //sleep(2000);
+        //encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
         /*
         robot.leftClaw.setPosition(1.0);            // S4: Stop and close the claw.
@@ -140,9 +142,11 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     private void encoderDrive(double speed, double leftInches, double rightInches, double timeoutS) {
 
         // Determine new target position, and pass to motor controller
+        double leftTarget2 = leftInches * EncoderNumberChangePerInch*WrongEncoderNumber*WrongEncoderCorrection;
+
         int     newLeftTarget = robot.left_front.getCurrentPosition() + (int) (leftInches * EncoderNumberChangePerInch),
                 newRightTarget = robot.right_front.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch),
-                newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (leftInches * EncoderNumberChangePerInch),
+                newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (leftTarget2),
                 newRightTarget2 = robot.right_back.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
 
         robot.left_front.setTargetPosition(newLeftTarget);
@@ -173,7 +177,18 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             // the motor will keep trying to advance to the target, and will overshoot it.
 
             // Just update telemetry with current positions, targets, and powers
-            robot.updateTelemetry();
+            //robot.updateTelemetry();
+            telemetry.addData("LF current:%7d",robot.left_front.getCurrentPosition())
+                    .addData("   target:%7d",newLeftTarget);
+            telemetry.addData("LB current :%7d",robot.left_back.getCurrentPosition())
+                    .addData("   target:%7d",newLeftTarget2);
+            telemetry.addData("RF current:%7d",robot.right_front.getCurrentPosition())
+                    .addData("   target:%7d",newRightTarget);
+            telemetry.addData("RB current:%7d",robot.right_back.getCurrentPosition())
+                    .addData("   target:%7d",newRightTarget2);
+
+            telemetry.update();
+
         }
 
         // This gets executed once the time limit has expired. or the motors have reached their targets

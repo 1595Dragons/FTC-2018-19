@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.Locale;
+
 /**
  * Created by Stephen Ogden on 9/20/18.
  * FTC 6128 | 7935
@@ -26,6 +28,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
         double IOLeftServoPosition = IOLeftServoOpen ,IORightServoPosition = IORightServoOpen;
 
+        double speedForTurn = 0.55, speedForMove =0.65, speedForSide = 0.9;
         // Wait for the start button to be pressed
         waitForStart();
 
@@ -43,8 +46,8 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
 
-            double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x;
-            double turnRight = -gamepad1.right_stick_x;
+            double driveForward = gamepad1.left_stick_y*speedForMove, driveRightSide = gamepad1.left_stick_x*speedForSide;
+            double turnRight = -gamepad1.right_stick_x*speedForTurn;
 
 
             left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
@@ -79,11 +82,24 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             robot.IO_Servo_Right.setPosition(IORightServoPosition);
 
             // Update telemetry
-            robot.updateTelemetry();
+            //robot.updateTelemetry();
+            if (robot.left_front != null) {
+                telemetry.addData("Left front power", String.format(Locale.US, "%.2f", robot.left_front.getPower()));
+            }
+            if (robot.right_front != null) {
+                telemetry.addData("Right front power", String.format(Locale.US, "%.2f", robot.right_front.getPower()));
+            }
+            if (robot.left_back != null) {
+                telemetry.addData("Left back power", String.format(Locale.US, "%.2f", robot.left_back.getPower()));
+            }
+            if (robot.right_back != null) {
+                telemetry.addData("Right back power", String.format(Locale.US, "%.2f", robot.right_back.getPower()));
+            }
             telemetry.addData("Forward (ls Y)", String.format("%.2f", gamepad1.left_stick_y))
                     .addData("Sideway (ls X)", String.format("%.2f", gamepad1.left_stick_x))
                     .addData("Turn (rs X)", String.format("%.2f", gamepad1.right_stick_x));
             telemetry.update();
+
         }
 
     }
