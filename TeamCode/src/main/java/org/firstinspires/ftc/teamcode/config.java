@@ -62,8 +62,10 @@ class config {
     String target = "None";
     TFObjectDetector objectDetector;
     // Version 2 color sensor
-    ColorSensor sensorColor;
-    DistanceSensor sensorDistance;
+    ColorSensor sensorColorLeft;
+    ColorSensor sensorColorRight;
+    DistanceSensor sensorDistanceLeft;
+    DistanceSensor sensorDistanceRight;
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
     // Stuff for vision
     private VuforiaTrackables pictures;
@@ -123,9 +125,11 @@ class config {
         status("Setting up right servo");
         IO_Servo_Right = hardware.servo.get("IO Servo Right");
 
-        status("Setting up color/distance sensor");
-        sensorColor = hardware.colorSensor.get("sensor_color_distance");
-        sensorDistance = hardware.get(DistanceSensor.class, "sensor_color_distance");
+        status("Setting up color sensor");
+        sensorColorLeft = hardware.colorSensor.get("color sensor left");
+        sensorDistanceLeft = hardware.get(DistanceSensor.class, "color sensor left");
+        sensorColorRight = hardware.colorSensor.get("color sensor right");
+        sensorDistanceRight = hardware.get(DistanceSensor.class, "color sensor right");
 
         // Update telemetry to signal done!
         status("Done!");
@@ -183,13 +187,7 @@ class config {
 
         telemetry.addData("", ""); // Add a space between servo values and color sensor stuff
 
-        if (sensorColor != null) {
-            telemetry.addData("A", sensorColor.alpha()).addData("R", sensorColor.red()).addData("G", sensorColor.green()).addData("B", sensorColor.blue());
-        }
-
-        if (sensorDistance != null) {
-            telemetry.addData("Distance (mm)", sensorDistance.getDistance(DistanceUnit.MM));
-        }
+        
 
         telemetry.addData("", ""); // Add a space between the color sensor stuff and the vision stuff
 

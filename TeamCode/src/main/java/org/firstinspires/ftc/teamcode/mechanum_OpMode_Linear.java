@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
@@ -23,12 +25,16 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         // Initialize the robot
         robot.ConfigureRobtHardware(this.hardwareMap);
 
-        double IOLeftServoClose = 0.1,IOLeftServoOpen = 0.05;
-        double IORightServoClose = 0.8, IORightServoOpen = 0.9;
+        //MOTORS
+        double IOLeftServoClose = 0.1,IOLeftServoHalfOpen = 0.5, IOLeftServoOpen = 0.8;
+        double IORightServoClose = 0.8, IORightServoHalfOpen = 0.5, IORightServoOpen = 0.1;
+        double speedForTurn = 0.5, speedForMove =0.6, speedForSide = 0.9;
 
-        double IOLeftServoPosition = IOLeftServoOpen ,IORightServoPosition = IORightServoOpen;
+        //ColorSensor
+        final double SCALE_FACTOR = 255;
+        float hsvValuesLeft[] = {0F, 0F, 0F};
+        float hsvValuesRight[] = {0F, 0F, 0F};
 
-        double speedForTurn = 0.55, speedForMove =0.65, speedForSide = 0.9;
         // Wait for the start button to be pressed
         waitForStart();
 
@@ -55,16 +61,6 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
             right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
 
-            if(gamepad1.a )//A intake
-            {
-                IOLeftServoPosition=IOLeftServoClose;
-                IORightServoPosition=IORightServoClose;
-            }
-            if(gamepad1.b)//B outtake
-            {
-                IOLeftServoPosition=IOLeftServoOpen;
-                IORightServoPosition=IORightServoOpen;
-            }
 
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
@@ -78,8 +74,33 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             robot.right_back.setPower(right2Power);
 
             //
-            robot.IO_Servo_Left.setPosition(IOLeftServoPosition);
-            robot.IO_Servo_Right.setPosition(IORightServoPosition);
+            if (gamepad1.b)
+            {
+                Color.RGBToHSV((int) (robot.sensorColorLeft.red() * SCALE_FACTOR),
+                        (int) (robot.sensorColorLeft.green() * SCALE_FACTOR),
+                        (int) (robot.sensorColorLeft.blue() * SCALE_FACTOR),
+                        hsvValuesLeft);//Hue value is hsvValuesLeft[0]
+                Color.RGBToHSV((int) (robot.sensorColorRight.red() * SCALE_FACTOR),
+                        (int) (robot.sensorColorRight.green() * SCALE_FACTOR),
+                        (int) (robot.sensorColorRight.blue() * SCALE_FACTOR),
+                        hsvValuesRight);//Hue value is hsvValuesRight[0]
+                if (hsvValuesLeft[0]>=25&&hsvValuesLeft[0]<=50) {
+                    robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                }
+                else {
+                    robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+                }
+                if (hsvValuesRight[0]>=25&&hsvValuesRight[0]<=35) {
+                    robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
+                }
+                else {
+                    robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                }
+            }
+            else{
+                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
+                robot.IO_Servo_Right.setPosition(IORightServoClose);
+            }
 
             // Update telemetry
             //robot.updateTelemetry();
@@ -95,9 +116,6 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             if (robot.right_back != null) {
                 telemetry.addData("Right back power", String.format(Locale.US, "%.2f", robot.right_back.getPower()));
             }
-            telemetry.addData("Forward (ls Y)", String.format("%.2f", gamepad1.left_stick_y))
-                    .addData("Sideway (ls X)", String.format("%.2f", gamepad1.left_stick_x))
-                    .addData("Turn (rs X)", String.format("%.2f", gamepad1.right_stick_x));
             telemetry.update();
 
         }
