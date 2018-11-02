@@ -44,7 +44,8 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 class config {
 
     // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
-    private final int ticksPerRotation = 28;
+
+    private final int ticksPerRotation = 1700;
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
 
@@ -162,52 +163,52 @@ class config {
                 right2.setTargetPosition(-1 * ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case LEFT:
-                left1.setTargetPosition(ticks);
-                left2.setTargetPosition(-1 * ticks);
-                right1.setTargetPosition(-1 * ticks);
-                right2.setTargetPosition(ticks);
+            case RIGHT:
+                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case RIGHT:
-                left1.setTargetPosition(-1 * ticks);
-                left2.setTargetPosition(ticks);
-                right1.setTargetPosition(ticks);
-                right2.setTargetPosition(-1 * ticks);
+            case LEFT:
+                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:
-                left1.setTargetPosition(ticks);
-                right2.setTargetPosition(ticks);
+                left1.setTargetPosition(2*ticks);
+                right2.setTargetPosition(2*ticks);
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGDOWNRIGHT:
-                left1.setTargetPosition(-1 * ticks);
-                right2.setTargetPosition(-1 * ticks);
+                left1.setTargetPosition(-2 * ticks);
+                right2.setTargetPosition(-2 * ticks);
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGUPRIGHT:
-                left2.setTargetPosition(ticks);
-                right1.setTargetPosition(ticks);
+                left2.setTargetPosition(2*ticks);
+                right1.setTargetPosition(2*ticks);
                 setMaxPower(maxPower, left2, right1);
                 break;
             case DIAGDOWNLEFT:
-                left2.setTargetPosition(-1 * ticks);
-                right1.setTargetPosition(-1 * ticks);
+                left2.setTargetPosition(-2 * ticks);
+                right1.setTargetPosition(-2 * ticks);
                 setMaxPower(maxPower, left2, right1);
                 break;
             case SPINLEFT:
-                left1.setTargetPosition(-1 * ticks);
-                left2.setTargetPosition(-1 * ticks);
-                right1.setTargetPosition(ticks);
-                right2.setTargetPosition(ticks);
+                left1.setTargetPosition(-2 * ticks);
+                left2.setTargetPosition(-2 * ticks);
+                right1.setTargetPosition(2*ticks);
+                right2.setTargetPosition(2*ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case SPINRIGHT:
-                left1.setTargetPosition(ticks);
-                left2.setTargetPosition(ticks);
-                right1.setTargetPosition(-1 * ticks);
-                right2.setTargetPosition(-1 * ticks);
+                left1.setTargetPosition(2*ticks);
+                left2.setTargetPosition(2*ticks);
+                right1.setTargetPosition(-2 * ticks);
+                right2.setTargetPosition(-2 * ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
         }
@@ -219,7 +220,7 @@ class config {
         telemetry.update();
     }
 
-    private void setMaxPower(double power, DcMotor... motors) {
+    void setMaxPower(double power, DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(power);
         }
