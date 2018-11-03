@@ -34,7 +34,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         //MOTORS Power
         double speedForTurn = 0.5, speedForMove =0.6, speedForSide = 0.9;
         double intakePower = 1;
-        double armPower =0.9;
+        double armPower =1;
         double extendPower = 0.5;
         // limit position
         int armMaxPosition = 0, armMinPosition = -680;
@@ -204,7 +204,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             }
             if (gamepad1.x)
             {
-                robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                robot.IO_Motor.setPower(-intakePower);
             }
             if (gamepad1.b)
             {

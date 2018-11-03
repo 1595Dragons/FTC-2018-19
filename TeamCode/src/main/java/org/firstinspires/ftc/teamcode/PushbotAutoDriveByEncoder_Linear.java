@@ -115,9 +115,9 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         armDrive(ARM_SPEED,680,5.0);
         //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        sleep(300);
-        distinctDrive(SIDE_SPEED,8,-8,-8,8,4.0);
-        sleep(300);
+        sleep(200);
+        distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
+        sleep(200);
         encoderDrive(DRIVE_SPEED,-45,-45,5.0);
 
         //sleep(2000);
