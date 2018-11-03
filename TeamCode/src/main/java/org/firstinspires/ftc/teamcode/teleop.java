@@ -33,6 +33,7 @@ public class teleop extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
 
+
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -64,7 +65,28 @@ public class teleop extends LinearOpMode {
             } else {
                 robot.climber.setPower(0);
             }
-
+            if (gamepad1.a)
+            {
+                robot.intake.setPower(1);
+            }
+            else
+            {
+                robot.intake.setPower(0);
+            }
+            if (gamepad1.x)
+            {
+                robot.arm.setPower(0.8);
+            }
+            else{
+                robot.arm.setPower(0);
+            }
+            if(gamepad1.y)
+            {
+                robot.arm.setPower(-0.8);
+            }
+            else{
+                robot.arm.setPower(0);
+            }
             // Update telemetry
             robot.updateTelemetry();
         }

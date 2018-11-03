@@ -50,6 +50,7 @@ class config {
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
 
     DcMotor left1, right1, left2, right2, climber;
+    DcMotor intake, arm;
     int maxClimberPos = 10000, minClimberPos = 0;
     private Telemetry telemetry;
 
@@ -86,6 +87,16 @@ class config {
         right2.setZeroPowerBehavior(BRAKE);
         right2.setMode(RUN_USING_ENCODER);
         right2.setDirection(FORWARD);
+
+        intake = hardware.dcMotor.get("intake");
+        intake.setZeroPowerBehavior(BRAKE);
+        intake.setMode(RUN_USING_ENCODER);
+        intake.setDirection(FORWARD);
+
+        arm = hardware.dcMotor.get("arm");
+        arm.setZeroPowerBehavior(BRAKE);
+        arm.setMode(RUN_USING_ENCODER);
+        arm.setDirection(FORWARD);
 
         // Declare and setup climber motor
         status("Setting up climber motor");
