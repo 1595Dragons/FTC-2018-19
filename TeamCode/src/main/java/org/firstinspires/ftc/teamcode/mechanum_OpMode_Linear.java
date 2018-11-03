@@ -34,7 +34,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         //MOTORS Power
         double speedForTurn = 0.5, speedForMove =0.6, speedForSide = 0.9;
         double intakePower = 1;
-        double armPower =1;
+        double armPower =0.9;
         double extendPower = 0.5;
         // limit position
         int armMaxPosition = 0, armMinPosition = -680;
@@ -76,7 +76,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
             left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
             right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
-            armUp=(gamepad1.right_trigger-gamepad1.left_trigger)*armPower;
+            armUp=(-gamepad1.left_stick_y)*armPower;
 
             if (gamepad1.left_stick_button)
             {
@@ -219,11 +219,13 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             telemetry.addData("DistanceL%7d", leftDistance);
             telemetry.addData("DistanceR%7d",robot.sensorDistanceRight.getDistance(DistanceUnit.CM));
             telemetry.addData("DistanceR%7d",rightDistance);
-            */
+
             telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
             telemetry.addData("armPower%7d",armUp);
             telemetry.addData("ExtendPosition%7d",robot.armMotorExtend.getCurrentPosition());
             telemetry.addData("extendPower%7d", armExtend);
+            */
+            telemetry.addData("%7d",gamepad2.right_stick_x);
 
             telemetry.update();
 
