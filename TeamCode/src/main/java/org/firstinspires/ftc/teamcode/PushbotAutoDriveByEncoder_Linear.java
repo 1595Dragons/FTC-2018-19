@@ -66,8 +66,10 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
-    private static final double DRIVE_SPEED = 0.3;
+    private static final double DRIVE_SPEED = 0.4;
     private static final double TURN_SPEED = 0.4;
+    private static final double ARM_SPEED = 0.7;
+    private static final double SIDE_SPEED=0.4;
 
     // Config for the robot
     private config robot = new config(this.telemetry);
@@ -90,11 +92,15 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.armMotorR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         robot.left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.armMotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.armMotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0", "Starting at %7d :%7d",
@@ -107,11 +113,11 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        armDrive(ARM_SPEED,680,5.0);
         //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        sleep(1500);
-
-        encoderDrive(DRIVE_SPEED,-30,-30,5.0);
+        sleep(500);
+        distinctDrive(SIDE_SPEED,8,-8,-8,8,4.0);
+        encoderDrive(DRIVE_SPEED,35,35,5.0);
 
         //sleep(2000);
         //encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
@@ -200,6 +206,124 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        sleep(250);   // optional pause after each move
+
+    }
+    private void distinctDrive(double speed, double LFInches, double LBInches, double RFInches, double RBInches, double timeoutS) {
+
+        // Determine new target position, and pass to motor controller
+
+        int     newLeftTarget = robot.left_front.getCurrentPosition() + (int) (LFInches * EncoderNumberChangePerInch),
+                newRightTarget = robot.right_front.getCurrentPosition() + (int) (RFInches * EncoderNumberChangePerInch),
+                newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (LBInches*EncoderNumberChangePerInch),
+                newRightTarget2 = robot.right_back.getCurrentPosition() + (int) (RBInches * EncoderNumberChangePerInch);
+
+        robot.left_front.setTargetPosition(newLeftTarget);
+        robot.right_front.setTargetPosition(newRightTarget);
+        robot.left_back.setTargetPosition(newLeftTarget2);
+        robot.right_back.setTargetPosition(newRightTarget2);
+
+        robot.left_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.right_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.left_back.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.right_back.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.left_front.setPower(Math.abs(speed));
+        robot.right_front.setPower(Math.abs(speed));
+        robot.left_back.setPower(Math.abs(speed));
+        robot.right_back.setPower(Math.abs(speed));
+
+        // Reset the runtime
+        runtime.reset();
+
+        // Ensure that the opmode is still active, we're within the timeout, and all motors are within their discrepancy of their target.
+        while (opModeIsActive() && (runtime.seconds() < timeoutS) && !robot.isAtTarget(10)) {
+
+            // Just let the motors run. Since their mode is set to RUN_TO_POSITION, they will advance to/retreat from their location to the target,
+            // and change the power accordingly.
+
+            // Due to discrepancies, we cannot use isBusy() because if the target position is off by at least 1 tick,
+            // the motor will keep trying to advance to the target, and will overshoot it.
+
+            // Just update telemetry with current positions, targets, and powers
+            //robot.updateTelemetry();
+            telemetry.addData("LF current:%7d",robot.left_front.getCurrentPosition())
+                    .addData("   target:%7d",newLeftTarget);
+            telemetry.addData("LB current :%7d",robot.left_back.getCurrentPosition())
+                    .addData("   target:%7d",newLeftTarget2);
+            telemetry.addData("RF current:%7d",robot.right_front.getCurrentPosition())
+                    .addData("   target:%7d",newRightTarget);
+            telemetry.addData("RB current:%7d",robot.right_back.getCurrentPosition())
+                    .addData("   target:%7d",newRightTarget2);
+
+            telemetry.update();
+
+        }
+
+        // This gets executed once the time limit has expired. or the motors have reached their targets
+
+        // Stop all motion;
+        robot.left_front.setPower(0);
+        robot.right_front.setPower(0);
+        robot.left_back.setPower(0);
+        robot.right_back.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        robot.left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        sleep(250);   // optional pause after each move
+
+    }
+    private void armDrive(double speed, double armUp, double timeoutS) {
+
+        // Determine new target position, and pass to motor controller
+
+        int    newTargetL = robot.armMotorL.getCurrentPosition()+(int)armUp,
+                newTargetR = robot.armMotorR.getCurrentPosition()+(int)armUp;
+        robot.armMotorL.setTargetPosition(newTargetL);
+        robot.armMotorR.setTargetPosition(newTargetR);
+
+        robot.armMotorL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.armMotorR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.armMotorL.setPower(Math.abs(speed));
+        robot.armMotorR.setPower(Math.abs(speed));
+        // Reset the runtime
+        runtime.reset();
+
+        // Ensure that the opmode is still active, we're within the timeout, and all motors are within their discrepancy of their target.
+        while (opModeIsActive() && (runtime.seconds() < timeoutS) && !robot.isAtTarget(10)) {
+
+            // Just let the motors run. Since their mode is set to RUN_TO_POSITION, they will advance to/retreat from their location to the target,
+            // and change the power accordingly.
+
+            // Due to discrepancies, we cannot use isBusy() because if the target position is off by at least 1 tick,
+            // the motor will keep trying to advance to the target, and will overshoot it.
+
+            // Just update telemetry with current positions, targets, and powers
+            //robot.updateTelemetry();
+            telemetry.addData("L arm current:%7d",robot.armMotorL.getCurrentPosition())
+                    .addData("   target:%7d",newTargetL);
+            telemetry.addData("R arm current :%7d",robot.armMotorR.getCurrentPosition())
+                    .addData("   target:%7d",newTargetR);
+
+            telemetry.update();
+
+        }
+
+        // This gets executed once the time limit has expired. or the motors have reached their targets
+
+        // Stop all motion;
+        robot.armMotorL.setPower(0);
+        robot.armMotorR.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        robot.armMotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.armMotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         sleep(250);   // optional pause after each move
 

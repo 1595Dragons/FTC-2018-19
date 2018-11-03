@@ -37,7 +37,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         double armPower =1;
         double extendPower = 0.5;
         // limit position
-        int armMaxPosition = 680, armMinPosition = 0;
+        int armMaxPosition = 0, armMinPosition = -680;
         int extendMaxPosition = 500, extendMinPosition = 0;
         robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -65,8 +65,8 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
 
-            double driveForward = gamepad1.left_stick_y*speedForMove, driveRightSide = gamepad1.left_stick_x*speedForSide;
-            double turnRight = -gamepad1.right_stick_x*speedForTurn;
+            double driveForward = gamepad2.left_stick_y*speedForMove, driveRightSide = gamepad2.left_stick_x*speedForSide;
+            double turnRight = -gamepad2.right_stick_x*speedForTurn;
             double armUp;
             double armExtend=0;
 
@@ -122,6 +122,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
 
             //
+            /*
             if (gamepad1.b)
             {
                 if (leftObject==1) {
@@ -147,9 +148,13 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
                 robot.IO_Servo_Left.setPosition(IOLeftServoClose);
                 robot.IO_Servo_Right.setPosition(IORightServoClose);
             }
-
+            */
             if(gamepad1.a)
             {
+                robot.IO_Motor.setPower(intakePower);
+                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
+                robot.IO_Servo_Right.setPosition(IORightServoClose);
+                /*
                 Color.RGBToHSV((int) (robot.sensorColorLeft.red() * SCALE_FACTOR),
                         (int) (robot.sensorColorLeft.green() * SCALE_FACTOR),
                         (int) (robot.sensorColorLeft.blue() * SCALE_FACTOR),
@@ -158,7 +163,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
                         (int) (robot.sensorColorRight.green() * SCALE_FACTOR),
                         (int) (robot.sensorColorRight.blue() * SCALE_FACTOR),
                         hsvValuesRight);//Hue value is hsvValuesRight[0]
-                robot.IO_Motor.setPower(intakePower);
+
                 leftDistance=robot.sensorDistanceLeft.getDistance(DistanceUnit.CM);
                 rightDistance=robot.sensorDistanceRight.getDistance(DistanceUnit.CM);
                 if (leftDistance<=5.5) {
@@ -186,12 +191,25 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
                 else{
                     rightObject=0;
                 }
+                */
             }
             else
             {
                 robot.IO_Motor.setPower(0);
             }
-
+            if (gamepad1.y)
+            {
+                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+                robot.IO_Servo_Right.setPosition(IORightServoOpen);
+            }
+            if (gamepad1.x)
+            {
+                robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+            }
+            if (gamepad1.b)
+            {
+                robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
+            }
             // Update telemetry
             //robot.updateTelemetry();
             /*
