@@ -58,6 +58,7 @@ class config {
 
     // DcMotors and servos used on the robot
     DcMotor left_front, right_front, left_back, right_back;
+    DcMotor IO_Motor, armMotorL, armMotorR, armMotorExtend;
     Servo IO_Servo_Left, IO_Servo_Right;
     String target = "None";
     TFObjectDetector objectDetector;
@@ -117,6 +118,22 @@ class config {
         right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         right_back.setDirection(Direction.REVERSE);
 
+        //Declare and setup armMotorL and armMotorR
+        armMotorL = hardware.dcMotor.get("arm motor left");
+        armMotorL.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorL.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorL.setDirection(Direction.REVERSE);
+
+        armMotorR = hardware.dcMotor.get("arm motor right");
+        armMotorR.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorR.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorR.setDirection(Direction.FORWARD);
+
+        armMotorExtend = hardware.dcMotor.get("arm motor extend");
+        armMotorExtend.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorExtend.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorExtend.setDirection(Direction.FORWARD);
+
         // Declare the left servo for the intake
         status("Setting up left servo");
         IO_Servo_Left = hardware.servo.get("IO Servo Left");
@@ -124,6 +141,13 @@ class config {
         // Declare the right servo for the intake
         status("Setting up right servo");
         IO_Servo_Right = hardware.servo.get("IO Servo Right");
+
+        //Declare and setup Intake Motor
+        status("Configuring Intake Motor");
+        IO_Motor = hardware.dcMotor.get("IO motor");
+        IO_Motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        IO_Motor.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        IO_Motor.setDirection(Direction.REVERSE);
 
         status("Setting up color sensor");
         sensorColorLeft = hardware.colorSensor.get("color sensor left");

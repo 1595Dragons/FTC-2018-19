@@ -4,7 +4,10 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Locale;
 
@@ -25,16 +28,26 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         // Initialize the robot
         robot.ConfigureRobtHardware(this.hardwareMap);
 
-        //MOTORS
-        double IOLeftServoClose = 0.1,IOLeftServoHalfOpen = 0.5, IOLeftServoOpen = 0.8;
-        double IORightServoClose = 0.8, IORightServoHalfOpen = 0.5, IORightServoOpen = 0.1;
+        //IO Servo
+        double IOLeftServoClose = 0.3,IOLeftServoHalfOpen = 0.7, IOLeftServoOpen = 0.95;
+        double IORightServoClose = 0.6, IORightServoHalfOpen = 0.2, IORightServoOpen = 0;
+        //MOTORS Power
         double speedForTurn = 0.5, speedForMove =0.6, speedForSide = 0.9;
-
+        double intakePower = 1;
+        double armPower =1;
+        double extendPower = 0.5;
+        // limit position
+        int armMaxPosition = 680, armMinPosition = 0;
+        int extendMaxPosition = 500, extendMinPosition = 0;
+        robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.armMotorExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.armMotorExtend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //ColorSensor
         final double SCALE_FACTOR = 255;
         float hsvValuesLeft[] = {0F, 0F, 0F};
         float hsvValuesRight[] = {0F, 0F, 0F};
-
+        int leftObject=0, rightObject=0;//0 means nothing, 1 means yellow, 2 means white
         // Wait for the start button to be pressed
         waitForStart();
 
@@ -45,7 +58,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
-
+            double leftDistance=10,rightDistance=10;
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -54,12 +67,26 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             double driveForward = gamepad1.left_stick_y*speedForMove, driveRightSide = gamepad1.left_stick_x*speedForSide;
             double turnRight = -gamepad1.right_stick_x*speedForTurn;
+            double armUp;
+            double armExtend=0;
+
 
 
             left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
             right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
             left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
             right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
+            armUp=(gamepad1.right_trigger-gamepad1.left_trigger)*armPower;
+
+            if (gamepad1.left_stick_button)
+            {
+                armExtend+=extendPower;
+            }
+            if(gamepad1.right_stick_button)
+            {
+                armExtend-=extendPower;
+            }
+
 
 
             // Tank Mode uses one stick to control each wheel.
@@ -72,9 +99,56 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             robot.right_front.setPower(right1Power);
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
+            if (robot.armMotorL.getCurrentPosition()>= armMaxPosition && armUp>=0)
+            {
+                armUp=0;
+            }
+            if(robot.armMotorL.getCurrentPosition()<= armMinPosition && armUp<=0)
+            {
+                armUp=0;
+            }
+            robot.armMotorL.setPower(armUp);
+            robot.armMotorR.setPower(armUp);
+
+            if(robot.armMotorExtend.getCurrentPosition()>=extendMaxPosition && armExtend>=0)
+            {
+                armExtend=0;
+            }
+            if(robot.armMotorExtend.getCurrentPosition()<=extendMinPosition && armExtend<=0)
+            {
+                armExtend=0;
+            }
+            robot.armMotorExtend.setPower(armExtend);
+
 
             //
             if (gamepad1.b)
+            {
+                if (leftObject==1) {
+                    robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                }
+                else if(leftObject==2){
+                    robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+                }
+                else{
+                    robot.IO_Servo_Left.setPosition(IOLeftServoClose);
+                }
+                if (rightObject==1) {
+                    robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
+                }
+                else if(rightObject==2){
+                    robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                }
+                else{
+                    robot.IO_Servo_Right.setPosition(IORightServoClose);
+                }
+            }
+            else{
+                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
+                robot.IO_Servo_Right.setPosition(IORightServoClose);
+            }
+
+            if(gamepad1.a)
             {
                 Color.RGBToHSV((int) (robot.sensorColorLeft.red() * SCALE_FACTOR),
                         (int) (robot.sensorColorLeft.green() * SCALE_FACTOR),
@@ -84,38 +158,55 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
                         (int) (robot.sensorColorRight.green() * SCALE_FACTOR),
                         (int) (robot.sensorColorRight.blue() * SCALE_FACTOR),
                         hsvValuesRight);//Hue value is hsvValuesRight[0]
-                if (hsvValuesLeft[0]>=25&&hsvValuesLeft[0]<=50) {
-                    robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                robot.IO_Motor.setPower(intakePower);
+                leftDistance=robot.sensorDistanceLeft.getDistance(DistanceUnit.CM);
+                rightDistance=robot.sensorDistanceRight.getDistance(DistanceUnit.CM);
+                if (leftDistance<=5.5) {
+                    if (hsvValuesLeft[0]>=25&&hsvValuesLeft[0]<=45)
+                    {
+                        leftObject=1;
+                    }
+                    else
+                    {
+                        leftObject=2;
+                    }
                 }
-                else {
-                    robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+                else
+                {
+                    leftObject=0;
                 }
-                if (hsvValuesRight[0]>=25&&hsvValuesRight[0]<=35) {
-                    robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
+                if (rightDistance<=5.5) {
+                    if (hsvValuesRight[0] >= 25 && hsvValuesRight[0] <= 45) {
+                        rightObject = 1;
+                    }
+                    else {
+                        rightObject = 2;
+                    }
                 }
-                else {
-                    robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                else{
+                    rightObject=0;
                 }
             }
-            else{
-                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                robot.IO_Servo_Right.setPosition(IORightServoClose);
+            else
+            {
+                robot.IO_Motor.setPower(0);
             }
 
             // Update telemetry
             //robot.updateTelemetry();
-            if (robot.left_front != null) {
-                telemetry.addData("Left front power", String.format(Locale.US, "%.2f", robot.left_front.getPower()));
-            }
-            if (robot.right_front != null) {
-                telemetry.addData("Right front power", String.format(Locale.US, "%.2f", robot.right_front.getPower()));
-            }
-            if (robot.left_back != null) {
-                telemetry.addData("Left back power", String.format(Locale.US, "%.2f", robot.left_back.getPower()));
-            }
-            if (robot.right_back != null) {
-                telemetry.addData("Right back power", String.format(Locale.US, "%.2f", robot.right_back.getPower()));
-            }
+            /*
+            telemetry.addData("ObjectL%7d",leftObject);
+            telemetry.addData("ObjectR%7d",rightObject);
+            telemetry.addData("DistanceL%7d",robot.sensorDistanceLeft.getDistance(DistanceUnit.CM));
+            telemetry.addData("DistanceL%7d", leftDistance);
+            telemetry.addData("DistanceR%7d",robot.sensorDistanceRight.getDistance(DistanceUnit.CM));
+            telemetry.addData("DistanceR%7d",rightDistance);
+            */
+            telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
+            telemetry.addData("armPower%7d",armUp);
+            telemetry.addData("ExtendPosition%7d",robot.armMotorExtend.getCurrentPosition());
+            telemetry.addData("extendPower%7d", armExtend);
+
             telemetry.update();
 
         }
