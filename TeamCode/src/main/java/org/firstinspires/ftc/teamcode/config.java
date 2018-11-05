@@ -49,9 +49,10 @@ class config {
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
 
-    DcMotor left1, right1, left2, right2, climber;
-    DcMotor intake, arm;
+    DcMotor left1, right1, left2, right2, climber, intake, arm;
+
     int maxClimberPos = 10000, minClimberPos = 0;
+
     private Telemetry telemetry;
 
     config(Telemetry t) {
@@ -146,6 +147,14 @@ class config {
 
         if (climber != null) {
             telemetry.addData("Climber (target)", String.format(Locale.US, "%d (%d)", climber.getCurrentPosition(), climber.getTargetPosition()));
+        }
+
+        if (arm != null) {
+            telemetry.addData("Arm (target)", String.format(Locale.US, "%d (%d)", arm.getCurrentPosition(), arm.getTargetPosition()));
+        }
+
+        if (intake != null) {
+            telemetry.addData("Intake (target)", String.format(Locale.US, "%d (%d)", intake.getCurrentPosition(), intake.getTargetPosition()));
         }
 
         telemetry.update();
