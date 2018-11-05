@@ -88,11 +88,13 @@ class config {
         right2.setMode(RUN_USING_ENCODER);
         right2.setDirection(FORWARD);
 
+        status("Setting up intake");
         intake = hardware.dcMotor.get("intake");
         intake.setZeroPowerBehavior(BRAKE);
         intake.setMode(RUN_USING_ENCODER);
         intake.setDirection(FORWARD);
 
+        status("Setting up arm");
         arm = hardware.dcMotor.get("arm");
         arm.setZeroPowerBehavior(BRAKE);
         arm.setMode(RUN_USING_ENCODER);
@@ -189,38 +191,24 @@ class config {
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:
-                left1.setTargetPosition(2*ticks);
-                right2.setTargetPosition(2*ticks);
+                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGDOWNRIGHT:
-                left1.setTargetPosition(-2 * ticks);
-                right2.setTargetPosition(-2 * ticks);
+                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGUPRIGHT:
-                left2.setTargetPosition(2*ticks);
-                right1.setTargetPosition(2*ticks);
+                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 setMaxPower(maxPower, left2, right1);
                 break;
             case DIAGDOWNLEFT:
-                left2.setTargetPosition(-2 * ticks);
-                right1.setTargetPosition(-2 * ticks);
+                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 setMaxPower(maxPower, left2, right1);
-                break;
-            case SPINLEFT:
-                left1.setTargetPosition(-2 * ticks);
-                left2.setTargetPosition(-2 * ticks);
-                right1.setTargetPosition(2*ticks);
-                right2.setTargetPosition(2*ticks);
-                setMaxPower(maxPower, left1, right1, left2, right2);
-                break;
-            case SPINRIGHT:
-                left1.setTargetPosition(2*ticks);
-                left2.setTargetPosition(2*ticks);
-                right1.setTargetPosition(-2 * ticks);
-                right2.setTargetPosition(-2 * ticks);
-                setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
         }
 

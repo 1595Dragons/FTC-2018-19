@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * FRC 1595
  */
 @Autonomous(name = "Drive distance funcion test", group = "Test")
-public class driveDistanceTest extends LinearOpMode {
+class driveDistanceTest extends LinearOpMode {
 
     private config robot = new config(this.telemetry);
 
