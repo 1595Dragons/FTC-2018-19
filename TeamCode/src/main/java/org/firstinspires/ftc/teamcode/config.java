@@ -234,4 +234,12 @@ class config {
         }
     }
 
+    static int BooleanToInt(boolean bool) {
+        return bool ? 1 : 0;
+    }
+
+    static boolean IntToBoolean(int i) {
+        return i == 1;
+    }
+
 }

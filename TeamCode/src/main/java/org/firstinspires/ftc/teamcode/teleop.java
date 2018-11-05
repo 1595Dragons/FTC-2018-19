@@ -65,28 +65,21 @@ public class teleop extends LinearOpMode {
             } else {
                 robot.climber.setPower(0);
             }
-            if (gamepad1.a)
-            {
-                robot.intake.setPower(1);
-            }
-            else
-            {
-                robot.intake.setPower(0);
-            }
-            if (gamepad1.x)
-            {
+
+            robot.intake.setPower(config.BooleanToInt(gamepad1.a));
+
+            if (gamepad1.x) {
                 robot.arm.setPower(0.8);
-            }
-            else{
+            } else {
                 robot.arm.setPower(0);
             }
-            if(gamepad1.y)
-            {
+
+            if (gamepad1.y) {
                 robot.arm.setPower(-0.8);
-            }
-            else{
+            } else {
                 robot.arm.setPower(0);
             }
+
             // Update telemetry
             robot.updateTelemetry();
         }
