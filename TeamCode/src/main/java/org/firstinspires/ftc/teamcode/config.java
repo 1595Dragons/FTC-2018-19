@@ -249,17 +249,17 @@ class config {
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case LEFT: // TODO: try left at 1.35
-                left1.setTargetPosition((int) (Math.round(1.325 * ticks)));
-                left2.setTargetPosition((int) (Math.round(-1.325 * ticks)));
-                right1.setTargetPosition((int) (Math.round(-1.325 * ticks)));
-                right2.setTargetPosition((int) (Math.round(1.325 * ticks)));
+                left1.setTargetPosition((int) (Math.round(1.35 * ticks)));
+                left2.setTargetPosition((int) (Math.round(-1.35 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.35 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.35 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case RIGHT: // This acts like diagdonwright // TODO: try right at 1.275
-                left1.setTargetPosition((int) (Math.round(-1.25 * ticks)));
-                left2.setTargetPosition((int) (Math.round(1.25 * ticks)));
-                right1.setTargetPosition((int) (Math.round(1.25 * ticks)));
-                right2.setTargetPosition((int) (Math.round(-1.25 * ticks)));
+                left1.setTargetPosition((int) (Math.round(-1.275 * ticks)));
+                left2.setTargetPosition((int) (Math.round(1.275 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.275 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.275 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:

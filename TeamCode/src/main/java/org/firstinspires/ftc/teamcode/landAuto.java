@@ -37,7 +37,7 @@ public class landAuto extends LinearOpMode {
                     break;
                 case 2:
                     robot.driveDistance(MecanumDriveDirection.FORWARD, 6, 1);
-                    if (robot.isThere(15, robot.right1) || robot.isThere(15, robot.left1) || robot.isThere(15, robot.left2) || robot.isThere(15, robot.right2)) {
+                    if (robot.isThere(5, robot.right1) || robot.isThere(15, robot.left1) || robot.isThere(15, robot.left2) || robot.isThere(15, robot.right2)) {
                         stage++;
                     }
                     break;
