@@ -16,7 +16,8 @@ public class landAuto extends LinearOpMode {
     public void runOpMode() {
 
         robot.ConfigureRobot(this.hardwareMap);
-        robot.setupForAuto();
+        //robot.setupForAuto();
+        robot.resetMotors(robot.left1, robot.right1, robot.left2, robot.right2, robot.climber);
 
         int stage = 0;
 
@@ -35,13 +36,14 @@ public class landAuto extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    robot.driveDistance(MecanumDriveDirection.LEFT, 12, 1);
+                    robot.driveDistance(MecanumDriveDirection.FORWARD, 6, 1);
                     if (robot.isThere(15, robot.right1) || robot.isThere(15, robot.left1) || robot.isThere(15, robot.left2) || robot.isThere(15, robot.right2)) {
                         stage++;
                     }
                     break;
                 case 3:
-                    robot.zeroEncoderForMotors(robot.left2, robot.left1, robot.right1, robot.right2);
+                    robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
+                    stage++;
                     break;
                 case 4:
                     stop();

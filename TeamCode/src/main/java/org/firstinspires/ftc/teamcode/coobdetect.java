@@ -4,6 +4,7 @@ import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.opencv.core.Size;
@@ -15,7 +16,8 @@ import java.util.Locale;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@Autonomous(name = "Test cube detector", group = "Test")
+@Autonomous(name = "Cube detector concept", group = "Test")
+@Disabled
 public class coobdetect extends LinearOpMode {
 
     private config robot = new config(this.telemetry);

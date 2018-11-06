@@ -1,17 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.disnodeteam.dogecv.DogeCV;
+import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.opencv.core.Size;
 
 import java.util.Locale;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 
 /**
  * This is the config file for the robot. It also has many useful helper functions in it!
@@ -35,6 +41,8 @@ class config {
 
 
     int maxClimberPos = 10000, minClimberPos = 0;
+
+    GoldDetector goldDetector;
 
 
     private Telemetry telemetry;
@@ -76,25 +84,52 @@ class config {
     void ConfigureRobot(HardwareMap hardware) {
 
         // Declare and setup left1
-        setupMotor("left1", REVERSE, this.left1, hardware);
+        status("Setting up left1");
+        left1 = hardware.dcMotor.get("left1");
+        left1.setZeroPowerBehavior(BRAKE);
+        left1.setMode(RUN_USING_ENCODER);
+        left1.setDirection(REVERSE);
 
         // Declare and setup right1
-        setupMotor("right1", FORWARD, this.right1, hardware);
+        status("Setting up right1");
+        right1 = hardware.dcMotor.get("right1");
+        right1.setZeroPowerBehavior(BRAKE);
+        right1.setMode(RUN_USING_ENCODER);
+        right1.setDirection(FORWARD);
 
         // Declare and setup left2
-        setupMotor("left2", REVERSE, this.left2, hardware);
+        status("Setting up left2");
+        left2 = hardware.dcMotor.get("left2");
+        left2.setZeroPowerBehavior(BRAKE);
+        left2.setMode(RUN_USING_ENCODER);
+        left2.setDirection(REVERSE);
 
         // Declare and setup right2
-        setupMotor("right2", FORWARD, this.right2, hardware);
+        status("Setting up right2");
+        right2 = hardware.dcMotor.get("right2");
+        right2.setZeroPowerBehavior(BRAKE);
+        right2.setMode(RUN_USING_ENCODER);
+        right2.setDirection(FORWARD);
 
-        // Declare and setup intake
-        setupMotor("intake", FORWARD, this.intake, hardware);
+        status("Setting up intake");
+        intake = hardware.dcMotor.get("intake");
+        intake.setZeroPowerBehavior(BRAKE);
+        intake.setMode(RUN_USING_ENCODER);
+        intake.setDirection(FORWARD);
 
-        // Declare and setup the arm
-        setupMotor("arm", FORWARD, this.arm, hardware);
+        status("Setting up arm");
+        arm = hardware.dcMotor.get("arm");
+        arm.setZeroPowerBehavior(BRAKE);
+        arm.setMode(RUN_USING_ENCODER);
+        arm.setDirection(FORWARD);
 
         // Declare and setup climber motor
-        setupMotor("climb", FORWARD, this.climber, hardware);
+        status("Setting up climber motor");
+        climber = hardware.dcMotor.get("climb");
+        climber.setZeroPowerBehavior(BRAKE);
+        climber.setMode(STOP_AND_RESET_ENCODER);
+        climber.setMode(RUN_USING_ENCODER);
+        climber.setDirection(FORWARD);
 
         // Update telemetry to signal done!
         status("Ready!");
@@ -103,27 +138,9 @@ class config {
 
 
     /**
-     * A helper function mainly for the {@link #ConfigureRobot(HardwareMap)} function.
-     * Takes in the motor, its name, direction, and the hardware map, and does the setup from there.
-     *
-     * @param name      The name of the motor. Also what is printed in telemetry in terms of setup.
-     * @param direction The direction of the motor. Either FORWARD or REVERSE.
-     * @param motor     The motor object itself.
-     * @param hardware  The hardware map.
-     */
-    private void setupMotor(String name, DcMotor.Direction direction, DcMotor motor, HardwareMap hardware) {
-        status("Setting up " + name);
-        motor = hardware.dcMotor.get(name);
-        motor.setMode(RUN_USING_ENCODER);
-        motor.setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setDirection(direction);
-    }
-
-
-    /**
      * Basically just resets the encoders for the drive motors and climber :P
      *
-     * @deprecated Use {@link #zeroEncoderForMotors(DcMotor... motors)}
+     * @deprecated Use {@link #resetMotors(DcMotor... motors)}
      */
     void setupForAuto() {
         left1.setMode(STOP_AND_RESET_ENCODER);
@@ -145,8 +162,9 @@ class config {
      *
      * @param motors The motor to have its encoder reset
      */
-    void zeroEncoderForMotors(DcMotor... motors) {
+    void resetMotors(DcMotor... motors) { // TODO: This retunrs null
         for (DcMotor motor : motors) {
+            motor.setPower(0);
             motor.setMode(STOP_AND_RESET_ENCODER);
             motor.setMode(RUN_TO_POSITION);
         }
@@ -186,6 +204,14 @@ class config {
             telemetry.addData("Intake (target)", String.format(Locale.US, "%d (%d)", intake.getCurrentPosition(), intake.getTargetPosition()));
         }
 
+        if (goldDetector != null) {
+            if (goldDetector.isFound()) {
+                telemetry.addData("", "");
+                telemetry.addData("Gold detector window size", "%d x %d", goldDetector.getInitSize().width, goldDetector.getInitSize().height);
+                telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %f, %f (in terms of center)", Math.abs(goldDetector.getScreenPosition().x - goldDetector.getInitSize().width), Math.abs(goldDetector.getScreenPosition().y - goldDetector.getInitSize().height)));
+            }
+        }
+
         telemetry.update();
     }
 
@@ -208,28 +234,28 @@ class config {
         // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
         // This only really applies to all but forward and backwards
         switch (direction) {
-            case FORWARD:
+            case BACKWARD:
                 left1.setTargetPosition(ticks);
                 left2.setTargetPosition(ticks);
                 right1.setTargetPosition(ticks);
                 right2.setTargetPosition(ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case BACKWARD:
+            case FORWARD:
                 left1.setTargetPosition(-1 * ticks);
                 left2.setTargetPosition(-1 * ticks);
                 right1.setTargetPosition(-1 * ticks);
                 right2.setTargetPosition(-1 * ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case RIGHT:
+            case LEFT:
                 left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case LEFT:
+            case RIGHT:
                 left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
                 left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
                 right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
@@ -257,6 +283,28 @@ class config {
                 setMaxPower(maxPower, left2, right1);
                 break;
         }
+
+    }
+
+    void setupGoldDetector(HardwareMap hardware) {
+
+        status("Creating gold detector");
+        goldDetector = new GoldDetector();
+
+        // Set the size of the camera
+        status("Setting camera size");
+        goldDetector.setAdjustedSize(new Size(270, 480));
+
+        // Init the detector (try to use the defaults)
+        status("Applying settings");
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance());
+        goldDetector.useDefaults();
+
+        // Apply the score based on color
+        status("Applying color deviation scoring");
+        goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
+
+        status("Ready!");
 
     }
 
