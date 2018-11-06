@@ -162,7 +162,7 @@ class config {
      *
      * @param motors The motor to have its encoder reset
      */
-    void resetMotors(DcMotor... motors) { // TODO: This retunrs null
+    void resetMotors(DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(STOP_AND_RESET_ENCODER);
@@ -248,18 +248,18 @@ class config {
                 right2.setTargetPosition(-1 * ticks);
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case LEFT:
-                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+            case LEFT: // TODO: try left at 1.35
+                left1.setTargetPosition((int) (Math.round(1.325 * ticks)));
+                left2.setTargetPosition((int) (Math.round(-1.325 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.325 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.325 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
-            case RIGHT:
-                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+            case RIGHT: // This acts like diagdonwright // TODO: try right at 1.275
+                left1.setTargetPosition((int) (Math.round(-1.25 * ticks)));
+                left2.setTargetPosition((int) (Math.round(1.25 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.25 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.25 * ticks)));
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:

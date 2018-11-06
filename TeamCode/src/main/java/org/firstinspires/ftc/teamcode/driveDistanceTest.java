@@ -20,7 +20,7 @@ public class driveDistanceTest extends LinearOpMode {
         //robot.setupForAuto();
         robot.resetMotors(robot.left1, robot.right2, robot.left2, robot.right1);
 
-        int error = 10;
+        int error = 5;
 
         waitForStart();
         while (opModeIsActive()) {
