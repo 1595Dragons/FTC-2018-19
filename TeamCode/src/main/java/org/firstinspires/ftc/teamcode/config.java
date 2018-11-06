@@ -223,7 +223,7 @@ class config {
 
     }
 
-    private void status(String string) {
+    void status(String string) {
         telemetry.addData("Status", string);
         telemetry.update();
     }
