@@ -40,7 +40,7 @@ class config {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = 10000, minClimberPos = 0;
+    int maxClimberPos = 9000, minClimberPos = 0;
 
     GoldDetector goldDetector;
 

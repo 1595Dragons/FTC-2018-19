@@ -25,7 +25,7 @@ public class driveDistanceTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            robot.driveDistance(MecanumDriveDirection.RIGHT, 24, .75);
+            robot.driveDistance(MecanumDriveDirection.LEFT, 24, .75);
 
             if (robot.isThere(error, robot.left1) || robot.isThere(error, robot.left2) || robot.isThere(error, robot.right1) || robot.isThere(error, robot.right2)) {
                 stop();
