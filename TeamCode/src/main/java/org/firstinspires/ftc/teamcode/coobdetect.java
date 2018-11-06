@@ -8,13 +8,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.opencv.core.Size;
 
+import java.util.Locale;
+
 /**
  * Created by Stephen Ogden on 11/5/18.
  * FTC 6128 | 7935
  * FRC 1595
  */
 @Autonomous(name = "Test cube detector", group = "Test")
-class coobdetect extends LinearOpMode {
+public class coobdetect extends LinearOpMode {
 
     private config robot = new config(this.telemetry);
 
@@ -27,7 +29,7 @@ class coobdetect extends LinearOpMode {
         GoldDetector detector = new GoldDetector();
 
         // Set the size of the camera
-        detector.setAdjustedSize(new Size(480, 270));
+        detector.setAdjustedSize(new Size(270, 480));
 
         // Init the detector (try to use the defaults)
         detector.init(this.hardwareMap.appContext, CameraViewDisplay.getInstance());
@@ -43,21 +45,20 @@ class coobdetect extends LinearOpMode {
         detector.enable();
         while (opModeIsActive()) {
 
-            // If the cube is found, stop tracking (and also stop the program)
+            // If the cube is found, let the user know
             if (detector.isFound()) {
-                detector.disable();
-                robot.status("Found gold!");
-                sleep(1000);
-                stop();
-            }
+                robot.status(String.format(Locale.US, "Found gold at %f, %f!", detector.getScreenPosition().x, detector.getScreenPosition().y));
+            } else {
 
-            // If its not found just continue searching
-            robot.status("Searching...");
+                // If its not found just continue searching
+                robot.status("Searching...");
+
+            }
 
         }
 
-        // Set the detector to null
-        detector = null;
+        // Disable the detector
+        detector.disable();
 
     }
 }
