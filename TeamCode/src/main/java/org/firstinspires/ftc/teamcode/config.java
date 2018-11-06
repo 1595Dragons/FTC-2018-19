@@ -10,30 +10,12 @@ import java.util.Locale;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 /**
- * This is the config file for the robot. It also has (or will have) many useful functions in it.
- * <p>
- * For example rather than typing: <br>
- * <br>
- * <code>left_front = hardware.dcMotor.get("left_drive");<br>
- * right_front = hardware.dcMotor.get("right_drive");<br>
- * ...</code>
- * <br>
- * <br>
- * you can just type: <br>
- * <br>
- * <code>private config robot = new config();<br>
  * robot.ConfigureRobotHardware(this.hardwareMap);</code>
- * <br>
- * <br>
- * That's literally the configuration process done!
- * <br>
- * <br>
- * <br>
+ * This is the config file for the robot. It also has many useful helper functions in it!
  * <p>
  * <p>
  * Created by Stephen Ogden on 9/13/18.
@@ -43,77 +25,107 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
  */
 class config {
 
+    // Top secret bleeding edge shit right here
     // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
-
     private final int ticksPerRotation = 1700;
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
 
+
     DcMotor left1, right1, left2, right2, climber, intake, arm;
+
 
     int maxClimberPos = 10000, minClimberPos = 0;
 
+
     private Telemetry telemetry;
+
 
     config(Telemetry t) {
         this.telemetry = t;
     }
 
+
+    /**
+     * A small helper function that returns an int (either 0 or 1) based on the given boolean.
+     *
+     * @param bool The boolean to cast to an int.
+     * @return Int (0 or 1) based on if the boolean is true. If its true, it will return 1. If false, it returns 0.
+     */
+    static int BooleanToInt(boolean bool) {
+        return bool ? 1 : 0;
+    }
+
+
+    /**
+     * A small helper function that returns a boolean based on the given int.
+     * This is usefull for setting motor power based on a button press. Since power is a number (0-1), but the gamepad returns either true or false.
+     *
+     * @param i The int to cast to a boolean
+     * @return If the entered int is 1, it returns true. Else it returns false.
+     */
+    static boolean IntToBoolean(int i) {
+        return i == 1;
+    }
+
+
+    /**
+     * Initializes and configures the robot's motors and anything extra that needs to be done before running the main programs.
+     *
+     * @param hardware The hardware map for the robot.
+     */
     void ConfigureRobot(HardwareMap hardware) {
 
         // Declare and setup left1
-        status("Setting up left1");
-        left1 = hardware.dcMotor.get("left1");
-        left1.setZeroPowerBehavior(BRAKE);
-        left1.setMode(RUN_USING_ENCODER);
-        left1.setDirection(REVERSE);
+        setupMotor("left1", REVERSE, this.left1, hardware);
 
         // Declare and setup right1
-        status("Setting up right1");
-        right1 = hardware.dcMotor.get("right1");
-        right1.setZeroPowerBehavior(BRAKE);
-        right1.setMode(RUN_USING_ENCODER);
-        right1.setDirection(FORWARD);
+        setupMotor("right1", FORWARD, this.right1, hardware);
 
         // Declare and setup left2
-        status("Setting up left2");
-        left2 = hardware.dcMotor.get("left2");
-        left2.setZeroPowerBehavior(BRAKE);
-        left2.setMode(RUN_USING_ENCODER);
-        left2.setDirection(REVERSE);
+        setupMotor("left2", REVERSE, this.left2, hardware);
 
         // Declare and setup right2
-        status("Setting up right2");
-        right2 = hardware.dcMotor.get("right2");
-        right2.setZeroPowerBehavior(BRAKE);
-        right2.setMode(RUN_USING_ENCODER);
-        right2.setDirection(FORWARD);
+        setupMotor("right2", FORWARD, this.right2, hardware);
 
-        status("Setting up intake");
-        intake = hardware.dcMotor.get("intake");
-        intake.setZeroPowerBehavior(BRAKE);
-        intake.setMode(RUN_USING_ENCODER);
-        intake.setDirection(FORWARD);
+        // Declare and setup intake
+        setupMotor("intake", FORWARD, this.intake, hardware);
 
-        status("Setting up arm");
-        arm = hardware.dcMotor.get("arm");
-        arm.setZeroPowerBehavior(BRAKE);
-        arm.setMode(RUN_USING_ENCODER);
-        arm.setDirection(FORWARD);
+        // Declare and setup the arm
+        setupMotor("arm", FORWARD, this.arm, hardware);
 
         // Declare and setup climber motor
-        status("Setting up climber motor");
-        climber = hardware.dcMotor.get("climb");
-        climber.setZeroPowerBehavior(BRAKE);
-        climber.setMode(STOP_AND_RESET_ENCODER);
-        climber.setMode(RUN_USING_ENCODER);
-        climber.setDirection(FORWARD);
+        setupMotor("climb", FORWARD, this.climber, hardware);
 
         // Update telemetry to signal done!
         status("Ready!");
 
     }
 
+
+    /**
+     * A helper function mainly for the {@link #ConfigureRobot(HardwareMap)} function.
+     * Takes in the motor, its name, direction, and the hardware map, and does the setup from there.
+     *
+     * @param name      The name of the motor. Also what is printed in telemetry in terms of setup.
+     * @param direction The direction of the motor. Either FORWARD or REVERSE.
+     * @param motor     The motor object itself.
+     * @param hardware  The hardware map.
+     */
+    private void setupMotor(String name, DcMotor.Direction direction, DcMotor motor, HardwareMap hardware) {
+        status("Setting up " + name);
+        motor = hardware.dcMotor.get(name);
+        motor.setMode(RUN_USING_ENCODER);
+        motor.setZeroPowerBehavior(com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setDirection(direction);
+    }
+
+
+    /**
+     * Basically just resets the encoders for the drive motors and climber :P
+     *
+     * @deprecated Use {@link #zeroEncoderForMotors(DcMotor... motors)}
+     */
     void setupForAuto() {
         left1.setMode(STOP_AND_RESET_ENCODER);
         left2.setMode(STOP_AND_RESET_ENCODER);
@@ -127,6 +139,24 @@ class config {
         climber.setMode(RUN_TO_POSITION);
     }
 
+
+    /**
+     * Goes through each motor provided and resets its encoder.
+     * The number of motors can vary.
+     *
+     * @param motors The motor to have its encoder reset
+     */
+    void zeroEncoderForMotors(DcMotor... motors) {
+        for (DcMotor motor : motors) {
+            motor.setMode(STOP_AND_RESET_ENCODER);
+            motor.setMode(RUN_TO_POSITION);
+        }
+    }
+
+
+    /**
+     * Updates the telemetry to display each of the position for all the motors (if they aren't null that is)
+     */
     void updateTelemetry() {
 
         if (left1 != null) {
@@ -160,12 +190,20 @@ class config {
         telemetry.update();
     }
 
+
+    /**
+     * Returns if the provided motor is within its provided margin of error
+     *
+     * @param error The margin of error its allowed (in encoder ticks).
+     * @param motor The motor to check.
+     * @return Returns true if the motor is within its given margin of error. If it is outside its margin of error then it returns false.
+     */
     boolean isThere(int error, DcMotor motor) {
         int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
         return delta <= error;
     }
 
-    // Returns if the destination was reached
+
     void driveDistance(MecanumDriveDirection direction, int inches, double maxPower) {
         int ticks = (int) Math.round(inches * drive_equation);
         // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
@@ -223,23 +261,28 @@ class config {
 
     }
 
+
+    /**
+     * A small helper function that updates the telemetry status with the provided string.
+     *
+     * @param string The description for the status.
+     */
     void status(String string) {
         telemetry.addData("Status", string);
         telemetry.update();
     }
 
-    void setMaxPower(double power, DcMotor... motors) {
+
+    /**
+     * Helper function mainly used by {@link #driveDistance(MecanumDriveDirection, int, double)} in order to set the maximum allowed power for each provided motor.
+     *
+     * @param power  The maximum power output value (from 0 to 1).
+     * @param motors The motors this applies to.
+     */
+    private void setMaxPower(double power, DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(power);
         }
-    }
-
-    static int BooleanToInt(boolean bool) {
-        return bool ? 1 : 0;
-    }
-
-    static boolean IntToBoolean(int i) {
-        return i == 1;
     }
 
 }

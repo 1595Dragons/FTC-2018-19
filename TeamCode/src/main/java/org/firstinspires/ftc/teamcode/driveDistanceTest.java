@@ -17,7 +17,8 @@ class driveDistanceTest extends LinearOpMode {
     public void runOpMode() {
 
         robot.ConfigureRobot(this.hardwareMap);
-        robot.setupForAuto();
+        //robot.setupForAuto();
+        robot.zeroEncoderForMotors(robot.left1, robot.right2, robot.left2, robot.right1);
 
         int error = 10;
 
