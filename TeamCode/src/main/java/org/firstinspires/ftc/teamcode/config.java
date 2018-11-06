@@ -14,7 +14,6 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 /**
- * robot.ConfigureRobotHardware(this.hardwareMap);</code>
  * This is the config file for the robot. It also has many useful helper functions in it!
  * <p>
  * <p>
