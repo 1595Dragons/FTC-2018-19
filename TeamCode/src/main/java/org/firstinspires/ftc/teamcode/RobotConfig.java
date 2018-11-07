@@ -3,10 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.opencv.core.Size;
 
 import java.util.Locale;
@@ -38,6 +45,9 @@ class RobotConfig {
 
 
     DcMotor left1, right1, left2, right2, climber, intake, arm;
+
+
+    BNO055IMU gyro;
 
 
     int maxClimberPos = 9000, minClimberPos = 0;
@@ -133,6 +143,19 @@ class RobotConfig {
         climber.setMode(RUN_USING_ENCODER);
         climber.setDirection(FORWARD);
 
+        // Declare and setup the gyro
+        status("Setting up gyro");
+        gyro = hardware.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = false;
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = hardware.get(BNO055IMU.class, "gyro");
+        gyro.initialize(parameters);
+
+
         // Update telemetry to signal done!
         status("Ready!");
 
@@ -215,6 +238,10 @@ class RobotConfig {
             }
         }
 
+        if (gyro != null) {
+            gyro.getPosition();
+        }
+
         telemetry.update();
     }
 
@@ -224,7 +251,7 @@ class RobotConfig {
      *
      * @param error The margin of error its allowed (in encoder ticks).
      * @param motor The motor to check.
-     * @return Returns true if the motor is within its given margin of error. If it is outside its margin of error then it returns false.
+     * @return Returns true if the motor is within its given margin of error. If it's outside its margin of error then it returns false.
      */
     boolean isThere(int error, DcMotor motor) {
         int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
@@ -251,6 +278,31 @@ class RobotConfig {
         return reached;
     }
 
+    /**
+     * Returns if the provided angle on the given axis is within the provided margin of error.
+     *
+     * @param error  The margin of error allowed in degrees.
+     * @param degree The degrees trying to be reached.
+     * @param axis   The axis to get the reading from.
+     * @return Returns true if the provided angle on the given axis is within the provided margin of error. If it's outside its margin error it returns false.
+     */
+    boolean isThere(int error, double degree, org.firstinspires.ftc.teamcode.Axis axis) {
+        boolean reached = false;
+        double angle = 0;
+        switch (axis) {
+            case X:
+                angle = getAngle().firstAngle;
+                break;
+            case Y:
+                angle = getAngle().secondAngle;
+                break;
+            case Z:
+                angle = getAngle().thirdAngle;
+                break;
+        }
+
+        double delta = Math.abs(degree - angle);
+        return delta <= error;
 
     /**
      * Sets up the vision system (DogeCV) for detecting the gold (piss yellow) cube
@@ -340,12 +392,44 @@ class RobotConfig {
                 setMaxPower(maxPower, left2, right1);
                 break;
             case DIAGDOWNLEFT:
-                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                left2.setTargetPosition((int) (Math.round(-1.15 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.15 * ticks)));
                 setMaxPower(maxPower, left2, right1);
                 break;
         }
 
+    }
+
+    void driveToDegree(int degree, int maxPower) {
+        double error = degree - getAngle().thirdAngle; // First angle is X, second is Y, and third angle is Z
+        while (error > 180) error -= 360;
+        while (error <= -180) error += 360;
+
+        double steer = Range.clip(error * 0.15, -1, 1); // A weird PID
+
+        left1.setMode(RUN_USING_ENCODER);
+        left2.setMode(RUN_USING_ENCODER);
+        right1.setMode(RUN_USING_ENCODER);
+        right2.setMode(RUN_USING_ENCODER);
+
+        double leftSpeed = maxPower - steer, rightSpeed = maxPower + steer;
+
+        // Normalize speeds if either one exceeds +/- 1.0;
+        double max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+        if (max > maxPower) {
+            leftSpeed /= max;
+            rightSpeed /= max;
+        }
+
+        left1.setPower(leftSpeed);
+        left2.setPower(leftSpeed);
+        right1.setPower(rightSpeed);
+        right2.setPower(rightSpeed);
+
+    }
+
+    Orientation getAngle() {
+        return gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
     }
 
 
