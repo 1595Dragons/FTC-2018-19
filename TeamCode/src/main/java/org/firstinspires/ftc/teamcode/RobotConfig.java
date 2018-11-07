@@ -304,6 +304,9 @@ class RobotConfig {
         double delta = Math.abs(degree - angle);
         return delta <= error;
 
+    }
+
+
     /**
      * Sets up the vision system (DogeCV) for detecting the gold (piss yellow) cube
      *
@@ -377,18 +380,18 @@ class RobotConfig {
                 setMaxPower(maxPower, left1, right1, left2, right2);
                 break;
             case DIAGUPLEFT:
-                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                left1.setTargetPosition((int) (Math.round(1.15 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.15 * ticks)));
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGDOWNRIGHT:
-                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                left1.setTargetPosition((int) (Math.round(-1.15 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.15 * ticks)));
                 setMaxPower(maxPower, left1, right2);
                 break;
             case DIAGUPRIGHT:
-                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                left2.setTargetPosition((int) (Math.round(1.15 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.15 * ticks)));
                 setMaxPower(maxPower, left2, right1);
                 break;
             case DIAGDOWNLEFT:
