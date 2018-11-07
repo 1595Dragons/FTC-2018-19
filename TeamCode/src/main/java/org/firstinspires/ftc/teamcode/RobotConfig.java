@@ -20,7 +20,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 
 /**
- * This is the config file for the robot. It also has many useful helper functions in it!
+ * This is the RobotConfig file for the robot. It also has many useful helper functions in it!
  * <p>
  * <p>
  * Created by Stephen Ogden on 9/13/18.
@@ -28,7 +28,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
  * FTC 6128 | 7935
  * FRC 1595
  */
-class config {
+class RobotConfig {
 
     // Top secret bleeding edge shit right here
     // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
@@ -48,7 +48,7 @@ class config {
     private Telemetry telemetry;
 
 
-    config(Telemetry t) {
+    RobotConfig(Telemetry t) {
         this.telemetry = t;
     }
 
@@ -81,7 +81,7 @@ class config {
      *
      * @param hardware The hardware map for the robot.
      */
-    void ConfigureRobot(HardwareMap hardware) {
+    void configureRobot(HardwareMap hardware) {
 
         // Declare and setup left1
         status("Setting up left1");
@@ -111,12 +111,14 @@ class config {
         right2.setMode(RUN_USING_ENCODER);
         right2.setDirection(FORWARD);
 
+        // Declare and setup the intake
         status("Setting up intake");
         intake = hardware.dcMotor.get("intake");
         intake.setZeroPowerBehavior(BRAKE);
         intake.setMode(RUN_USING_ENCODER);
         intake.setDirection(FORWARD);
 
+        // Declare and setup the arm
         status("Setting up arm");
         arm = hardware.dcMotor.get("arm");
         arm.setZeroPowerBehavior(BRAKE);
@@ -172,7 +174,7 @@ class config {
 
 
     /**
-     * Updates the telemetry to display each of the position for all the motors (if they aren't null that is)
+     * Updates the telemetry to display each of the position for all the motors and sensors (if they aren't null that is)
      */
     void updateTelemetry() {
 
@@ -209,6 +211,7 @@ class config {
                 telemetry.addData("", "");
                 telemetry.addData("Gold detector window size", "%d x %d", goldDetector.getInitSize().width, goldDetector.getInitSize().height);
                 telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %f, %f (in terms of center)", Math.abs(goldDetector.getScreenPosition().x - goldDetector.getInitSize().width), Math.abs(goldDetector.getScreenPosition().y - goldDetector.getInitSize().height)));
+                //telemetry.addData("Gold score", goldDetector.getFoundRect().)
             }
         }
 
@@ -217,7 +220,7 @@ class config {
 
 
     /**
-     * Returns if the provided motor is within its provided margin of error
+     * Returns if the provided motor is within its provided margin of error.
      *
      * @param error The margin of error its allowed (in encoder ticks).
      * @param motor The motor to check.
@@ -229,63 +232,31 @@ class config {
     }
 
 
-    void driveDistance(MecanumDriveDirection direction, int inches, double maxPower) {
-        int ticks = (int) Math.round(inches * drive_equation);
-        // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
-        // This only really applies to all but forward and backwards
-        switch (direction) {
-            case BACKWARD:
-                left1.setTargetPosition(ticks);
-                left2.setTargetPosition(ticks);
-                right1.setTargetPosition(ticks);
-                right2.setTargetPosition(ticks);
-                setMaxPower(maxPower, left1, right1, left2, right2);
+    /**
+     * Returns if <i>any</i> of the provided motors are within its provided margin of error.
+     *
+     * @param error  The margin of error its allowed (in encoder ticks).
+     * @param motors The motors to check.
+     * @return Returns true if any of the motors are within its given margin of error. If all of them are outside the margin of error then it returns false.
+     */
+    boolean isThere(int error, DcMotor... motors) {
+        boolean reached = false;
+        for (DcMotor motor : motors) {
+            int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+            if (delta <= error) {
+                reached = true;
                 break;
-            case FORWARD:
-                left1.setTargetPosition(-1 * ticks);
-                left2.setTargetPosition(-1 * ticks);
-                right1.setTargetPosition(-1 * ticks);
-                right2.setTargetPosition(-1 * ticks);
-                setMaxPower(maxPower, left1, right1, left2, right2);
-                break;
-            case LEFT: // TODO: try left at 1.35
-                left1.setTargetPosition((int) (Math.round(1.35 * ticks)));
-                left2.setTargetPosition((int) (Math.round(-1.35 * ticks)));
-                right1.setTargetPosition((int) (Math.round(-1.35 * ticks)));
-                right2.setTargetPosition((int) (Math.round(1.35 * ticks)));
-                setMaxPower(maxPower, left1, right1, left2, right2);
-                break;
-            case RIGHT: // This acts like diagdonwright // TODO: try right at 1.275
-                left1.setTargetPosition((int) (Math.round(-1.275 * ticks)));
-                left2.setTargetPosition((int) (Math.round(1.275 * ticks)));
-                right1.setTargetPosition((int) (Math.round(1.275 * ticks)));
-                right2.setTargetPosition((int) (Math.round(-1.275 * ticks)));
-                setMaxPower(maxPower, left1, right1, left2, right2);
-                break;
-            case DIAGUPLEFT:
-                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                setMaxPower(maxPower, left1, right2);
-                break;
-            case DIAGDOWNRIGHT:
-                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                setMaxPower(maxPower, left1, right2);
-                break;
-            case DIAGUPRIGHT:
-                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
-                setMaxPower(maxPower, left2, right1);
-                break;
-            case DIAGDOWNLEFT:
-                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
-                setMaxPower(maxPower, left2, right1);
-                break;
+            }
         }
-
+        return reached;
     }
 
+
+    /**
+     * Sets up the vision system (DogeCV) for detecting the gold (piss yellow) cube
+     *
+     * @param hardware The hardware map of the robot (for getting the app context... android is weird)
+     */
     void setupGoldDetector(HardwareMap hardware) {
 
         status("Creating gold detector");
@@ -317,6 +288,64 @@ class config {
     void status(String string) {
         telemetry.addData("Status", string);
         telemetry.update();
+    }
+
+
+    void driveDistance(MecanumDriveDirection direction, int inches, double maxPower) {
+        int ticks = (int) Math.round(inches * drive_equation);
+        // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
+        // This only really applies to all but forward and backwards
+        switch (direction) {
+            case BACKWARD:
+                left1.setTargetPosition(ticks);
+                left2.setTargetPosition(ticks);
+                right1.setTargetPosition(ticks);
+                right2.setTargetPosition(ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
+                break;
+            case FORWARD:
+                left1.setTargetPosition(-1 * ticks);
+                left2.setTargetPosition(-1 * ticks);
+                right1.setTargetPosition(-1 * ticks);
+                right2.setTargetPosition(-1 * ticks);
+                setMaxPower(maxPower, left1, right1, left2, right2);
+                break;
+            case LEFT:
+                left1.setTargetPosition((int) (Math.round(1.35 * ticks)));
+                left2.setTargetPosition((int) (Math.round(-1.35 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.35 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.35 * ticks)));
+                setMaxPower(maxPower, left1, right1, left2, right2);
+                break;
+            case RIGHT:
+                left1.setTargetPosition((int) (Math.round(-1.275 * ticks)));
+                left2.setTargetPosition((int) (Math.round(1.275 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.275 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.275 * ticks)));
+                setMaxPower(maxPower, left1, right1, left2, right2);
+                break;
+            case DIAGUPLEFT:
+                left1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                setMaxPower(maxPower, left1, right2);
+                break;
+            case DIAGDOWNRIGHT:
+                left1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                setMaxPower(maxPower, left1, right2);
+                break;
+            case DIAGUPRIGHT:
+                left2.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(1.2 * ticks)));
+                setMaxPower(maxPower, left2, right1);
+                break;
+            case DIAGDOWNLEFT:
+                left2.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                right1.setTargetPosition((int) (Math.round(-1.2 * ticks)));
+                setMaxPower(maxPower, left2, right1);
+                break;
+        }
+
     }
 
 

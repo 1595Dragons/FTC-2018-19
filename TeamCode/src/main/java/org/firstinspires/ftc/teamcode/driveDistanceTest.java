@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "Drive distance funcion test", group = "Test")
 public class driveDistanceTest extends LinearOpMode {
 
-    private config robot = new config(this.telemetry);
+    private RobotConfig robot = new RobotConfig(this.telemetry);
 
     @Override
     public void runOpMode() {
 
-        robot.ConfigureRobot(this.hardwareMap);
+        robot.configureRobot(this.hardwareMap);
         //robot.setupForAuto();
         robot.resetMotors(robot.left1, robot.right2, robot.left2, robot.right1);
 
@@ -25,9 +25,9 @@ public class driveDistanceTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            robot.driveDistance(MecanumDriveDirection.LEFT, 24, .75);
+            robot.driveDistance(MecanumDriveDirection.DIAGUPLEFT, 24, .75);
 
-            if (robot.isThere(error, robot.left1) || robot.isThere(error, robot.left2) || robot.isThere(error, robot.right1) || robot.isThere(error, robot.right2)) {
+            if (robot.isThere(error, robot.left1, robot.left2, robot.right1, robot.right2)) {
                 stop();
             }
             robot.updateTelemetry();

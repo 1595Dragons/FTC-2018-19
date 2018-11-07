@@ -20,7 +20,7 @@ import java.util.Locale;
 @Disabled
 public class coobdetect extends LinearOpMode {
 
-    private config robot = new config(this.telemetry);
+    private RobotConfig robot = new RobotConfig(this.telemetry);
 
     @Override
     public void runOpMode() {

@@ -11,11 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "Just land", group = "Official")
 public class landAuto extends LinearOpMode {
 
-    private config robot = new config(this.telemetry);
+    private RobotConfig robot = new RobotConfig(this.telemetry);
 
     public void runOpMode() {
 
-        robot.ConfigureRobot(this.hardwareMap);
+        robot.configureRobot(this.hardwareMap);
         //robot.setupForAuto();
         robot.resetMotors(robot.left1, robot.right1, robot.left2, robot.right2, robot.climber);
 
@@ -44,11 +44,8 @@ public class landAuto extends LinearOpMode {
                 case 3:
                     robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
                     stage++;
-                    break;
-                case 4:
                     stop();
                     break;
-
             }
             robot.updateTelemetry();
         }

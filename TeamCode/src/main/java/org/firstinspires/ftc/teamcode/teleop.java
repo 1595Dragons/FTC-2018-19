@@ -13,13 +13,13 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "6128 TeleOp", group = "Official")
 public class teleop extends LinearOpMode {
 
-    // Declare the config file, that way we can use the pre-made fictions for cleaner code
-    private config robot = new config(this.telemetry);
+    // Declare the RobotConfig file, that way we can use the pre-made fictions for cleaner code
+    private RobotConfig robot = new RobotConfig(this.telemetry);
 
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobot(this.hardwareMap);
+        robot.configureRobot(this.hardwareMap);
 
         // Wait for the start button to be pressed
         waitForStart();
@@ -66,7 +66,7 @@ public class teleop extends LinearOpMode {
                 robot.climber.setPower(0);
             }
 
-            robot.intake.setPower(config.BooleanToInt(gamepad1.a));
+            robot.intake.setPower(RobotConfig.BooleanToInt(gamepad1.a));
 
             if (gamepad1.x) {
                 robot.arm.setPower(0.8);

@@ -13,12 +13,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Disabled // For now disable the motor until camera mount is decided
 public class detectCubeCrater extends LinearOpMode {
 
-    private config robot = new config(this.telemetry);
+    private RobotConfig robot = new RobotConfig(this.telemetry);
 
     @Override
     public void runOpMode() {
 
-        robot.ConfigureRobot(this.hardwareMap);
+        robot.configureRobot(this.hardwareMap);
         robot.setupGoldDetector(this.hardwareMap);
 
         int stage = 0, foundTimes = 0;
