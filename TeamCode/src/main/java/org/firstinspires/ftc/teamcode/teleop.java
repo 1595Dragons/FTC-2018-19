@@ -56,25 +56,25 @@ public class teleop extends LinearOpMode {
             robot.left2.setPower(left2Power);
             robot.right2.setPower(right2Power);
 
-            double halfPower = gamepad1.b ? .5 : 1;
 
             if (gamepad1.dpad_down) {
-                robot.climber.setPower(-1 * halfPower);
+                robot.climber.setPower(-1);
             } else if (gamepad1.dpad_up) {
-                robot.climber.setPower(1 * halfPower);
+                robot.climber.setPower(1);
             } else {
                 robot.climber.setPower(0);
             }
 
             robot.intake.setPower(RobotConfig.BooleanToInt(gamepad1.a));
+            if (gamepad1.a) {
+                robot.intake.setPower(1);
+            } else if (gamepad1.b) {
+                robot.intake.setPower(-1);
+            }
 
             if (gamepad1.x) {
                 robot.arm.setPower(0.8);
-            } else {
-                robot.arm.setPower(0);
-            }
-
-            if (gamepad1.y) {
+            } else if (gamepad1.y) {
                 robot.arm.setPower(-0.8);
             } else {
                 robot.arm.setPower(0);
