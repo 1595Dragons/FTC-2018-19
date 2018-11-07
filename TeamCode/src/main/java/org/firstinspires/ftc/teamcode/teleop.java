@@ -57,9 +57,9 @@ public class teleop extends LinearOpMode {
             robot.right2.setPower(right2Power);
 
 
-            if (gamepad1.dpad_down) {
+            if (gamepad1.dpad_down && robot.climber.getCurrentPosition() > robot.minClimberPos) {
                 robot.climber.setPower(-1);
-            } else if (gamepad1.dpad_up) {
+            } else if (gamepad1.dpad_up && robot.climber.getCurrentPosition() < robot.maxClimberPos) {
                 robot.climber.setPower(1);
             } else {
                 robot.climber.setPower(0);
