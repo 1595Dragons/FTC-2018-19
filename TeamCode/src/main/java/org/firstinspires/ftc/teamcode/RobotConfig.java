@@ -6,6 +6,7 @@ import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
@@ -17,13 +18,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.opencv.core.Size;
 
 import java.util.Locale;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 
 /**
@@ -41,6 +35,7 @@ class RobotConfig {
     // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
     private final int ticksPerRotation = 1700;
     private final double whellRotationPerInch = (1 / (Math.PI * 4));
+    @SuppressWarnings("FieldCanBeLocal")
     private final double drive_equation = ticksPerRotation * whellRotationPerInch;
 
 
@@ -96,52 +91,52 @@ class RobotConfig {
         // Declare and setup left1
         status("Setting up left1");
         left1 = hardware.dcMotor.get("left1");
-        left1.setZeroPowerBehavior(BRAKE);
-        left1.setMode(RUN_USING_ENCODER);
-        left1.setDirection(REVERSE);
+        left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup right1
         status("Setting up right1");
         right1 = hardware.dcMotor.get("right1");
-        right1.setZeroPowerBehavior(BRAKE);
-        right1.setMode(RUN_USING_ENCODER);
-        right1.setDirection(FORWARD);
+        right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right1.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup left2
         status("Setting up left2");
         left2 = hardware.dcMotor.get("left2");
-        left2.setZeroPowerBehavior(BRAKE);
-        left2.setMode(RUN_USING_ENCODER);
-        left2.setDirection(REVERSE);
+        left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup right2
         status("Setting up right2");
         right2 = hardware.dcMotor.get("right2");
-        right2.setZeroPowerBehavior(BRAKE);
-        right2.setMode(RUN_USING_ENCODER);
-        right2.setDirection(FORWARD);
+        right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup the intake
         status("Setting up intake");
         intake = hardware.dcMotor.get("intake");
-        intake.setZeroPowerBehavior(BRAKE);
-        intake.setMode(RUN_USING_ENCODER);
-        intake.setDirection(FORWARD);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup the arm
         status("Setting up arm");
         arm = hardware.dcMotor.get("arm");
-        arm.setZeroPowerBehavior(BRAKE);
-        arm.setMode(RUN_USING_ENCODER);
-        arm.setDirection(FORWARD);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup climber motor
         status("Setting up climber motor");
         climber = hardware.dcMotor.get("climb");
-        climber.setZeroPowerBehavior(BRAKE);
-        climber.setMode(STOP_AND_RESET_ENCODER);
-        climber.setMode(RUN_USING_ENCODER);
-        climber.setDirection(FORWARD);
+        climber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climber.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup the gyro
         status("Setting up gyro");
@@ -155,6 +150,9 @@ class RobotConfig {
         gyro = hardware.get(BNO055IMU.class, "gyro");
         gyro.initialize(parameters);
 
+        while (!gyro.isGyroCalibrated()) {
+            Thread.yield();
+        }
 
         // Update telemetry to signal done!
         status("Ready!");
@@ -168,16 +166,16 @@ class RobotConfig {
      * @deprecated Use {@link #resetMotors(DcMotor... motors)}
      */
     void setupForAuto() {
-        left1.setMode(STOP_AND_RESET_ENCODER);
-        left2.setMode(STOP_AND_RESET_ENCODER);
-        right1.setMode(STOP_AND_RESET_ENCODER);
-        right2.setMode(STOP_AND_RESET_ENCODER);
-        climber.setMode(STOP_AND_RESET_ENCODER);
-        left1.setMode(RUN_TO_POSITION);
-        left2.setMode(RUN_TO_POSITION);
-        right1.setMode(RUN_TO_POSITION);
-        right2.setMode(RUN_TO_POSITION);
-        climber.setMode(RUN_TO_POSITION);
+        left1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        left2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
 
@@ -190,8 +188,8 @@ class RobotConfig {
     void resetMotors(DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(0);
-            motor.setMode(STOP_AND_RESET_ENCODER);
-            motor.setMode(RUN_TO_POSITION);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
 
@@ -234,12 +232,12 @@ class RobotConfig {
                 telemetry.addData("", "");
                 telemetry.addData("Gold detector window size", "%d x %d", goldDetector.getInitSize().width, goldDetector.getInitSize().height);
                 telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %f, %f (in terms of center)", Math.abs(goldDetector.getScreenPosition().x - goldDetector.getInitSize().width), Math.abs(goldDetector.getScreenPosition().y - goldDetector.getInitSize().height)));
-                //telemetry.addData("Gold score", goldDetector.getFoundRect().)
             }
         }
 
         if (gyro != null) {
-            gyro.getPosition();
+            telemetry.addData("", "");
+            telemetry.addData("Gyro angles (XYZ)", String.format(Locale.US, "%fX %fY %fZ", getAngle().firstAngle, getAngle().secondAngle, getAngle().thirdAngle));
         }
 
         telemetry.update();
@@ -410,10 +408,10 @@ class RobotConfig {
 
         double steer = Range.clip(error * 0.15, -1, 1); // A weird PID
 
-        left1.setMode(RUN_USING_ENCODER);
-        left2.setMode(RUN_USING_ENCODER);
-        right1.setMode(RUN_USING_ENCODER);
-        right2.setMode(RUN_USING_ENCODER);
+        left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         double leftSpeed = maxPower - steer, rightSpeed = maxPower + steer;
 
