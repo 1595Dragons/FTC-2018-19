@@ -22,6 +22,8 @@ public class teleop extends LinearOpMode {
         // Initialize the robot
         robot.configureRobot(this.hardwareMap);
 
+        robot.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         // Wait for the start button to be pressed
         waitForStart();
 
@@ -81,7 +83,7 @@ public class teleop extends LinearOpMode {
 
             robot.intake.setPower(gamepad2.right_stick_y);
 
-            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, 0, .75));
+            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
 
 
             /*
