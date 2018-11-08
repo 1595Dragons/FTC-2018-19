@@ -21,11 +21,7 @@ import java.util.Locale;
 
 
 /**
- * This is the RobotConfig file for the robot. It also has many useful helper functions in it!
- * <p>
- * <p>
  * Created by Stephen Ogden on 9/13/18.
- * <p>
  * FTC 6128 | 7935
  * FRC 1595
  */
@@ -33,9 +29,17 @@ class RobotConfig {
 
 
     DcMotor left1, right1, left2, right2, climber, intake, arm;
+
+
     int maxClimberPos = 4100, minClimberPos = 0;
+
+
     GoldDetector goldDetector;
+
+
     private BNO055IMU gyro;
+
+
     private Telemetry telemetry;
 
 
@@ -330,7 +334,6 @@ class RobotConfig {
 
 
     /**
-     * 
      * @param direction
      * @param inches
      * @param maxPower
@@ -401,7 +404,6 @@ class RobotConfig {
     }
 
     /**
-     *
      * @param degree
      * @param maxPower
      */

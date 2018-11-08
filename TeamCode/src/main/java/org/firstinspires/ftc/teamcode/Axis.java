@@ -7,6 +7,6 @@ package org.firstinspires.ftc.teamcode;
  */
 enum Axis {
 
-    X,Y,Z
+    X, Y, Z
 
 }
