@@ -40,7 +40,7 @@ public class teleop extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
 
-            double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x, turnRight = -gamepad1.right_stick_x;
+            double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x, turnRight = gamepad1.right_stick_x;
 
 
             // Calculate the power to send to each motor
