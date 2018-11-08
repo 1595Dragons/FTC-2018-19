@@ -22,36 +22,33 @@ public class teleop extends LinearOpMode {
         // Initialize the robot
         robot.configureRobot(this.hardwareMap);
 
+
+        // Setup vision system for tracking gold
+        robot.setupGoldDetector(this.hardwareMap);
+
         robot.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Wait for the start button to be pressed
         waitForStart();
 
-        // Code that we want to run repeatedly
-        while (opModeIsActive()) {
+        // Start tracking shit
+        robot.goldDetector.enable();
 
-            // Copy paste from Henry's Iterative program, with some formatting changes :)
-            //      ~ Stephen
+
+        while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double left1Power, right1Power, left2Power, right2Power, allPower = 1;
 
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-
             double driveForward = gamepad1.left_stick_y, driveRightSide = gamepad1.left_stick_x, turnRight = -gamepad1.right_stick_x;
 
+
+            // Calculate the power to send to each motor
             left1Power = Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
             right1Power = Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
             left2Power = Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
             right2Power = Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
 
             // Send calculated power to wheels
             robot.left1.setPower(left1Power);
@@ -60,7 +57,7 @@ public class teleop extends LinearOpMode {
             robot.right2.setPower(right2Power);
 
 
-            // If the motor type is run to position, use predefined positions
+            // If the climb motor type is run to position, use predefined positions
             if (robot.climber.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
 
                 if (gamepad2.left_bumper) {
@@ -76,50 +73,24 @@ public class teleop extends LinearOpMode {
                 }
 
             } else {
-
                 // If its not, just run based on the bumpers
                 robot.climber.setPower(gamepad2.left_bumper ? 1 : gamepad2.right_bumper ? -1 : 0);
             }
 
+
+            // Set the intake to the power of the right stick
             robot.intake.setPower(gamepad2.right_stick_y);
 
+
+            // Set the arm power to that of the left stick, but cap it at 60% (Otherwise its too fast)
             robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
-
-
-            /*
-            if (gamepad1.dpad_down && robot.climber.getCurrentPosition() > robot.minClimberPos) {
-                robot.climber.setPower(-1);
-            } else if (gamepad1.dpad_up && robot.climber.getCurrentPosition() < robot.maxClimberPos) {
-                robot.climber.setPower(1);
-            } else if (gamepad1.dpad_left) {
-                robot.climber.setPower(-1);
-            } else if (gamepad1.dpad_right) {
-                robot.climber.setPower(1);
-            } else {
-                robot.climber.setPower(0);
-            }
-
-
-            robot.intake.setPower(RobotConfig.BooleanToInt(gamepad1.a));
-            if (gamepad1.a) {
-                robot.intake.setPower(1);
-            } else if (gamepad1.b) {
-                robot.intake.setPower(-1);
-            }
-
-            if (gamepad1.x) {
-                robot.arm.setPower(0.8);
-            } else if (gamepad1.y) {
-                robot.arm.setPower(-0.8);
-            } else {
-                robot.arm.setPower(0);
-            }
-
-            */
 
             // Update telemetry
             robot.updateTelemetry();
         }
+
+        // Stop tracking gold
+        robot.goldDetector.disable();
 
     }
 }

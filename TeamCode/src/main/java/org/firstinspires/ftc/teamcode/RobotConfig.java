@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Size;
 
 import java.util.Locale;
@@ -230,8 +231,10 @@ class RobotConfig {
         if (goldDetector != null) {
             if (goldDetector.isFound()) {
                 telemetry.addData("", "");
-                telemetry.addData("Gold detector window size", "%d x %d", goldDetector.getInitSize().width, goldDetector.getInitSize().height);
                 telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %f, %f (in terms of center)", Math.abs(goldDetector.getScreenPosition().x - goldDetector.getInitSize().width), Math.abs(goldDetector.getScreenPosition().y - goldDetector.getInitSize().height)));
+            } else {
+                telemetry.addData("", "");
+                telemetry.addData("Gold detector", "Still searching...");
             }
         }
 
@@ -321,7 +324,7 @@ class RobotConfig {
 
         // Init the detector (try to use the defaults)
         status("Applying settings");
-        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance());
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
         goldDetector.useDefaults();
 
         // Apply the score based on color
