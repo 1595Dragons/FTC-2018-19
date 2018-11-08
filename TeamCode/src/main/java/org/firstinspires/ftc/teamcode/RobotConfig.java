@@ -15,7 +15,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Size;
 
 import java.util.Locale;
@@ -32,53 +31,16 @@ import java.util.Locale;
  */
 class RobotConfig {
 
-    // Top secret bleeding edge shit right here
-    // 28 (ticks)/(rot motor) * 49 (rot motor/rot wheel) * 1/(3.14*4) (rot wheel/in) = 109 ticks/in
-    private final int ticksPerRotation = 1700;
-    private final double whellRotationPerInch = (1 / (Math.PI * 4));
-    @SuppressWarnings("FieldCanBeLocal")
-    private final double drive_equation = ticksPerRotation * whellRotationPerInch;
-
 
     DcMotor left1, right1, left2, right2, climber, intake, arm;
-
-
-    BNO055IMU gyro;
-
-
     int maxClimberPos = 4100, minClimberPos = 0;
-
     GoldDetector goldDetector;
-
-
+    private BNO055IMU gyro;
     private Telemetry telemetry;
 
 
     RobotConfig(Telemetry t) {
         this.telemetry = t;
-    }
-
-
-    /**
-     * A small helper function that returns an int (either 0 or 1) based on the given boolean.
-     *
-     * @param bool The boolean to cast to an int.
-     * @return Int (0 or 1) based on if the boolean is true. If its true, it will return 1. If false, it returns 0.
-     */
-    static int BooleanToInt(boolean bool) {
-        return bool ? 1 : 0;
-    }
-
-
-    /**
-     * A small helper function that returns a boolean based on the given int.
-     * This is usefull for setting motor power based on a button press. Since power is a number (0-1), but the gamepad returns either true or false.
-     *
-     * @param i The int to cast to a boolean
-     * @return If the entered int is 1, it returns true. Else it returns false.
-     */
-    static boolean IntToBoolean(int i) {
-        return i == 1;
     }
 
 
@@ -162,25 +124,6 @@ class RobotConfig {
 
 
     /**
-     * Basically just resets the encoders for the drive motors and climber :P
-     *
-     * @deprecated Use {@link #resetMotors(DcMotor... motors)}
-     */
-    void setupForAuto() {
-        left1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-
-    /**
      * Goes through each motor provided and resets its encoder.
      * The number of motors can vary.
      *
@@ -201,46 +144,85 @@ class RobotConfig {
     void updateTelemetry() {
 
         if (left1 != null) {
-            telemetry.addData("Left1 (target)", String.format(Locale.US, "%d (%d)", left1.getCurrentPosition(), left1.getTargetPosition()));
+            telemetry.addData("Left1 (target)", String.format(Locale.US, "%d (%d)",
+                    left1.getCurrentPosition(),
+                    left1.getTargetPosition()));
         }
 
         if (right1 != null) {
-            telemetry.addData("Right1 (target)", String.format(Locale.US, "%d (%d)", right1.getCurrentPosition(), right1.getTargetPosition()));
+            telemetry.addData("Right1 (target)", String.format(Locale.US, "%d (%d)",
+                    right1.getCurrentPosition(),
+                    right1.getTargetPosition()));
         }
 
         if (left2 != null) {
-            telemetry.addData("Left2 (target)", String.format(Locale.US, "%d (%d)", left2.getCurrentPosition(), left2.getTargetPosition()));
+            telemetry.addData("Left2 (target)", String.format(Locale.US, "%d (%d)",
+                    left2.getCurrentPosition(),
+                    left2.getTargetPosition()));
         }
 
         if (right2 != null) {
-            telemetry.addData("Right2 (target)", String.format(Locale.US, "%d (%d)", right2.getCurrentPosition(), right2.getTargetPosition()));
+            telemetry.addData("Right2 (target)", String.format(Locale.US, "%d (%d)",
+                    right2.getCurrentPosition(),
+                    right2.getTargetPosition()));
         }
 
         if (climber != null) {
-            telemetry.addData("Climber (target)", String.format(Locale.US, "%d (%d)", climber.getCurrentPosition(), climber.getTargetPosition()));
+            telemetry.addData("Climber (target)", String.format(Locale.US, "%d (%d)",
+                    climber.getCurrentPosition(),
+                    climber.getTargetPosition()));
         }
 
         if (arm != null) {
-            telemetry.addData("Arm (target)", String.format(Locale.US, "%d (%d)", arm.getCurrentPosition(), arm.getTargetPosition()));
+            telemetry.addData("Arm (target)", String.format(Locale.US, "%d (%d)",
+                    arm.getCurrentPosition(),
+                    arm.getTargetPosition()));
         }
 
         if (intake != null) {
-            telemetry.addData("Intake (target)", String.format(Locale.US, "%d (%d)", intake.getCurrentPosition(), intake.getTargetPosition()));
+            telemetry.addData("Intake (target)", String.format(Locale.US, "%d (%d)",
+                    intake.getCurrentPosition(),
+                    intake.getTargetPosition()));
         }
 
         if (goldDetector != null) {
+            telemetry.addLine();
             if (goldDetector.isFound()) {
-                telemetry.addData("", "");
-                telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %f, %f (in terms of center)", Math.abs(goldDetector.getScreenPosition().x - goldDetector.getInitSize().width), Math.abs(goldDetector.getScreenPosition().y - goldDetector.getInitSize().height)));
+                telemetry.addData("Gold detector", String.format(Locale.US, "Found gold at %.3f, %.3f (in terms of center)",
+                        Math.abs(goldDetector.getScreenPosition().x - (goldDetector.getInitSize().width / 2)),
+                        Math.abs(goldDetector.getScreenPosition().y - (goldDetector.getInitSize().height / 2))));
             } else {
-                telemetry.addData("", "");
                 telemetry.addData("Gold detector", "Still searching...");
             }
         }
 
         if (gyro != null) {
-            telemetry.addData("", "");
-            telemetry.addData("Gyro angles (XYZ)", String.format(Locale.US, "%fX %fY %fZ", getAngle().firstAngle, getAngle().secondAngle, getAngle().thirdAngle));
+            telemetry.addLine();
+            if (gyro.isGyroCalibrated()) {
+                telemetry.addData("Gyro angles", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
+                        getAngle().firstAngle, getAngle().angleUnit.name().toLowerCase(),
+                        getAngle().secondAngle, getAngle().angleUnit.name().toLowerCase(),
+                        getAngle().thirdAngle, getAngle().angleUnit.name().toLowerCase()));
+                telemetry.addData("Gyro position", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
+                        gyro.getPosition().x, gyro.getPosition().unit.toString(),
+                        gyro.getPosition().y, gyro.getPosition().unit.toString(),
+                        gyro.getPosition().z, gyro.getPosition().unit.toString()));
+            } else {
+                telemetry.addData("Gyro error", "Gyro isn't calibrated");
+            }
+
+            if (gyro.isAccelerometerCalibrated()) {
+                telemetry.addData("Gyro velocity", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
+                        gyro.getVelocity().xVeloc, gyro.getVelocity().unit.toString(),
+                        gyro.getVelocity().yVeloc, gyro.getVelocity().unit.toString(),
+                        gyro.getVelocity().zVeloc, gyro.getVelocity().unit.toString()));
+                telemetry.addData("Gyro acceleration", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
+                        gyro.getAcceleration().xAccel, gyro.getAcceleration().unit.toString(),
+                        gyro.getAcceleration().yAccel, gyro.getAcceleration().unit.toString(),
+                        gyro.getAcceleration().zAccel, gyro.getAcceleration().unit.toString()));
+            } else {
+                telemetry.addData("Gyro error", "Accelerometer isn't calibrated!");
+            }
         }
 
         telemetry.update();
@@ -347,7 +329,21 @@ class RobotConfig {
     }
 
 
+    /**
+     * 
+     * @param direction
+     * @param inches
+     * @param maxPower
+     */
     void driveDistance(MecanumDriveDirection direction, int inches, double maxPower) {
+
+        // Top secret bleeding edge shit right here
+        // 1700 (ticks)/(rot motor) * 1/(π*4) (rot wheel/in) = 135 ticks/in
+        final int ticksPerRotation = 1700;
+        final double wheelRotationPerInch = (1 / (Math.PI * 4));
+        final double drive_equation = ticksPerRotation * wheelRotationPerInch;
+
+
         int ticks = (int) Math.round(inches * drive_equation);
         // TODO: Because of vector math, the total number of ticks the wheels need to go it going to be different depending on the direction
         // This only really applies to all but forward and backwards
@@ -404,6 +400,11 @@ class RobotConfig {
 
     }
 
+    /**
+     *
+     * @param degree
+     * @param maxPower
+     */
     void driveToDegree(int degree, int maxPower) {
         double error = degree - getAngle().thirdAngle; // First angle is X, second is Y, and third angle is Z
         while (error > 180) error -= 360;
@@ -432,7 +433,10 @@ class RobotConfig {
 
     }
 
-    Orientation getAngle() {
+    /**
+     * @return Returns the angles read by the gyro.
+     */
+    private Orientation getAngle() {
         return gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
     }
 
