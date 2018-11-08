@@ -27,23 +27,34 @@ public class landAuto extends LinearOpMode {
                 case 0:
                     robot.climber.setTargetPosition(robot.maxClimberPos);
                     robot.climber.setPower(1);
+
+                    if (robot.isThere(1, robot.climber)) {
+                        robot.climber.setPower(0);
+                        stage++;
+                    }
+
                     stage++;
                     break;
                 case 1:
-                    if (robot.isThere(5, robot.climber)) {
-                        robot.climber.setPower(0);
+                    robot.driveDistance(MecanumDriveDirection.FORWARD, 8, 1);
+                    if (robot.isThere(5, robot.right1, robot.left1, robot.left2, robot.right2)) {
                         stage++;
                     }
                     break;
                 case 2:
-                    robot.driveDistance(MecanumDriveDirection.FORWARD, 8, 1);
-                    if (robot.isThere(5, robot.right1) || robot.isThere(15, robot.left1) || robot.isThere(15, robot.left2) || robot.isThere(15, robot.right2)) {
+                    robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
+                    stage++;
+                    break;
+                case 3:
+                    robot.climber.setTargetPosition(robot.minClimberPos);
+                    robot.climber.setPower(1);
+
+                    if (robot.isThere(1, robot.climber)) {
+                        robot.climber.setPower(0);
                         stage++;
                     }
                     break;
-                case 3:
-                    robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
-                    stage++;
+                case 4:
                     stop();
                     break;
             }

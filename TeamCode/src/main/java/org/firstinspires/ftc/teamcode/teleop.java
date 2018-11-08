@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -57,13 +58,45 @@ public class teleop extends LinearOpMode {
             robot.right2.setPower(right2Power);
 
 
+            // If the motor type is run to position, use predefined positions
+            if (robot.climber.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+
+                if (gamepad2.left_bumper) {
+                    robot.climber.setTargetPosition(robot.maxClimberPos);
+                } else if (gamepad2.right_bumper) {
+                    robot.climber.setTargetPosition(robot.minClimberPos);
+                }
+
+                if (robot.isThere(1, robot.climber)) {
+                    robot.climber.setPower(0);
+                } else {
+                    robot.climber.setPower(1);
+                }
+
+            } else {
+
+                // If its not, just run based on the bumpers
+                robot.climber.setPower(gamepad2.left_bumper ? 1 : gamepad2.right_bumper ? -1 : 0);
+            }
+
+            robot.intake.setPower(gamepad2.right_stick_y);
+
+            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, 0, .75));
+
+
+            /*
             if (gamepad1.dpad_down && robot.climber.getCurrentPosition() > robot.minClimberPos) {
                 robot.climber.setPower(-1);
             } else if (gamepad1.dpad_up && robot.climber.getCurrentPosition() < robot.maxClimberPos) {
                 robot.climber.setPower(1);
+            } else if (gamepad1.dpad_left) {
+                robot.climber.setPower(-1);
+            } else if (gamepad1.dpad_right) {
+                robot.climber.setPower(1);
             } else {
                 robot.climber.setPower(0);
             }
+
 
             robot.intake.setPower(RobotConfig.BooleanToInt(gamepad1.a));
             if (gamepad1.a) {
@@ -79,6 +112,8 @@ public class teleop extends LinearOpMode {
             } else {
                 robot.arm.setPower(0);
             }
+
+            */
 
             // Update telemetry
             robot.updateTelemetry();

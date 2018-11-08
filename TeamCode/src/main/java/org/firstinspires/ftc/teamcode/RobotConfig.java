@@ -45,7 +45,7 @@ class RobotConfig {
     BNO055IMU gyro;
 
 
-    int maxClimberPos = 4450, minClimberPos = 0;
+    int maxClimberPos = 4100, minClimberPos = 0;
 
     GoldDetector goldDetector;
 
