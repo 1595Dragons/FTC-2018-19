@@ -32,7 +32,6 @@ public class landAuto extends LinearOpMode {
                         stage++;
                     }
 
-                    stage++;
                     break;
                 case 1:
                     robot.driveDistance(MecanumDriveDirection.FORWARD, 8, 1);

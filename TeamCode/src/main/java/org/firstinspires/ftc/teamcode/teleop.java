@@ -31,10 +31,6 @@ public class teleop extends LinearOpMode {
         // Wait for the start button to be pressed
         waitForStart();
 
-        // Start tracking shit
-        robot.goldDetector.enable();
-
-
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
@@ -60,9 +56,9 @@ public class teleop extends LinearOpMode {
             // If the climb motor type is run to position, use predefined positions
             if (robot.climber.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
 
-                if (gamepad2.left_bumper) {
+                if (gamepad1.left_bumper) {
                     robot.climber.setTargetPosition(robot.maxClimberPos);
-                } else if (gamepad2.right_bumper) {
+                } else if (gamepad1.right_bumper) {
                     robot.climber.setTargetPosition(robot.minClimberPos);
                 }
 
@@ -74,7 +70,7 @@ public class teleop extends LinearOpMode {
 
             } else {
                 // If its not, just run based on the bumpers
-                robot.climber.setPower(gamepad2.left_bumper ? 1 : gamepad2.right_bumper ? -1 : 0);
+                robot.climber.setPower(gamepad1.left_bumper ? 1 : gamepad1.right_bumper ? -1 : 0);
             }
 
 
@@ -84,6 +80,12 @@ public class teleop extends LinearOpMode {
 
             // Set the arm power to that of the left stick, but cap it at 60% (Otherwise its too fast)
             robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
+
+            if (gamepad2.x) {
+                robot.goldDetector.enable();
+            } else if (gamepad2.y) {
+                robot.goldDetector.disable();
+            }
 
             // Update telemetry
             robot.updateTelemetry();

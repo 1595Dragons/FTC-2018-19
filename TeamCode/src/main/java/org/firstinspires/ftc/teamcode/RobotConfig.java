@@ -31,7 +31,7 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = 4100, minClimberPos = 0;
+    int maxClimberPos = 4150, minClimberPos = 0;
 
 
     GoldDetector goldDetector;
@@ -207,15 +207,15 @@ class RobotConfig {
                         getAngle().firstAngle, getAngle().angleUnit.name().toLowerCase(),
                         getAngle().secondAngle, getAngle().angleUnit.name().toLowerCase(),
                         getAngle().thirdAngle, getAngle().angleUnit.name().toLowerCase()));
-                telemetry.addData("Gyro position", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
-                        gyro.getPosition().x, gyro.getPosition().unit.toString(),
-                        gyro.getPosition().y, gyro.getPosition().unit.toString(),
-                        gyro.getPosition().z, gyro.getPosition().unit.toString()));
             } else {
                 telemetry.addData("Gyro error", "Gyro isn't calibrated");
             }
 
             if (gyro.isAccelerometerCalibrated()) {
+                telemetry.addData("Gyro position", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
+                        gyro.getPosition().x, gyro.getPosition().unit.toString(),
+                        gyro.getPosition().y, gyro.getPosition().unit.toString(),
+                        gyro.getPosition().z, gyro.getPosition().unit.toString()));
                 telemetry.addData("Gyro velocity", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
                         gyro.getVelocity().xVeloc, gyro.getVelocity().unit.toString(),
                         gyro.getVelocity().yVeloc, gyro.getVelocity().unit.toString(),
@@ -449,7 +449,7 @@ class RobotConfig {
      * @param power  The maximum power output value (from 0 to 1).
      * @param motors The motors this applies to.
      */
-    private void setMaxPower(double power, DcMotor... motors) {
+    void setMaxPower(double power, DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(power);
         }
