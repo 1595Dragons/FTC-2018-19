@@ -67,7 +67,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Disabled
+//@Disabled
 @Autonomous(name = "AutoEncoderDriveByTwoMotor", group = "Pushbot")
 public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
 
@@ -78,8 +78,10 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
     // Config for the robot
     private config robot = new config(this.telemetry);
 
-   /* Declare OpMode members. */
+    /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+
+    private BNO055IMU imu;
 
     @Override
     public void runOpMode() {
@@ -102,6 +104,15 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
         //robot.left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //set up imu
+        telemetry.addData("Status", "Setting up imu");
+        telemetry.update();
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0", "Starting at %7d :%7d",
                 robot.left_front.getCurrentPosition(),
@@ -110,20 +121,12 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        //set up imu
-
-        Orientation angles;
-        BNO055IMU imu;
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
 
         //ACTION
         encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
         sleep(3000);
-        encoderDrive(DRIVE_SPEED,-30,-30,5.0);
+        encoderDrive(DRIVE_SPEED, -30, -30, 5.0);
 
         //sleep(2000);
         //encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
@@ -146,16 +149,9 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the opmode running.
      */
+    private void turnByTime(double speed, double turnDegree, double timeoutS) {
 
-    private void turnByTime (double speed, double turnDegree, double timeoutS ){
-
-        Orientation angles;
-        BNO055IMU imu;
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double direction = angles.firstAngle;
         double targetDirection = angles.firstAngle + turnDegree;
         robot.left_front.setPower(TURN_SPEED);
@@ -163,9 +159,8 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
         robot.right_front.setPower(TURN_SPEED);
         robot.right_back.setPower(TURN_SPEED);
 
-        while (opModeIsActive() && (runtime.seconds() < timeoutS) && !robot.isAtTarget(10)&&
-                Math.abs(angles.firstAngle-targetDirection)>10)
-        {
+        while (opModeIsActive() && (runtime.seconds() < timeoutS) && !robot.isAtTarget(10) &&
+                Math.abs(angles.firstAngle - targetDirection) > 10) {
 
         }
         robot.left_front.setPower(0);
@@ -173,15 +168,16 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
         //robot.left_back.setPower(0);
         //robot.right_back.setPower(0);
     }
+
     private void encoderDrive(double speed, double leftInches, double rightInches, double timeoutS) {
 
         // Determine new target position, and pass to motor controller
         //double leftTarget2 = leftInches * EncoderNumberChangePerInch*WrongEncoderNumber*WrongEncoderCorrection;
 
-        int     newLeftTarget = robot.left_front.getCurrentPosition() + (int) (leftInches * EncoderNumberChangePerInch),
+        int newLeftTarget = robot.left_front.getCurrentPosition() + (int) (leftInches * EncoderNumberChangePerInch),
                 newRightTarget = robot.right_front.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
-                //newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (leftTarget2),
-                //newRightTarget2 = robot.right_back.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
+        //newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (leftTarget2),
+        //newRightTarget2 = robot.right_back.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
 
         robot.left_front.setTargetPosition(newLeftTarget);
         robot.right_front.setTargetPosition(newRightTarget);
@@ -212,12 +208,12 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
 
             // Just update telemetry with current positions, targets, and powers
             //robot.updateTelemetry();
-            telemetry.addData("LF current:%7d",robot.left_front.getCurrentPosition())
-                    .addData("   target:%7d",newLeftTarget);
+            telemetry.addData("LF current:%7d", robot.left_front.getCurrentPosition())
+                    .addData("   target:%7d", newLeftTarget);
             //telemetry.addData("LB current :%7d",robot.left_back.getCurrentPosition())
             //        .addData("   target:%7d",newLeftTarget2);
-            telemetry.addData("RF current:%7d",robot.right_front.getCurrentPosition())
-                    .addData("   target:%7d",newRightTarget);
+            telemetry.addData("RF current:%7d", robot.right_front.getCurrentPosition())
+                    .addData("   target:%7d", newRightTarget);
             //telemetry.addData("RB current:%7d",robot.right_back.getCurrentPosition())
             //       .addData("   target:%7d",newRightTarget2);
 
