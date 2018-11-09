@@ -24,11 +24,14 @@ public class driveDistanceTest extends LinearOpMode {
 
         int error = 5, distance = 24;
 
-        boolean manual = true;
+        boolean manual;
 
         MecanumDriveDirection direction = MecanumDriveDirection.FORWARD;
 
         waitForStart();
+
+        manual = true;
+
         while (opModeIsActive() && !gamepad1.b && !gamepad1.y) {
 
             if (manual) {
@@ -53,7 +56,7 @@ public class driveDistanceTest extends LinearOpMode {
 
             } else {
                 if (gamepad1.a || gamepad1.x) {
-                    robot.driveDistance(direction, distance, .75);
+                    robot.driveDistance(direction, distance, 1);
                 }
 
                 if (robot.isThere(error, robot.left1, robot.left2, robot.right1, robot.right2)) {
@@ -101,6 +104,7 @@ public class driveDistanceTest extends LinearOpMode {
             telemetry.addData("Manual", Boolean.toString(manual))
                     .addData("Direction", direction.name())
                     .addData("Distance", distance);
+            telemetry.addLine();
             robot.updateTelemetry();
 
         }

@@ -317,6 +317,9 @@ class RobotConfig {
         status("Applying color deviation scoring");
         goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
 
+        status("Starting detector");
+        goldDetector.enable();
+
         status("Ready!");
 
     }

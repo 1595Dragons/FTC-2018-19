@@ -78,17 +78,19 @@ public class teleop extends LinearOpMode {
             robot.intake.setPower(gamepad2.right_stick_y);
 
 
-            // Set the arm power to that of the left stick, but cap it at 60% (Otherwise its too fast)
-            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
-
-            if (gamepad2.x) {
+            if (gamepad1.x) {
                 robot.goldDetector.enable();
-            } else if (gamepad2.y) {
+            } else if (gamepad1.y) {
                 robot.goldDetector.disable();
             }
 
+            // Set the arm power to that of the left stick, but cap it at 60% (Otherwise its too fast)
+            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
+
             // Update telemetry
             robot.updateTelemetry();
+
+            idle();
         }
 
         // Stop tracking gold
