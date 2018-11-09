@@ -66,7 +66,7 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
-    private static final double DRIVE_SPEED = 0.4;
+    private static final double DRIVE_SPEED = 3.5;
     private static final double TURN_SPEED = 0.4;
     private static final double ARM_SPEED = 0.7;
     private static final double SIDE_SPEED=0.4;
@@ -113,7 +113,7 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        armDrive(ARM_SPEED,680,5.0);
+        armDrive(ARM_SPEED,680,4.0);
         //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         sleep(200);
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
@@ -285,6 +285,9 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         int    newTargetL = robot.armMotorL.getCurrentPosition()+(int)armUp,
                 newTargetR = robot.armMotorR.getCurrentPosition()+(int)armUp;
+        robot.armMotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.armMotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         robot.armMotorL.setTargetPosition(newTargetL);
         robot.armMotorR.setTargetPosition(newTargetR);
 

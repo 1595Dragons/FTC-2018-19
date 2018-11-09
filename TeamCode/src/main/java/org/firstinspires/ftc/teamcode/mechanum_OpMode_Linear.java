@@ -37,7 +37,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         double armPower =1;
         double extendPower = 0.5;
         // limit position
-        int armMaxPosition = 0, armMinPosition = -680;
+        int armMaxPosition = 100, armMinPosition = -680;
         int extendMaxPosition = 500, extendMinPosition = 0;
         robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -69,14 +69,47 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             double turnRight = -gamepad2.right_stick_x*speedForTurn;
             double armUp;
             double armExtend=0;
+            left1Power=0;
+            left2Power=0;
+            right1Power=0;
+            right2Power=0;
 
+            if(gamepad2.dpad_down==false&&gamepad2.dpad_left==false&&gamepad2.dpad_right==false&&gamepad2.dpad_up==false)
+            {
+                left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
+                right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
+                left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
+                right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
+            }
+            else
+            {
+                if(gamepad2.dpad_up){
+                    left1Power=1*speedForMove*allPower;
+                    left2Power=1*speedForMove*allPower;
+                    right1Power=1*speedForMove*allPower;
+                    right2Power=1*speedForMove*allPower;
+                }
+                else if(gamepad2.dpad_down){
+                    left1Power=-1*speedForMove*allPower;
+                    left2Power=-1*speedForMove*allPower;
+                    right1Power=-1*speedForMove*allPower;
+                    right2Power=-1*speedForMove*allPower;
+                }
+                else if(gamepad2.dpad_right){
+                    left1Power=-1*speedForSide*allPower;
+                    left2Power=1*speedForSide*allPower;
+                    right1Power=1*speedForSide*allPower;
+                    right2Power=-1*speedForSide*allPower;
+                }
+                else if(gamepad2.dpad_left){
+                    left1Power=1*speedForSide*allPower;
+                    left2Power=-1*speedForSide*allPower;
+                    right1Power=-1*speedForSide*allPower;
+                    right2Power=1*speedForSide*allPower;
+                }
+            }
 
-
-            left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
-            right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
-            left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
-            right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
-            armUp=(-gamepad1.left_stick_y)*armPower;
+            armUp=(gamepad1.left_stick_y)*armPower;
 
             if (gamepad1.left_stick_button)
             {
