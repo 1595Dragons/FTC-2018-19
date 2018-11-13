@@ -55,23 +55,19 @@ class config {
     private final float mmPerInch = 25.4f;
     private final float mmFTCFieldWidth = (12 * 6) * mmPerInch; // The width of the FTC field (from the center point to the outer panels)
     private final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
-
+    // Stuff for vision
+    public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
     // DcMotors and servos used on the robot
-    DcMotor left_front, right_front, left_back, right_back;
-    DcMotor IO_Motor, armMotorL, armMotorR, armMotorExtend;
+    DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
     Servo IO_Servo_Left, IO_Servo_Right;
+    // Version 2 color sensor
+    ColorSensor sensorColorLeft, sensorColorRight;
+    DistanceSensor sensorDistanceLeft, sensorDistanceRight;
     String target = "None";
     TFObjectDetector objectDetector;
-    // Version 2 color sensor
-    ColorSensor sensorColorLeft;
-    ColorSensor sensorColorRight;
-    DistanceSensor sensorDistanceLeft;
-    DistanceSensor sensorDistanceRight;
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
-    // Stuff for vision
     private VuforiaTrackables pictures;
     private VuforiaLocalizer vuforia;
-    public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
     private boolean VisionIsActive = false;
     private int cameraViewID;
     // Telemetry stuff
@@ -94,44 +90,47 @@ class config {
         status("Configuring left front motor");
         left_front = hardware.dcMotor.get("left front");
         left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        left_front.setMode(RunMode.RUN_USING_ENCODER);
         left_front.setDirection(Direction.FORWARD);
 
         // Declare and setup right_front
         status("Configuring right front motor");
         right_front = hardware.dcMotor.get("right front");
         right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        right_front.setMode(RunMode.RUN_USING_ENCODER);
         right_front.setDirection(Direction.REVERSE);
 
         // Declare and setup left_back
         status("Configuring left back motor");
         left_back = hardware.dcMotor.get("left back");
         left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        left_back.setMode(RunMode.RUN_USING_ENCODER);
         left_back.setDirection(Direction.FORWARD);
 
         // Declare and setup right_back
         status("Configuring right back motor");
         right_back = hardware.dcMotor.get("right back");
         right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        right_back.setMode(RunMode.RUN_USING_ENCODER);
         right_back.setDirection(Direction.REVERSE);
 
         //Declare and setup armMotorL and armMotorR
+        status("Configuring left arm");
         armMotorL = hardware.dcMotor.get("arm motor left");
         armMotorL.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        armMotorL.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorL.setMode(RunMode.RUN_USING_ENCODER);
         armMotorL.setDirection(Direction.REVERSE);
 
+        status("Configuring right arm");
         armMotorR = hardware.dcMotor.get("arm motor right");
         armMotorR.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        armMotorR.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorR.setMode(RunMode.RUN_USING_ENCODER);
         armMotorR.setDirection(Direction.FORWARD);
 
+        status("Configuring arm extender");
         armMotorExtend = hardware.dcMotor.get("arm motor extend");
         armMotorExtend.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        armMotorExtend.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        armMotorExtend.setMode(RunMode.RUN_USING_ENCODER);
         armMotorExtend.setDirection(Direction.FORWARD);
 
         // Declare the left servo for the intake
@@ -146,7 +145,7 @@ class config {
         status("Configuring Intake Motor");
         IO_Motor = hardware.dcMotor.get("IO motor");
         IO_Motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        IO_Motor.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        IO_Motor.setMode(RunMode.RUN_USING_ENCODER);
         IO_Motor.setDirection(Direction.REVERSE);
 
         status("Setting up color sensor");
@@ -167,57 +166,125 @@ class config {
         if (left_front != null) {
             telemetry.addData("Left front power", String.format(Locale.US, "%.2f", left_front.getPower()));
         }
+
+
         if (right_front != null) {
             telemetry.addData("Right front power", String.format(Locale.US, "%.2f", right_front.getPower()));
         }
+
+
         if (left_back != null) {
-            telemetry.addData("Left back power", String.format(Locale.US, "%.2f", this.left_back.getPower()));
-        }
-        if (right_back != null) {
-            telemetry.addData("Right back power", String.format(Locale.US, "%.2f", this.right_back.getPower()));
+            telemetry.addData("Left back power", String.format(Locale.US, "%.2f", left_back.getPower()));
         }
 
-        telemetry.addData("", ""); // Add a space between the drive power and the encoder values
+
+        if (right_back != null) {
+            telemetry.addData("Right back power", String.format(Locale.US, "%.2f", right_back.getPower()));
+        }
+
+
+        if (IO_Motor != null) {
+            telemetry.addData("Intake motor power", String.format(Locale.US, "%.2f", IO_Motor.getPower()));
+        }
+
+
+        if (armMotorL != null) {
+            telemetry.addData("Left arm motor power", String.format(Locale.US, "%.2f", armMotorL.getPower()));
+        }
+
+
+        if (armMotorR != null) {
+            telemetry.addData("Right arm motor power", String.format(Locale.US, "%.2f", armMotorR.getPower()));
+        }
+
+
+        if (armMotorExtend != null) {
+            telemetry.addData("Arm extension motor power", String.format(Locale.US, "%.2f", armMotorExtend.getPower()));
+        }
+
+        telemetry.addLine(); // Add a space between the drive power and the encoder values
+
 
         if (left_front != null) {
-            if (left_front.getMode() == RunMode.RUN_USING_ENCODER) {
-                telemetry.addData("Left front target, current location (displacement)", String.format("%s, %s (%s)", this.left_front.getTargetPosition(), this.left_front.getCurrentPosition(), Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition())));
-            }
-        }
-        if (right_front != null) {
-            if (right_front.getMode() == RunMode.RUN_USING_ENCODER) {
-                telemetry.addData("Right front target, current location (displacement)", String.format("%s, %s (%s)", this.right_front.getTargetPosition(), this.right_front.getCurrentPosition(), Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition())));
-            }
-        }
-        if (left_back != null) {
-            if (left_back.getMode() == RunMode.RUN_USING_ENCODER) {
-                telemetry.addData("Left back target, current location (displacement)", String.format("%s, %s (%s)", this.left_back.getTargetPosition(), this.left_back.getCurrentPosition(), Math.abs(this.left_back.getCurrentPosition() - this.right_front.getTargetPosition())));
-            }
-        }
-        if (right_back != null) {
-            if (right_back.getMode() == RunMode.RUN_USING_ENCODER) {
-                telemetry.addData("Right back target, current location (displacement)", String.format("%s, %s (%s)", this.right_back.getTargetPosition(), this.right_back.getCurrentPosition(), Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition())));
-            }
+            telemetry.addData("Left front current location", left_front.getCurrentPosition())
+                    .addData("Left front target location", left_front.getTargetPosition())
+                    .addData("Left front displacement", Math.abs(left_front.getCurrentPosition() - left_front.getTargetPosition()));
+
         }
 
-        telemetry.addData("", ""); // Add a space between encoder values and servo values
+
+        if (right_front != null) {
+            telemetry.addData("Right front current location", right_front.getCurrentPosition())
+                    .addData("Right front target location", right_front.getTargetPosition())
+                    .addData("Right front displacement", Math.abs(right_front.getCurrentPosition() - right_front.getTargetPosition()));
+        }
+
+
+        if (left_back != null) {
+            telemetry.addData("Left back current location", left_back.getCurrentPosition())
+                    .addData("Left back target location", left_back.getTargetPosition())
+                    .addData("Left back displacement", Math.abs(left_back.getCurrentPosition() - left_back.getTargetPosition()));
+        }
+
+
+        if (right_back != null) {
+            telemetry.addData("Right back current location", right_back.getCurrentPosition())
+                    .addData("Right back target location", right_back.getTargetPosition())
+                    .addData("Right back displacement", Math.abs(right_back.getCurrentPosition() - right_back.getTargetPosition()));
+        }
+
+
+        if (IO_Motor != null) {
+            telemetry.addData("Intake motor current location", IO_Motor.getCurrentPosition())
+                    .addData("Intake motor target location", IO_Motor.getTargetPosition())
+                    .addData("Intake motor displacement", Math.abs(IO_Motor.getCurrentPosition() - IO_Motor.getTargetPosition()));
+        }
+
+
+        if (armMotorL != null) {
+            telemetry.addData("Left arm current location", armMotorL.getCurrentPosition())
+                    .addData("Left arm target location", armMotorL.getTargetPosition())
+                    .addData("Left arm displacement", Math.abs(armMotorL.getCurrentPosition() - armMotorL.getTargetPosition()));
+        }
+
+
+        if (armMotorR != null) {
+            telemetry.addData("Right arm current location", armMotorR.getCurrentPosition())
+                    .addData("Right arm target location", armMotorR.getTargetPosition())
+                    .addData("Right arm displacement", Math.abs(armMotorR.getCurrentPosition() - armMotorR.getTargetPosition()));
+        }
+
+
+        if (armMotorExtend != null) {
+            telemetry.addData("Arm extension motor current location", armMotorExtend.getCurrentPosition())
+                    .addData("Arm extension motor target location", armMotorExtend.getTargetPosition())
+                    .addData("Arm extension motor displacement", Math.abs(armMotorExtend.getCurrentPosition() - armMotorExtend.getTargetPosition()));
+        }
+
+
+        telemetry.addLine(); // Add a space between encoder values and servo values
+
 
         if (IO_Servo_Left != null) {
             telemetry.addData("IO Servo Left target position", IO_Servo_Left.getPosition());
         }
+
+
         if (IO_Servo_Right != null) {
             telemetry.addData("IO Servo Right target position", IO_Servo_Right.getPosition());
         }
 
-        telemetry.addData("", ""); // Add a space between servo values and color sensor stuff
 
-        
+        telemetry.addLine(); // Add a space between servo values and color sensor stuff
 
-        telemetry.addData("", ""); // Add a space between the color sensor stuff and the vision stuff
+
+        telemetry.addLine(); // Add a space between the color sensor stuff and the vision stuff
+
 
         if (VisionIsActive) {
             telemetry.addData("Current visible target", target);
         }
+
 
         // Update the telemetry
         telemetry.update();

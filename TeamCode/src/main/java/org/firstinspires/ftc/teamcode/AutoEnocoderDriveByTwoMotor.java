@@ -112,7 +112,6 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0", "Starting at %7d :%7d",
                 robot.left_front.getCurrentPosition(),
@@ -174,8 +173,10 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
         // Determine new target position, and pass to motor controller
         //double leftTarget2 = leftInches * EncoderNumberChangePerInch*WrongEncoderNumber*WrongEncoderCorrection;
 
-        int newLeftTarget = robot.left_front.getCurrentPosition() + (int) (leftInches * EncoderNumberChangePerInch),
-                newRightTarget = robot.right_front.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
+        // TODO: Casting like this may return 0
+        int newLeftTarget = (int) (robot.left_front.getCurrentPosition() + Math.round(leftInches * EncoderNumberChangePerInch)),
+                newRightTarget = (int) (robot.right_front.getCurrentPosition() + Math.round(rightInches * EncoderNumberChangePerInch));
+
         //newLeftTarget2 = robot.left_back.getCurrentPosition() + (int) (leftTarget2),
         //newRightTarget2 = robot.right_back.getCurrentPosition() + (int) (rightInches * EncoderNumberChangePerInch);
 
@@ -207,9 +208,10 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
             // the motor will keep trying to advance to the target, and will overshoot it.
 
             // Just update telemetry with current positions, targets, and powers
-            //robot.updateTelemetry();
-            telemetry.addData("LF current:%7d", robot.left_front.getCurrentPosition())
-                    .addData("   target:%7d", newLeftTarget);
+            robot.updateTelemetry();
+            /*
+            telemetry.addData("LF current:", robot.left_front.getCurrentPosition())
+                    .addData("LF target:%7d", newLeftTarget);
             //telemetry.addData("LB current :%7d",robot.left_back.getCurrentPosition())
             //        .addData("   target:%7d",newLeftTarget2);
             telemetry.addData("RF current:%7d", robot.right_front.getCurrentPosition())
@@ -218,6 +220,7 @@ public class AutoEnocoderDriveByTwoMotor extends LinearOpMode {
             //       .addData("   target:%7d",newRightTarget2);
 
             telemetry.update();
+            */
 
         }
 
