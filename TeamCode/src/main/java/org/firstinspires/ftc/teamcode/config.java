@@ -55,6 +55,8 @@ class config {
     private final float mmPerInch = 25.4f;
     private final float mmFTCFieldWidth = (12 * 6) * mmPerInch; // The width of the FTC field (from the center point to the outer panels)
     private final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
+
+    final int leftarmUp = 660, leftArmDown = 0, rightArmUp = 660, rightArmDown = 0;
     // Stuff for vision
     public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
     // DcMotors and servos used on the robot
@@ -90,6 +92,7 @@ class config {
         status("Configuring left front motor");
         left_front = hardware.dcMotor.get("left front");
         left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        left_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
         left_front.setMode(RunMode.RUN_USING_ENCODER);
         left_front.setDirection(Direction.FORWARD);
 
@@ -97,6 +100,7 @@ class config {
         status("Configuring right front motor");
         right_front = hardware.dcMotor.get("right front");
         right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        right_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
         right_front.setMode(RunMode.RUN_USING_ENCODER);
         right_front.setDirection(Direction.REVERSE);
 
@@ -104,6 +108,7 @@ class config {
         status("Configuring left back motor");
         left_back = hardware.dcMotor.get("left back");
         left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        left_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
         left_back.setMode(RunMode.RUN_USING_ENCODER);
         left_back.setDirection(Direction.FORWARD);
 
@@ -111,6 +116,7 @@ class config {
         status("Configuring right back motor");
         right_back = hardware.dcMotor.get("right back");
         right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        right_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
         right_back.setMode(RunMode.RUN_USING_ENCODER);
         right_back.setDirection(Direction.REVERSE);
 
@@ -118,18 +124,21 @@ class config {
         status("Configuring left arm");
         armMotorL = hardware.dcMotor.get("arm motor left");
         armMotorL.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorL.setMode(RunMode.STOP_AND_RESET_ENCODER);
         armMotorL.setMode(RunMode.RUN_USING_ENCODER);
         armMotorL.setDirection(Direction.REVERSE);
 
         status("Configuring right arm");
         armMotorR = hardware.dcMotor.get("arm motor right");
         armMotorR.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorR.setMode(RunMode.STOP_AND_RESET_ENCODER);
         armMotorR.setMode(RunMode.RUN_USING_ENCODER);
         armMotorR.setDirection(Direction.FORWARD);
 
         status("Configuring arm extender");
         armMotorExtend = hardware.dcMotor.get("arm motor extend");
         armMotorExtend.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        armMotorExtend.setMode(RunMode.STOP_AND_RESET_ENCODER);
         armMotorExtend.setMode(RunMode.RUN_USING_ENCODER);
         armMotorExtend.setDirection(Direction.FORWARD);
 
@@ -145,6 +154,7 @@ class config {
         status("Configuring Intake Motor");
         IO_Motor = hardware.dcMotor.get("IO motor");
         IO_Motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        IO_Motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
         IO_Motor.setMode(RunMode.RUN_USING_ENCODER);
         IO_Motor.setDirection(Direction.REVERSE);
 
@@ -156,6 +166,16 @@ class config {
 
         // Update telemetry to signal done!
         status("Done!");
+    }
+
+
+    void resetMotors(DcMotor... motors) {
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+            motor.setTargetPosition(0);
+            motor.setMode(RunMode.RUN_TO_POSITION);
+        }
     }
 
     /**
@@ -297,11 +317,32 @@ class config {
      * @param discrepancy -- The number of ticks the current position is allowed to be within in order to qualify it as at target
      * @return -- Whether all motors have reached their targets
      */
+    @Deprecated
     boolean isAtTarget(int discrepancy) {
         return ((Math.abs(this.left_front.getCurrentPosition() - this.left_front.getTargetPosition()) <= discrepancy &&
                 (Math.abs(this.right_front.getCurrentPosition() - this.right_front.getTargetPosition()) <= discrepancy) &&
                 (Math.abs(this.left_back.getCurrentPosition() - this.left_back.getTargetPosition()) <= discrepancy) &&
                 (Math.abs(this.right_back.getCurrentPosition() - this.right_back.getTargetPosition()) <= discrepancy)));
+    }
+
+
+    /**
+     * Returns if <i>any</i> of the provided motors are within its provided margin of error.
+     *
+     * @param error  The margin of error its allowed (in encoder ticks).
+     * @param motors The motors to check.
+     * @return Returns true if any of the motors are within its given margin of error. If all of them are outside the margin of error then it returns false.
+     */
+    boolean isThere(int error, DcMotor... motors) {
+        boolean reached = false;
+        for (DcMotor motor : motors) {
+            int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+            if (delta <= error) {
+                reached = true;
+                break;
+            }
+        }
+        return reached;
     }
 
 

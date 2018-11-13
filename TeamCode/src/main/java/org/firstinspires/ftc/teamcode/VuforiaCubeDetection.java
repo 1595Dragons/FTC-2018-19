@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,6 +15,7 @@ import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABE
  * FTC 6128 | 7935
  * FRC 1595
  */
+@Disabled
 @TeleOp(name = "Vuforia Cube detection", group = "Test")
 public class VuforiaCubeDetection extends LinearOpMode {
 
