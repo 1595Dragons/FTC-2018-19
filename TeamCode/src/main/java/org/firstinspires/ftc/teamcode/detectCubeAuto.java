@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@Autonomous(name = "Land and detect cube (crater)", group = "Official")
+@Autonomous(name = "Land and detect cube", group = "Official")
 //@Disabled
-public class detectCubeCrater extends LinearOpMode {
+public class detectCubeAuto extends LinearOpMode {
 
     private RobotConfig robot = new RobotConfig(this.telemetry);
 

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name = "6128 TeleOp", group = "Official")
-public class teleop extends LinearOpMode {
+public class Teleop extends LinearOpMode {
 
     // Declare the RobotConfig file, that way we can use the pre-made fictions for cleaner code
     private RobotConfig robot = new RobotConfig(this.telemetry);
