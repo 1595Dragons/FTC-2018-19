@@ -137,6 +137,7 @@ class RobotConfig {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setTargetPosition(0);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
