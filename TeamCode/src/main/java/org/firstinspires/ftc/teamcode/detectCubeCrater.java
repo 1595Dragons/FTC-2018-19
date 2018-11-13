@@ -109,7 +109,7 @@ public class detectCubeCrater extends LinearOpMode {
                     }
                     break;
                 case 11:
-                    robot.driveDistance(MecanumDriveDirection.FORWARD, 12, 1);
+                    robot.driveDistance(MecanumDriveDirection.FORWARD, 36, 1);
                     if (robot.isThere(10, robot.right1, robot.left1, robot.left2, robot.right2)) {
                         robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
                         stage++;
