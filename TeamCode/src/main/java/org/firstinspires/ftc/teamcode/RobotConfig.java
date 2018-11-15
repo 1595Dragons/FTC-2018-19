@@ -103,7 +103,7 @@ class RobotConfig {
         climber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climber.setDirection(DcMotorSimple.Direction.FORWARD);
+        climber.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the gyro
         status("Setting up gyro");
