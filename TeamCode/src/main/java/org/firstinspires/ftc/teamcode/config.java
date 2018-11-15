@@ -11,11 +11,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.opencv.core.Size;
+
+import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.disnodeteam.dogecv.DogeCV;
+import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,23 +60,31 @@ class config {
     private final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
 
     final int leftarmUp = 660, leftArmDown = 0, rightArmUp = 660, rightArmDown = 0;
+
+
     // Stuff for vision
     public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
-    // DcMotors and servos used on the robot
-    DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
-    Servo IO_Servo_Left, IO_Servo_Right;
-    // Version 2 color sensor
-    ColorSensor sensorColorLeft, sensorColorRight;
-    DistanceSensor sensorDistanceLeft, sensorDistanceRight;
+    GoldDetector goldDetector;
     String target = "None";
-    TFObjectDetector objectDetector;
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
     private VuforiaTrackables pictures;
     private VuforiaLocalizer vuforia;
     private boolean VisionIsActive = false;
     private int cameraViewID;
+
+    // DcMotors and servos used on the robot
+    DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
+    Servo IO_Servo_Left, IO_Servo_Right;
+
+
+    // Version 2 color sensor
+    ColorSensor sensorColorLeft, sensorColorRight;
+    DistanceSensor sensorDistanceLeft, sensorDistanceRight;
+
     // Telemetry stuff
     private Telemetry telemetry;
+
+    // G
 
     config(Telemetry t) {
         this.telemetry = t;
@@ -395,10 +406,6 @@ class config {
 
         // TODO: We could also add location data to get the position of the images on the field as well as the robot
 
-        if (useTF) {
-            InitTensorFlow();
-        }
-
         status("Done!");
     }
 
@@ -407,9 +414,6 @@ class config {
      */
     void StartTrackingVisionTargets() {
         pictures.activate();
-        if (objectDetector != null) {
-            objectDetector.activate();
-        }
         VisionIsActive = true;
     }
 
@@ -418,20 +422,37 @@ class config {
      */
     void StopTrackingVisionTargets() {
         pictures.deactivate();
-        if (objectDetector != null) {
-            objectDetector.deactivate();
-            objectDetector.shutdown();
-        }
         VisionIsActive = false;
     }
 
-    private void InitTensorFlow() {
-        status("Setting parameters");
-        TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(cameraViewID);
-        status("Creating object detector");
-        objectDetector = ClassFactory.getInstance().createTFObjectDetector(parameters, vuforia);
-        status("Loading object assets");
-        objectDetector.loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral");
+    /**
+     * Sets up the vision system (DogeCV) for detecting the gold (piss yellow) cube
+     *
+     * @param hardware The hardware map of the robot (for getting the app context... android is weird)
+     */
+    void setupGoldDetector(HardwareMap hardware) {
+
+        status("Creating gold detector");
+        goldDetector = new GoldDetector();
+
+        // Set the size of the camera
+        status("Setting camera size");
+        goldDetector.setAdjustedSize(new Size(270, 480));
+
+        // Init the detector (try to use the defaults)
+        status("Applying settings");
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
+        goldDetector.useDefaults();
+
+        // Apply the score based on color
+        status("Applying color deviation scoring");
+        goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
+
+        status("Starting detector");
+        goldDetector.enable();
+
+        status("Ready!");
+
     }
 
     private void status(String string) {
