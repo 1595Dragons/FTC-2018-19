@@ -441,7 +441,7 @@ class config {
 
         // Init the detector (try to use the defaults)
         status("Applying settings");
-        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false); // TODO: Change for USB camera :)
         goldDetector.useDefaults();
 
         // Apply the score based on color

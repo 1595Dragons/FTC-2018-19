@@ -100,6 +100,11 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
         sleep(200);
         encoderDrive(DRIVE_SPEED,-45,-45,5.0);
+        robot.setupGoldDetector(this.hardwareMap);
+        sleep(1000);
+        if (robot.goldDetector.isFound()) {
+            // Do whatever when found
+        }
 
         //sleep(2000);
         //encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S3: Reverse 24 Inches with 4 Sec timeout
