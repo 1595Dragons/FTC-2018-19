@@ -37,7 +37,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         double armPower =1;
         double extendPower = 0.5;
         // limit position
-        int armMaxPosition = 100, armMinPosition = -680;
+        int armMaxPosition = 0, armMinPosition = -680;
         int extendMaxPosition = 500, extendMinPosition = 0;
         robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

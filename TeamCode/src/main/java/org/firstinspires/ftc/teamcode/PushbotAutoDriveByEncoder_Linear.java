@@ -95,7 +95,7 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        armDrive(ARM_SPEED, 660, 4.0);
+        armDrive(ARM_SPEED, 680, 4.0);
         sleep(200);
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
         sleep(200);
