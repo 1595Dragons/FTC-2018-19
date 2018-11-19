@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.Dogeforia;
+import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
@@ -9,18 +12,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.opencv.core.Size;
-
-import com.disnodeteam.dogecv.CameraViewDisplay;
-import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,23 +60,22 @@ class config {
     private final float mmPerInch = 25.4f;
     private final float mmFTCFieldWidth = (12 * 6) * mmPerInch; // The width of the FTC field (from the center point to the outer panels)
     private final float mmTargetHeight = (6) * mmPerInch; // The height of the center of the target image above the floor
-    // Stuff for vision
-    public VuforiaTrackable BlueRover, RedFootprint, FrontCraters, BackSpace;
     GoldDetector goldDetector;
     String target = "None";
     List<VuforiaTrackable> VisionTargets = new ArrayList<>();
-    int cameraMonitorViewId;
     // DcMotors and servos used on the robot
     DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
     Servo IO_Servo_Left, IO_Servo_Right;
     // Version 2 color sensor
     ColorSensor sensorColorLeft, sensorColorRight;
     DistanceSensor sensorDistanceLeft, sensorDistanceRight;
+    private boolean VisionIsActive = false;
+    private Dogeforia vuforia;
     private VuforiaTrackables pictures;
-    boolean VisionIsActive = false;
-    Dogeforia vuforia;
     // Telemetry stuff
     private Telemetry telemetry;
+
+    private ElapsedTime time = new ElapsedTime();
 
 
     config(Telemetry t) {
@@ -85,7 +83,7 @@ class config {
     }
 
     /**
-     * Goes through the configureation of the robot, even updating the telemetry :)
+     * Goes through the configuration of the robot, even updating the telemetry :)
      * <br>
      * <br>
      *
@@ -302,20 +300,25 @@ class config {
 
         telemetry.addLine(); // Add a space between servo values and color sensor stuff
 
-
-        telemetry.addLine(); // Add a space between the color sensor stuff and the vision stuff
-
-
-        /*
-        if (VisionIsActive) {
-            telemetry.addData("Current visible target", target);
+        if (sensorColorRight != null) {
+            telemetry.addData("Right color sensor R, G, B", String.format(Locale.US, "%d, %d, %d", sensorColorRight.red(), sensorColorRight.green(), sensorColorRight.blue()));
         }
-        */
-        if (goldDetector != null) {
-            if (goldDetector.isFound()) {
-                telemetry.addData("Vision", "Found gold");
-            } else {
-                telemetry.addData("Vision", "Still searching...");
+
+
+        if (sensorColorLeft != null) {
+            telemetry.addData("Left color sensor R, G, B", String.format(Locale.US, "%d, %d, %d", sensorColorLeft.red(), sensorColorLeft.green(), sensorColorLeft.blue()));
+        }
+
+
+        if (VisionIsActive) {
+            telemetry.addLine(); // Add a space between the color sensor stuff and the vision stuff
+            telemetry.addData("Current visible target", target);
+            if (goldDetector != null) {
+                if (goldDetector.isFound()) {
+                    telemetry.addData("Vision", "Found gold");
+                } else {
+                    telemetry.addData("Vision", "Still searching...");
+                }
             }
         }
 
@@ -370,13 +373,13 @@ class config {
         status("Setting up vision system");
 
         // Get the camera monitor id for the app
-        status("Getting camera view id");
+        status("Getting the Webcam name");
         WebcamName webcamName = hardware.get(WebcamName.class, "Webcam");
-        cameraMonitorViewId = hardware.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardware.appContext.getPackageName());
+
 
         // Create a variable for passing parameters, such as the key for vuforia, and what camera we want to use (Back vs Selfie camera)
-        status("Setting up parameters");
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        status("Creating parameters");
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(hardware.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardware.appContext.getPackageName()));
         parameters.vuforiaLicenseKey = "AZCmJPP/////AAABmRv4/TqKsEL5ibXvaun2fEQKEUkwXTrdsCcIueZmlFVNNUuH0X6UhMExuB/m/NXRcHP+Wq/W9XTSqiS21EZ/itywzp7hwhlDorTrimz/dFGqKtpA8xI+hoktwHhVbqZkgt+BrZTqYh6jB6VsIUZ/u6xH7eA3mi2AZgoKQrhjGlJt+I0vU/Ge6BH44QQqs/mYW0em2diCwdTXIotik0DvFqW8xlCt3LGjJti23oYcPRIwBx3tHhZb9eZHRaILghHoCsdnBK4fHM0Gl2e/QXbbnq/FeB5mislfemylT7YVHDmTgPgDGFZb1aorTiFm6fQCWX7duJ8YtOzsV2WEUbH64DSHZUYVmhR0rK+IcUbLs9G/";
         parameters.fillCameraMonitorViewParent = true;
         parameters.cameraName = webcamName;
@@ -385,75 +388,71 @@ class config {
         status("Applying parameters");
         vuforia = new Dogeforia(parameters);
         vuforia.enableConvertFrameToBitmap();
-        // Load the pictures targets from the engine, that way we can track them
 
+
+        // Load the pictures targets from the engine, that way we can track them
         status("Loading assets");
         pictures = vuforia.loadTrackablesFromAsset("RoverRuckus");
 
         // Setup the images one by one
-        // This *could* be done all at once, but one by one keeps things simple
-        BlueRover = pictures.get(0);
-        BlueRover.setName("Blue rover");
+        VuforiaTrackable blueRover = pictures.get(0);
+        blueRover.setName("Blue rover");
 
-        RedFootprint = pictures.get(1);
-        RedFootprint.setName("Red footprint");
+        VuforiaTrackable redFootprint = pictures.get(1);
+        redFootprint.setName("Red footprint");
 
-        FrontCraters = pictures.get(2);
-        FrontCraters.setName("Front craters");
+        VuforiaTrackable frontCraters = pictures.get(2);
+        frontCraters.setName("Front craters");
 
-        BackSpace = pictures.get(3);
-        BackSpace.setName("Back space");
+        VuforiaTrackable backSpace = pictures.get(3);
+        backSpace.setName("Back space");
 
-        // Add all the trackables to a list
-        status("Activating tracker");
+
+        // Add all the target to a list, and then activate the tracker
+        status("Activating picture targets");
         VisionTargets.addAll(pictures);
         pictures.activate();
 
 
+        // Create the gold detector
         status("Creating gold detector");
-        goldDetector = new GoldDetector();
-
-        // Init the detector (try to use the defaults)
-        status("Applying settings");
+        goldDetector = new GoldDetector();;
         goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 0, true);
         goldDetector.useDefaults();
 
+
         // Apply the score based on color
-        status("Applying color deviation scoring");
-        goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
+        status("Applying max area scoring");
+        goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
         goldDetector.downscale = 0.8;
 
+        // Set the detector to vuforia
+        status("Adding goldDetector to vuforia");
         vuforia.setDogeCVDetector(goldDetector);
-        vuforia.enableDogeCV();
-        vuforia.showDebug();
-        vuforia.start();
-
-        //status("Starting detector");
-        //goldDetector.enable();
 
         status("Ready!");
-
-        // TODO: We could also add location data to get the position of the images on the field as well as the robot
-
-        status("Done!");
     }
 
     /**
      * Starts tracking the vision targets. This is quite taxing on the phone, so be sure to end it as soon as you can
      */
-    @Deprecated
     void StartTrackingVisionTargets() {
-        pictures.activate();
         VisionIsActive = true;
+        vuforia.showDebug();
+        vuforia.enableDogeCV();
+        vuforia.enableTrack();
+        vuforia.start();
     }
 
     /**
      * Stops tracking the vision targets
      */
-    @Deprecated
     void StopTrackingVisionTargets() {
         pictures.deactivate();
         VisionIsActive = false;
+        vuforia.disableTrack();
+        vuforia.disableDogeCV();
+        vuforia.stop();
     }
 
     /**
@@ -473,7 +472,7 @@ class config {
 
         // Init the detector (try to use the defaults)
         status("Applying settings");
-        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false); // TODO: Change for USB camera :)
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
         goldDetector.useDefaults();
 
         // Apply the score based on color
@@ -487,7 +486,20 @@ class config {
 
     }
 
-    private void status(String string) {
+    boolean searchForGold(int milliseconds) {
+        time.reset();
+        while (time.milliseconds() < milliseconds) {
+            telemetry.addData("Elapsed time", time.milliseconds());
+            updateTelemetry();
+            if (goldDetector.isFound()) {
+                return true;
+            }
+            Thread.yield();
+        }
+        return false;
+    }
+
+    void status(String string) {
         telemetry.addData("Status", string);
         telemetry.update();
     }

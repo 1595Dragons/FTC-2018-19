@@ -77,18 +77,14 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        // Setup robot hardware
         robot.ConfigureRobtHardware(this.hardwareMap);
 
+
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
-        telemetry.update();
+        robot.status("Resetting motors");
         robot.resetMotors(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
 
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0", "Starting at %7d :%7d",
-                robot.left_front.getCurrentPosition(),
-                robot.right_front.getCurrentPosition());
-        telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -100,9 +96,9 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
         sleep(200);
         encoderDrive(DRIVE_SPEED,-45,-45,5.0);
-        robot.setupGoldDetector(this.hardwareMap);
-        sleep(1000);
-        if (robot.goldDetector.isFound()) {
+        robot.InitializeVision(this.hardwareMap);
+        robot.StartTrackingVisionTargets();
+        if (robot.searchForGold(1000)) {
             // Do whatever when found
         }
 
@@ -238,4 +234,5 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.armMotorR.setPower(0);
 
     }
+
 }

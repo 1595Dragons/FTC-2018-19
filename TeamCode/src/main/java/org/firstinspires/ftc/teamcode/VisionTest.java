@@ -13,8 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
  * FRC 1595
  */
 //@Disabled
-@TeleOp(name = "Stephens vision test code", group = "Test")
-public class Stephens_Vision_Code___yay extends LinearOpMode {
+@TeleOp(name = "Vision test code", group = "Test")
+public class VisionTest extends LinearOpMode {
 
     private config robot = new config(this.telemetry);
 
@@ -26,18 +26,16 @@ public class Stephens_Vision_Code___yay extends LinearOpMode {
         waitForStart();
 
         // Start tracking
-        //robot.StartTrackingVisionTargets();
+        robot.StartTrackingVisionTargets();
 
         while (opModeIsActive()) {
 
             // Iterate through the image targets, and if one is visible, set the found vision target
-            /*
             for (VuforiaTrackable Target : robot.VisionTargets) {
                 if (((VuforiaTrackableDefaultListener) Target.getListener()).isVisible()) {
                     robot.target = Target.getName();
                 }
             }
-            */
 
             // Update the telemetry to display critical information
             robot.updateTelemetry();
@@ -45,8 +43,6 @@ public class Stephens_Vision_Code___yay extends LinearOpMode {
         }
 
         // Stop tracking
-        //robot.StopTrackingVisionTargets();
-        robot.vuforia.disableTrack();
-        robot.vuforia.disableDogeCV();
+        robot.StopTrackingVisionTargets();
     }
 }
