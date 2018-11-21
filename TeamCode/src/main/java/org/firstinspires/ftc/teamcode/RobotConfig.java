@@ -31,7 +31,7 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = 4150, minClimberPos = 0;
+    int maxClimberPos = -4200, minClimberPos = 0;
 
 
     GoldDetector goldDetector;

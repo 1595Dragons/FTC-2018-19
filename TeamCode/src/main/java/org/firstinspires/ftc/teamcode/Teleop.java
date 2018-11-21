@@ -84,8 +84,26 @@ public class Teleop extends LinearOpMode {
                 robot.goldDetector.disable();
             }
 
+            
             // Set the arm power to that of the left stick, but cap it at 60% (Otherwise its too fast)
-            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
+            // Be sure to move the arm only if the climber is high enough
+            if (gamepad2.left_stick_y < -0.1) {
+                robot.climber.setTargetPosition(robot.maxClimberPos);
+                if (robot.isThere(50, robot.climber)) {
+                    robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
+                } else {
+                    robot.arm.setPower(0);
+                }
+
+                if (robot.isThere(1, robot.climber)) {
+                    robot.climber.setPower(0);
+                } else {
+                    robot.climber.setPower(1);
+                }
+            } else {
+                robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -.60, .60));
+            }
+
 
             // Update telemetry
             robot.updateTelemetry();
