@@ -21,28 +21,15 @@ public class VisionTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        robot.InitializeVision(this.hardwareMap);
+        robot.setupGoldDetector(this.hardwareMap);
 
         waitForStart();
 
-        // Start tracking
-        robot.StartTrackingVisionTargets();
-
         while (opModeIsActive()) {
 
-            // Iterate through the image targets, and if one is visible, set the found vision target
-            for (VuforiaTrackable Target : robot.VisionTargets) {
-                if (((VuforiaTrackableDefaultListener) Target.getListener()).isVisible()) {
-                    robot.target = Target.getName();
-                }
-            }
-
-            // Update the telemetry to display critical information
             robot.updateTelemetry();
 
         }
-
-        // Stop tracking
-        robot.StopTrackingVisionTargets();
+        robot.goldDetector.disable();
     }
 }

@@ -313,12 +313,14 @@ class config {
         if (VisionIsActive) {
             telemetry.addLine(); // Add a space between the color sensor stuff and the vision stuff
             telemetry.addData("Current visible target", target);
-            if (goldDetector != null) {
-                if (goldDetector.isFound()) {
-                    telemetry.addData("Vision", "Found gold");
-                } else {
-                    telemetry.addData("Vision", "Still searching...");
-                }
+
+        }
+
+        if (goldDetector != null) {
+            if (goldDetector.isFound()) {
+                telemetry.addData("Vision", "Found gold");
+            } else {
+                telemetry.addData("Vision", "Still searching...");
             }
         }
 
@@ -455,12 +457,12 @@ class config {
         vuforia.stop();
     }
 
+
     /**
      * Sets up the vision system (DogeCV) for detecting the gold (piss yellow) cube
      *
      * @param hardware The hardware map of the robot (for getting the app context... android is weird)
      */
-    @Deprecated
     void setupGoldDetector(HardwareMap hardware) {
 
         status("Creating gold detector");
@@ -472,7 +474,7 @@ class config {
 
         // Init the detector (try to use the defaults)
         status("Applying settings");
-        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 0, false);
         goldDetector.useDefaults();
 
         // Apply the score based on color
