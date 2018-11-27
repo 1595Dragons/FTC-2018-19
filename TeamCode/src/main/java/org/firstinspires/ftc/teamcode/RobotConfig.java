@@ -31,7 +31,7 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = -4200, minClimberPos = 0;
+    int maxClimberPos = 4200, minClimberPos = 0;
 
 
     GoldDetector goldDetector;
@@ -60,42 +60,42 @@ class RobotConfig {
         left1 = hardware.dcMotor.get("left1");
         left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left1.setDirection(DcMotorSimple.Direction.REVERSE);
+        left1.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup right1
         status("Setting up right1");
         right1 = hardware.dcMotor.get("right1");
         right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right1.setDirection(DcMotorSimple.Direction.FORWARD);
+        right1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup left2
         status("Setting up left2");
         left2 = hardware.dcMotor.get("left2");
         left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left2.setDirection(DcMotorSimple.Direction.REVERSE);
+        left2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup right2
         status("Setting up right2");
         right2 = hardware.dcMotor.get("right2");
         right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right2.setDirection(DcMotorSimple.Direction.FORWARD);
+        right2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the intake
         status("Setting up intake");
         intake = hardware.dcMotor.get("intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the arm
         status("Setting up arm");
         arm = hardware.dcMotor.get("arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setDirection(DcMotorSimple.Direction.FORWARD);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup climber motor
         status("Setting up climber motor");
