@@ -91,8 +91,7 @@ public class Teleop extends LinearOpMode {
 
             // Update telemetry
             robot.updateTelemetry();
-
-            idle();
+            
         }
 
         // Stop tracking gold
