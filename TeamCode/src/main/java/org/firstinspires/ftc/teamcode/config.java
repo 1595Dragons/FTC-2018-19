@@ -418,7 +418,8 @@ class config {
 
         // Create the gold detector
         status("Creating gold detector");
-        goldDetector = new GoldDetector();;
+        goldDetector = new GoldDetector();
+        ;
         goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 0, true);
         goldDetector.useDefaults();
 
