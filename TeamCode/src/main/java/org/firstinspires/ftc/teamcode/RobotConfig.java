@@ -59,6 +59,7 @@ class RobotConfig {
         status("Setting up left1");
         left1 = hardware.dcMotor.get("left1");
         left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left1.setTargetPosition(0);
         left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left1.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -66,6 +67,7 @@ class RobotConfig {
         status("Setting up right1");
         right1 = hardware.dcMotor.get("right1");
         right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right1.setTargetPosition(0);
         right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right1.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -73,6 +75,7 @@ class RobotConfig {
         status("Setting up left2");
         left2 = hardware.dcMotor.get("left2");
         left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left2.setTargetPosition(0);
         left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left2.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -80,20 +83,22 @@ class RobotConfig {
         status("Setting up right2");
         right2 = hardware.dcMotor.get("right2");
         right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right2.setTargetPosition(0);
         right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the intake
         status("Setting up intake");
         intake = hardware.dcMotor.get("intake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the arm
         status("Setting up arm");
         arm = hardware.dcMotor.get("arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -101,8 +106,10 @@ class RobotConfig {
         status("Setting up climber motor");
         climber = hardware.dcMotor.get("climb");
         climber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climber.setTargetPosition(0);
         climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         climber.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the gyro
@@ -182,12 +189,6 @@ class RobotConfig {
             telemetry.addData("Arm (target)", String.format(Locale.US, "%d (%d)",
                     arm.getCurrentPosition(),
                     arm.getTargetPosition()));
-        }
-
-        if (intake != null) {
-            telemetry.addData("Intake (target)", String.format(Locale.US, "%d (%d)",
-                    intake.getCurrentPosition(),
-                    intake.getTargetPosition()));
         }
 
         if (goldDetector != null) {
