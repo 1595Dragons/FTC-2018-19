@@ -29,15 +29,16 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
         robot.ConfigureRobtHardware(this.hardwareMap);
 
         //IO Servo
+        //Servo 位置
         double IOLeftServoClose = 0.3,IOLeftServoHalfOpen = 0.7, IOLeftServoOpen = 0.95;
         double IORightServoClose = 0.6, IORightServoHalfOpen = 0.2, IORightServoOpen = 0;
         //MOTORS Power
-        double speedForTurn = 0.5, speedForMove =0.6, speedForSide = 0.9;
+        double speedForTurn = 0.4, speedForMove =0.5, speedForSide = 0.7;
         double intakePower = 1;
         double armPower =1;
         double extendPower = 0.5;
         // limit position
-        int armMaxPosition = 0, armMinPosition = -680;
+        int armMaxPosition = 0, armMinPosition = -380;
         int extendMaxPosition = 500, extendMinPosition = 0;
         robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -73,6 +74,16 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             left2Power=0;
             right1Power=0;
             right2Power=0;
+            //prevent small input from stick
+            if (driveForward>=-0.1&&driveForward<=0.1){
+                driveForward=0;
+            }
+            if (driveRightSide>=-0.1&&driveRightSide<=0.1){
+                driveRightSide=0;
+            }
+            if (turnRight>=-0.1&&turnRight<=0.1){
+                turnRight=0;
+            }
 
             if(gamepad2.dpad_down==false&&gamepad2.dpad_left==false&&gamepad2.dpad_right==false&&gamepad2.dpad_up==false)
             {
@@ -83,17 +94,17 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             }
             else
             {
-                if(gamepad2.dpad_up){
-                    left1Power=1*speedForMove*allPower;
-                    left2Power=1*speedForMove*allPower;
-                    right1Power=1*speedForMove*allPower;
-                    right2Power=1*speedForMove*allPower;
-                }
-                else if(gamepad2.dpad_down){
+                if(gamepad2.dpad_up){//up button actually works for down function
                     left1Power=-1*speedForMove*allPower;
                     left2Power=-1*speedForMove*allPower;
                     right1Power=-1*speedForMove*allPower;
                     right2Power=-1*speedForMove*allPower;
+                }
+                else if(gamepad2.dpad_down){//down button actually works for up function
+                    left1Power=1*speedForMove*allPower;
+                    left2Power=1*speedForMove*allPower;
+                    right1Power=1*speedForMove*allPower;
+                    right2Power=1*speedForMove*allPower;
                 }
                 else if(gamepad2.dpad_right){
                     left1Power=-1*speedForSide*allPower;
@@ -113,6 +124,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
             if (gamepad1.left_stick_button)
             {
+
                 armExtend+=extendPower;
             }
             if(gamepad1.right_stick_button)
@@ -237,11 +249,13 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             }
             if (gamepad1.x)
             {
-                robot.IO_Motor.setPower(-intakePower);
+                robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
             }
             if (gamepad1.b)
             {
                 robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
+                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
             }
             // Update telemetry
             //robot.updateTelemetry();
