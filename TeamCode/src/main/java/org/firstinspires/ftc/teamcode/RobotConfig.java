@@ -31,7 +31,7 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = -4200, minClimberPos = 0;
+    int maxClimberPos = 4200, minClimberPos = 0;
 
 
     GoldDetector goldDetector;
@@ -312,7 +312,7 @@ class RobotConfig {
 
         // Init the detector (try to use the defaults)
         status("Applying settings");
-        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 1, false);
+        goldDetector.init(hardware.appContext, CameraViewDisplay.getInstance(), 0, false);
         goldDetector.useDefaults();
 
         // Apply the score based on color
