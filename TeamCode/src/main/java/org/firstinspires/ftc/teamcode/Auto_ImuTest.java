@@ -32,7 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -67,8 +66,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "PushbotAutoDriveByEncoder_Linear", group = "Pushbot")
-public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
+@Autonomous(name = "ImuTest", group = "Pushbot")
+public class Auto_ImuTest extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
@@ -104,35 +103,11 @@ public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        //PlanA
-        /*
-        armDrive(ARM_SPEED, 680, 4.0);
-        sleep(200);
-        distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
-        sleep(200);
-        //robot.InitializeVision(this.hardwareMap);
-        //robot.StartTrackingVisionTargets();
-        robot.setupGoldDetector(this.hardwareMap);
-        if (robot.searchForGold(1000)) {//check left 1 position
-            // Do whatever when found
-            encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-        }
-        else{
-            distinctDrive(SIDE_SPEED,-9,9,9,-9,4.0);
-            if (robot.searchForGold(1000)) {//check left 2 position
-                // Do whatever when found
-                encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-            } else {
-                distinctDrive(SIDE_SPEED,-9,9,9,-9,4.0);
-                encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-            }
-        }
-        */
-
-        //Test A
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
         sleep(200);
         TurnByImu(TURN_SPEED,0,imu,5);
+        sleep(1000);
+        TurnByImu(TURN_SPEED,180,imu,6);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
