@@ -66,11 +66,9 @@ public class Teleop extends LinearOpMode {
             robot.intake.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
 
 
-            // Set the arm power to that of the left stick, but cap it at
-            if (gamepad2.dpad_up) {
-                robot.arm.setPower(0.6);
-            } else if (gamepad2.dpad_down) {
-                robot.arm.setPower(-0.6);
+            // Set the arm power to that of the left stick, but cap it at 60%
+            if (Math.abs(robot.climber.getCurrentPosition() - robot.maxClimberPos) < 100) {
+                robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -0.6, 0.6));
             } else {
                 robot.arm.setPower(0);
             }

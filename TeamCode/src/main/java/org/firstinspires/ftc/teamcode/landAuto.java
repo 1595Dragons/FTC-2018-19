@@ -32,7 +32,7 @@ public class landAuto extends LinearOpMode {
                     }
                     break;
                 case 1:
-                    robot.driveDistance(MecanumDriveDirection.RIGHT, 3, 1);
+                    robot.driveDistance(MecanumDriveDirection.RIGHT, 4, 1);
                     if (robot.isThere(10, robot.right1, robot.left1, robot.left2, robot.right2)) {
                         robot.resetMotors(robot.left2, robot.left1, robot.right1, robot.right2);
                         stage++;

@@ -31,7 +31,7 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
 
-    int maxClimberPos = 4200, minClimberPos = 0;
+    int maxClimberPos = -1000, minClimberPos = 0;
 
 
     GoldDetector goldDetector;
@@ -159,24 +159,28 @@ class RobotConfig {
             telemetry.addData("Left1 (target)", String.format(Locale.US, "%d (%d)",
                     left1.getCurrentPosition(),
                     left1.getTargetPosition()));
+            telemetry.addData("Left1 power", left1.getPower());
         }
 
         if (right1 != null) {
             telemetry.addData("Right1 (target)", String.format(Locale.US, "%d (%d)",
                     right1.getCurrentPosition(),
                     right1.getTargetPosition()));
+            telemetry.addData("Right1 power", right1.getPower());
         }
 
         if (left2 != null) {
             telemetry.addData("Left2 (target)", String.format(Locale.US, "%d (%d)",
                     left2.getCurrentPosition(),
                     left2.getTargetPosition()));
+            telemetry.addData("Left2 power", left2.getPower());
         }
 
         if (right2 != null) {
             telemetry.addData("Right2 (target)", String.format(Locale.US, "%d (%d)",
                     right2.getCurrentPosition(),
                     right2.getTargetPosition()));
+            telemetry.addData("Right2 power", right2.getPower());
         }
 
         if (climber != null) {
