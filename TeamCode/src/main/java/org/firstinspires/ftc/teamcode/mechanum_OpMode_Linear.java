@@ -13,9 +13,11 @@ import java.util.Locale;
 
 /**
  * Created by Stephen Ogden on 9/20/18.
- * FTC 6128 | 7935
+ * edited by Henry Xu.
+ * FTC 7935
  * FRC 1595
  */
+
 
 @TeleOp(name="Mechanum OpMode Linear", group="Test")
 public class mechanum_OpMode_Linear extends LinearOpMode {
@@ -144,22 +146,22 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             robot.right_front.setPower(right1Power);
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
-            if (robot.armMotorL.getCurrentPosition()>= armMaxPosition && armUp>=0)
+            if (robot.armMotorL.getCurrentPosition()>= armMaxPosition && armUp>=0 && gamepad2.a==false)
             {
                 armUp=0;
             }
-            if(robot.armMotorL.getCurrentPosition()<= armMinPosition && armUp<=0)
+            if(robot.armMotorL.getCurrentPosition()<= armMinPosition && armUp<=0 && gamepad2.a==false)
             {
                 armUp=0;
             }
             robot.armMotorL.setPower(armUp);
             robot.armMotorR.setPower(armUp);
 
-            if(robot.armMotorExtend.getCurrentPosition()>=extendMaxPosition && armExtend>=0)
+            if(robot.armMotorExtend.getCurrentPosition()>=extendMaxPosition && armExtend>=0 && gamepad2.a==false)
             {
                 armExtend=0;
             }
-            if(robot.armMotorExtend.getCurrentPosition()<=extendMinPosition && armExtend<=0)
+            if(robot.armMotorExtend.getCurrentPosition()<=extendMinPosition && armExtend<=0 && gamepad2.a==false)
             {
                 armExtend=0;
             }

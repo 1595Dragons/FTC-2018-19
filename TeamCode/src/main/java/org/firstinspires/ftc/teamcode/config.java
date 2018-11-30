@@ -1,9 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.Dogeforia;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
@@ -16,6 +25,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
@@ -67,6 +77,7 @@ class config {
     DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
     Servo IO_Servo_Left, IO_Servo_Right;
     // Version 2 color sensor
+
     ColorSensor sensorColorLeft, sensorColorRight;
     DistanceSensor sensorDistanceLeft, sensorDistanceRight;
     private boolean VisionIsActive = false;
@@ -370,6 +381,7 @@ class config {
      *
      * @param hardware -- The HardwareMap of the robot. Just type <code>this.hardwareMap</code> for this parameter.
      */
+@Deprecated
     void InitializeVision(HardwareMap hardware) {
 
         status("Setting up vision system");
@@ -439,6 +451,7 @@ class config {
     /**
      * Starts tracking the vision targets. This is quite taxing on the phone, so be sure to end it as soon as you can
      */
+    @Deprecated
     void StartTrackingVisionTargets() {
         VisionIsActive = true;
         vuforia.showDebug();

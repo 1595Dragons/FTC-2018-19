@@ -32,7 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -67,8 +66,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "PushbotAutoDriveByEncoder_Linear", group = "Pushbot")
-public class PushbotAutoDriveByEncoder_Linear extends LinearOpMode {
+@Autonomous(name = "Auto Origin", group = "Pushbot")
+public class Auto_Origin extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
