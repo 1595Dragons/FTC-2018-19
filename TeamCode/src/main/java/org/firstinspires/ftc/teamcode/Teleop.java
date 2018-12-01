@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -44,15 +45,35 @@ public class Teleop extends LinearOpMode {
 
             // Climb to predefined positions
             if (gamepad2.y) {
+                robot.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.climber.setTargetPosition(robot.maxClimberPos);
             } else if (gamepad2.x) {
+                robot.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.climber.setTargetPosition(robot.minClimberPos);
             }
-            if (robot.isThere(1, robot.climber)) {
-                robot.climber.setPower(0);
-            } else {
-                robot.climber.setPower(1);
+
+            if (robot.climber.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+                if (robot.isThere(1, robot.climber)) {
+                    robot.climber.setPower(0);
+                } else {
+                    robot.climber.setPower(1);
+                }
             }
+
+
+            if (gamepad2.right_stick_y != 0) {
+                robot.climber.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+
+
+            if (robot.climber.getMode().equals(DcMotor.RunMode.RUN_WITHOUT_ENCODER)){
+                robot.climber.setPower(-1*gamepad2.right_stick_y);
+            }
+
+            robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -0.6, 0.6));
+
+            // Set the intake to the power left trigger compared to the right trigger
+            robot.intake.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
 
               /*
             // Set arm positions
@@ -144,17 +165,14 @@ public class Teleop extends LinearOpMode {
             }
             */
 
-            // Set the intake to the power left trigger compared to the right trigger
-            robot.intake.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
-
-
-
             // Set the arm power to that of the left stick, but cap it at 60%
+            /*
             if (Math.abs(robot.climber.getCurrentPosition() - robot.maxClimberPos) < 100) {
                 robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -0.6, 0.6));
             } else {
                 robot.arm.setPower(0);
             }
+            */
 
             // Update telemetry
             telemetry.addData("Arm stage", armStage);

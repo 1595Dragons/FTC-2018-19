@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * FRC 1595
  */
 @Autonomous(name = "Land and detect cube", group = "Official")
-//@Disabled
+@Disabled
 public class detectCubeAuto extends LinearOpMode {
 
     private RobotConfig robot = new RobotConfig(this.telemetry);

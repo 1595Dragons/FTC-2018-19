@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
  * FRC 1595
  */
 
-@TeleOp(name = "6128 TeleOp (Only 1 controller)")
+@TeleOp(name = "6128 TeleOp (Only 1 controller)", group = "Official")
 public class TeleOpSingleController extends LinearOpMode {
     // Declare the RobotConfig file, that way we can use the pre-made fictions for cleaner code
     private RobotConfig robot = new RobotConfig(this.telemetry);
