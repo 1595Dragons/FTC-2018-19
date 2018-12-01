@@ -4,7 +4,6 @@ import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -30,8 +29,7 @@ class RobotConfig {
 
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
-
-    int maxClimberPos = -1000, minClimberPos = 0;
+    int maxClimberPos = 4200, minClimberPos = 0, minArmPos = 0, adjustedArmPos = 300, topArmPos = 4700;
 
 
     GoldDetector goldDetector;
@@ -60,15 +58,16 @@ class RobotConfig {
         left1 = hardware.dcMotor.get("left1");
         left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left1.setTargetPosition(0);
-        left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         left1.setDirection(DcMotorSimple.Direction.FORWARD);
+
 
         // Declare and setup right1
         status("Setting up right1");
         right1 = hardware.dcMotor.get("right1");
         right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right1.setTargetPosition(0);
-        right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup left2
@@ -76,7 +75,7 @@ class RobotConfig {
         left2 = hardware.dcMotor.get("left2");
         left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left2.setTargetPosition(0);
-        left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         left2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup right2
@@ -84,7 +83,7 @@ class RobotConfig {
         right2 = hardware.dcMotor.get("right2");
         right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right2.setTargetPosition(0);
-        right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the intake
@@ -99,7 +98,7 @@ class RobotConfig {
         arm = hardware.dcMotor.get("arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup climber motor
@@ -113,20 +112,20 @@ class RobotConfig {
         climber.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the gyro
+        /*
         status("Setting up gyro");
-        gyro = hardware.get(BNO055IMU.class, "imu");
+        gyro = hardware.get(BNO055IMU.class, "gyro");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
         parameters.loggingEnabled = false;
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        gyro = hardware.get(BNO055IMU.class, "gyro");
-        gyro.initialize(parameters);
 
         while (!gyro.isGyroCalibrated()) {
             Thread.yield();
         }
+        */
 
         // Update telemetry to signal done!
         status("Ready!");
