@@ -71,7 +71,7 @@ public class Auto_Origin extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
-    private static final double DRIVE_SPEED = .2, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
+    private static final double DRIVE_SPEED = .15, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
 
     // Config for the robot
     private config robot = new config(this.telemetry);
@@ -101,38 +101,51 @@ public class Auto_Origin extends LinearOpMode {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+
 
         //PlanA
-        /*
-        armDrive(ARM_SPEED, 680, 4.0);
+        armDrive(ARM_SPEED, 700, 3.0);
         sleep(200);
-        distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
+        imu.initialize(parameters);
+        distinctDrive(SIDE_SPEED,10,-10,-10,10,3.0);
         sleep(200);
+        encoderDrive(DRIVE_SPEED, 4,-4,3);
+        sleep(200);
+        encoderDrive(DRIVE_SPEED, -5,-5,3);
+        sleep(200);
+        distinctDrive(SIDE_SPEED,10,-10,-10,10,3.0);
+        //TurnByImu(TURN_SPEED,0,imu,3);
         //robot.InitializeVision(this.hardwareMap);
         //robot.StartTrackingVisionTargets();
         robot.setupGoldDetector(this.hardwareMap);
+        /*
         if (robot.searchForGold(1000)) {//check left 1 position
             // Do whatever when found
             encoderDrive(DRIVE_SPEED,-30,-30,4.0);
         }
         else{
-            distinctDrive(SIDE_SPEED,-9,9,9,-9,4.0);
+            distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
+            TurnByImu(TURN_SPEED,0,imu,3);
             if (robot.searchForGold(1000)) {//check left 2 position
                 // Do whatever when found
                 encoderDrive(DRIVE_SPEED,-30,-30,4.0);
             } else {
-                distinctDrive(SIDE_SPEED,-9,9,9,-9,4.0);
+                distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
+                TurnByImu(TURN_SPEED,0,imu,3);
                 encoderDrive(DRIVE_SPEED,-30,-30,4.0);
             }
         }
         */
-
-        //Test A
-        distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
-        sleep(200);
-        TurnByImu(TURN_SPEED,0,imu,5);
-
+        for (int i=0;i<=7;i++)
+        {
+            if(robot.searchForGold(1000))
+            {
+                encoderDrive(DRIVE_SPEED,-30,-30,3.0);
+                break;
+            }
+            distinctDrive(SIDE_SPEED,-7,7,7,-7,2.0);
+            encoderDrive(DRIVE_SPEED, -1,1,1);
+        }
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
@@ -264,14 +277,14 @@ public class Auto_Origin extends LinearOpMode {
 
         Orientation angles2;
         angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double kp=0.005, ki=0.001, kd=0.0001;
+        double kp=0.007, ki=0.005, kd=0.0001;
         double lastTime=0,accumulation=0,lastAngle=angles2.firstAngle;
         double lastDifference=0;
         double output=0;
 
         // Reset the runtime
         runtime.reset();
-        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=3||(angles2.firstAngle-turnToAngle)<=-3))
+        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=1||(angles2.firstAngle-turnToAngle)<=-1))
         {
             angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             if ((lastDifference>0&&(angles2.firstAngle-turnToAngle)<=0)

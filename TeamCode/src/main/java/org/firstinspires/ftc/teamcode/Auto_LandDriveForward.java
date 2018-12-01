@@ -66,13 +66,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "SetUpIntake", group = "Pushbot")
-public class Auto_SetUpIntake extends LinearOpMode {
+@Autonomous(name = "Auto LandDriveForward", group = "Pushbot")
+public class Auto_LandDriveForward extends LinearOpMode {
 
     private static final double EncoderNumberChangePerInch = 34;
 
-    private static final double DRIVE_SPEED = .2, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
-    private static final double ARM_DROP = .3;
+    private static final double DRIVE_SPEED = .15, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
+
     // Config for the robot
     private config robot = new config(this.telemetry);
 
@@ -101,25 +101,21 @@ public class Auto_SetUpIntake extends LinearOpMode {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
 
-        armDrive(ARM_SPEED, 680, 4.0);
-        sleep(200);
-        distinctDrive(SIDE_SPEED,10,-10,-10,10,4.0);
-        sleep(200);
-        armDrive(ARM_SPEED,-350,3.0);
-        sleep(200);
-        robot.armMotorL.setPower(-ARM_DROP);
-        robot.armMotorR.setPower(-ARM_DROP);
-        encoderDrive(DRIVE_SPEED*0.5, -20,-20,5);
-        robot.armMotorL.setPower(0);
-        robot.armMotorR.setPower(0);
+        //PlanA
+        armDrive(ARM_SPEED, 700, 3.0);
+        sleep(300);
+        distinctDrive(SIDE_SPEED,10,-10,-10,10,3);
+        sleep(300);
+        encoderDrive(DRIVE_SPEED, 3,-3,3);
+        sleep(300);
+        encoderDrive(DRIVE_SPEED, -5,-5,2);
+        distinctDrive(SIDE_SPEED,-10,10,10,-10,3);
+        sleep(300);
+        encoderDrive(DRIVE_SPEED, -40,-40,5);
 
-        armDrive(ARM_SPEED,500,4.0);
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
     }
 
     private void encoderDrive(double speed, double leftInches, double rightInches, double timeoutS) {
@@ -249,14 +245,14 @@ public class Auto_SetUpIntake extends LinearOpMode {
 
         Orientation angles2;
         angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double kp=0.005, ki=0.001, kd=0.0001;
+        double kp=0.007, ki=0.005, kd=0.0001;
         double lastTime=0,accumulation=0,lastAngle=angles2.firstAngle;
         double lastDifference=0;
         double output=0;
 
         // Reset the runtime
         runtime.reset();
-        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=3||(angles2.firstAngle-turnToAngle)<=-3))
+        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=1||(angles2.firstAngle-turnToAngle)<=-1))
         {
             angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             if ((lastDifference>0&&(angles2.firstAngle-turnToAngle)<=0)

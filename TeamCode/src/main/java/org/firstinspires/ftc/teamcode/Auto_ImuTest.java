@@ -87,14 +87,6 @@ public class Auto_ImuTest extends LinearOpMode {
         // Setup robot hardware
         robot.ConfigureRobtHardware(this.hardwareMap);
 
-
-        // Send telemetry message to signify robot waiting;
-        robot.status("Resetting motors");
-        robot.resetMotors(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
-
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
         //set up imu
         BNO055IMU imu;
         Orientation angles;
@@ -103,11 +95,19 @@ public class Auto_ImuTest extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
+        // Send telemetry message to signify robot waiting;
+        robot.status("Resetting motors");
+        robot.resetMotors(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
+
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+
         distinctDrive(SIDE_SPEED,9,-9,-9,9,4.0);
         sleep(200);
-        TurnByImu(TURN_SPEED,0,imu,5);
-        sleep(1000);
-        TurnByImu(TURN_SPEED,180,imu,6);
+        TurnByImu(TURN_SPEED,0,imu,8);
+        sleep(500);
+        //TurnByImu(TURN_SPEED,90,imu,8);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -204,7 +204,7 @@ public class Auto_ImuTest extends LinearOpMode {
 
     }
 
-    private void armDrive(double speed, int armUp, double timeoutS) {
+    private void testDrive(double speed, int armUp, double timeoutS) {
 
         robot.armMotorL.setTargetPosition(armUp);
         robot.armMotorR.setTargetPosition(armUp);
@@ -240,15 +240,14 @@ public class Auto_ImuTest extends LinearOpMode {
 
         Orientation angles2;
         angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double kp=0.005, ki=0.001, kd=0.0001;
+        double kp=0.04, ki=0.015, kd=0.0001;
         double lastTime=0,accumulation=0,lastAngle=angles2.firstAngle;
         double lastDifference=0;
         double output=0;
 
         // Reset the runtime
         runtime.reset();
-        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=3||(angles2.firstAngle-turnToAngle)<=-3))
-        {
+        while(runtime.seconds() < timeoutS && (Math.abs(angles2.firstAngle - turnToAngle)) >= 1) {
             angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             if ((lastDifference>0&&(angles2.firstAngle-turnToAngle)<=0)
                     ||((lastDifference<0&&(angles2.firstAngle-turnToAngle)>=0)))
@@ -260,10 +259,16 @@ public class Auto_ImuTest extends LinearOpMode {
             lastTime=runtime.seconds();
             lastAngle=angles2.firstAngle;
             lastDifference=angles2.firstAngle-turnToAngle;
+            output=0.5;
             robot.left_front.setPower(output*speed);
             robot.left_back.setPower(output*speed);
             robot.right_front.setPower(-output*speed);
             robot.right_back.setPower(-output*speed);
+            telemetry.addData("angle",angles2.firstAngle);
+            telemetry.addData("difference",lastDifference);
+            telemetry.addData("power",output);
+            telemetry.addData("left front", robot.left_front.getPower());
+            telemetry.update();
         }
         // Stop all motion;
         robot.left_front.setPower(0);
@@ -271,4 +276,37 @@ public class Auto_ImuTest extends LinearOpMode {
         robot.right_front.setPower(0);
         robot.right_back.setPower(0);
     }
+    private void armDrive(double speed, int armUp, double timeoutS) {
+
+        robot.armMotorL.setTargetPosition(armUp);
+        robot.armMotorR.setTargetPosition(armUp);
+
+        robot.armMotorR.setPower(speed);
+        robot.armMotorL.setPower(speed);
+
+        // Reset the runtime
+        runtime.reset();
+
+        // Ensure that the opmode is still active, we're within the timeout, and all motors are within their discrepancy of their target.
+        while (opModeIsActive() && (runtime.seconds() < timeoutS) && !robot.isThere(5, robot.armMotorR, robot.armMotorL)) {
+
+            // Just let the motors run. Since their mode is set to RUN_TO_POSITION, they will advance to/retreat from their location to the target,
+            // and change the power accordingly.
+
+            // Due to discrepancies, we cannot use isBusy() because if the target position is off by at least 1 tick,
+            // the motor will keep trying to advance to the target, and will overshoot it.
+
+            // Just update telemetry with current positions, targets, and powers
+            robot.updateTelemetry();
+
+        }
+
+        // This gets executed once the time limit has expired, or when the motors have reached their targets
+
+        // Stop all motion;
+        robot.armMotorL.setPower(0);
+        robot.armMotorR.setPower(0);
+
+    }
 }
+

@@ -170,7 +170,7 @@ class config {
         IO_Motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         IO_Motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
         IO_Motor.setMode(RunMode.RUN_USING_ENCODER);
-        IO_Motor.setDirection(Direction.REVERSE);
+        IO_Motor.setDirection(Direction.FORWARD);
 
         status("Setting up color sensor");
         sensorColorLeft = hardware.colorSensor.get("color sensor left");
@@ -288,12 +288,13 @@ class config {
                     .addData("Right arm displacement", Math.abs(armMotorR.getCurrentPosition() - armMotorR.getTargetPosition()));
         }
 
-
+        /*
         if (armMotorExtend != null) {
             telemetry.addData("Arm extension motor current location", armMotorExtend.getCurrentPosition())
                     .addData("Arm extension motor target location", armMotorExtend.getTargetPosition())
                     .addData("Arm extension motor displacement", Math.abs(armMotorExtend.getCurrentPosition() - armMotorExtend.getTargetPosition()));
         }
+        */
 
 
         telemetry.addLine(); // Add a space between encoder values and servo values

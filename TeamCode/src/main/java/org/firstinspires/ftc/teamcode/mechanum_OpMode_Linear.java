@@ -32,16 +32,16 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
 
         //IO Servo
         //Servo 位置
-        double IOLeftServoClose = 0.3,IOLeftServoHalfOpen = 0.7, IOLeftServoOpen = 0.95;
-        double IORightServoClose = 0.6, IORightServoHalfOpen = 0.2, IORightServoOpen = 0;
+        double IOLeftServoClose = 0.2,IOLeftServoHalfOpen = 0.6, IOLeftServoOpen = 0.80;
+        double IORightServoClose = 0.7, IORightServoHalfOpen = 0.35, IORightServoOpen = 0.15;
         //MOTORS Power
         double speedForTurn = 0.4, speedForMove =0.5, speedForSide = 0.7;
         double intakePower = 1;
         double armPower =1;
-        double extendPower = 0.5;
+        double extendPower = 0.8;
         // limit position
-        int armMaxPosition = 0, armMinPosition = -380;
-        int extendMaxPosition = 500, extendMinPosition = 0;
+        int armPositionInitial=0;
+        int armMaxPosition = 0, armMinPosition = -680;
         robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.armMotorExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -123,16 +123,22 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             }
 
             armUp=(gamepad1.left_stick_y)*armPower;
-
-            if (gamepad1.left_stick_button)
+            if (gamepad1.dpad_up)
             {
+                armExtend=extendPower;
+            }
+            else{
+                if (gamepad1.dpad_down)
+                {
+                    armExtend=-extendPower;
+                }
+                else
+                {
+                    armExtend=0;
+                }
+            }
 
-                armExtend+=extendPower;
-            }
-            if(gamepad1.right_stick_button)
-            {
-                armExtend-=extendPower;
-            }
+
 
 
 
@@ -146,25 +152,18 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             robot.right_front.setPower(right1Power);
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
-            if (robot.armMotorL.getCurrentPosition()>= armMaxPosition && armUp>=0 && gamepad2.a==false)
+            if (robot.armMotorL.getCurrentPosition()>= armMaxPosition+armPositionInitial && armUp>=0 && gamepad1.left_stick_button==false)
             {
                 armUp=0;
             }
-            if(robot.armMotorL.getCurrentPosition()<= armMinPosition && armUp<=0 && gamepad2.a==false)
+            if(robot.armMotorL.getCurrentPosition()<= armMinPosition+armPositionInitial && armUp<=0 && gamepad1.left_stick_button==false)
             {
                 armUp=0;
             }
             robot.armMotorL.setPower(armUp);
             robot.armMotorR.setPower(armUp);
 
-            if(robot.armMotorExtend.getCurrentPosition()>=extendMaxPosition && armExtend>=0 && gamepad2.a==false)
-            {
-                armExtend=0;
-            }
-            if(robot.armMotorExtend.getCurrentPosition()<=extendMinPosition && armExtend<=0 && gamepad2.a==false)
-            {
-                armExtend=0;
-            }
+
             robot.armMotorExtend.setPower(armExtend);
 
 
@@ -196,7 +195,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
                 robot.IO_Servo_Right.setPosition(IORightServoClose);
             }
             */
-            if(gamepad1.a)
+            if(gamepad1.right_bumper)
             {
                 robot.IO_Motor.setPower(intakePower);
                 robot.IO_Servo_Left.setPosition(IOLeftServoClose);
@@ -242,7 +241,14 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             }
             else
             {
-                robot.IO_Motor.setPower(0);
+                if (gamepad1.left_bumper)
+                {
+                    robot.IO_Motor.setPower(-intakePower);
+                }
+                else
+                {
+                    robot.IO_Motor.setPower(0);
+                }
             }
             if (gamepad1.y)
             {
@@ -258,6 +264,10 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
             {
                 robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
                 robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+            }
+            if (gamepad1.a)
+            {
+                armPositionInitial=robot.armMotorL.getCurrentPosition();
             }
             // Update telemetry
             //robot.updateTelemetry();
