@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class justTelemetry extends LinearOpMode {
     @Override
     public void runOpMode() {
-        config robot = new config(this.telemetry);
-        robot.ConfigureRobtHardware(this.hardwareMap);
+        Config robot = new Config(this);
+        robot.ConfigureRobtHardware();
         waitForStart();
         while (opModeIsActive()) {
             robot.updateTelemetry();

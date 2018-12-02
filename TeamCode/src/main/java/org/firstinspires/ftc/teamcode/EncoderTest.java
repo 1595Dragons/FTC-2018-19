@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * FRC 1595
  */
 @TeleOp(name = "Encoder test", group = "Test")
+@Disabled
+@Deprecated
 public class EncoderTest extends LinearOpMode {
 
     public void runOpMode() {

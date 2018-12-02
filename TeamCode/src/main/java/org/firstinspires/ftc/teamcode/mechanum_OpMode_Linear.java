@@ -1,15 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.Locale;
 
 /**
  * Created by Stephen Ogden on 9/20/18.
@@ -22,13 +16,13 @@ import java.util.Locale;
 @TeleOp(name="Mechanum OpMode Linear", group="Test")
 public class mechanum_OpMode_Linear extends LinearOpMode {
 
-    // Declare the config file, that way we can use the pre-made fictions for cleaner code
-    private config robot = new config(this.telemetry);
+    // Declare the Config file, that way we can use the pre-made fictions for cleaner code
+    private Config robot = new Config(this);
 
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobtHardware(this.hardwareMap);
+        robot.ConfigureRobtHardware();
 
         //IO Servo
         //Servo 位置

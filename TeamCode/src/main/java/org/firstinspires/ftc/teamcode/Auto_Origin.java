@@ -74,7 +74,7 @@ public class Auto_Origin extends LinearOpMode {
     private static final double DRIVE_SPEED = .15, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
 
     // Config for the robot
-    private config robot = new config(this.telemetry);
+    private Config robot = new Config(this);
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -85,7 +85,7 @@ public class Auto_Origin extends LinearOpMode {
     public void runOpMode() {
 
         // Setup robot hardware
-        robot.ConfigureRobtHardware(this.hardwareMap);
+        robot.ConfigureRobtHardware();
 
 
         // Send telemetry message to signify robot waiting;
@@ -114,10 +114,10 @@ public class Auto_Origin extends LinearOpMode {
         encoderDrive(DRIVE_SPEED, -5,-5,3);
         sleep(200);
         distinctDrive(SIDE_SPEED,10,-10,-10,10,3.0);
-        //TurnByImu(TURN_SPEED,0,imu,3);
+        //turnToDegree(TURN_SPEED,0,imu,3);
         //robot.InitializeVision(this.hardwareMap);
         //robot.StartTrackingVisionTargets();
-        robot.setupGoldDetector(this.hardwareMap);
+        robot.setupGoldDetector();
         /*
         if (robot.searchForGold(1000)) {//check left 1 position
             // Do whatever when found
@@ -125,13 +125,13 @@ public class Auto_Origin extends LinearOpMode {
         }
         else{
             distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
-            TurnByImu(TURN_SPEED,0,imu,3);
+            turnToDegree(TURN_SPEED,0,imu,3);
             if (robot.searchForGold(1000)) {//check left 2 position
                 // Do whatever when found
                 encoderDrive(DRIVE_SPEED,-30,-30,4.0);
             } else {
                 distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
-                TurnByImu(TURN_SPEED,0,imu,3);
+                turnToDegree(TURN_SPEED,0,imu,3);
                 encoderDrive(DRIVE_SPEED,-30,-30,4.0);
             }
         }

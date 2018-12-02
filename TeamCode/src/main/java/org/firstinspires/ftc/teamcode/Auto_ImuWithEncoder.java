@@ -75,7 +75,7 @@ public class Auto_ImuWithEncoder extends LinearOpMode {
     private static final double MoveForOneDegree = 0.25;
 
     // Config for the robot
-    private config robot = new config(this.telemetry);
+    private Config robot = new Config(this);
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -86,7 +86,7 @@ public class Auto_ImuWithEncoder extends LinearOpMode {
     public void runOpMode() {
 
         // Setup robot hardware
-        robot.ConfigureRobtHardware(this.hardwareMap);
+        robot.ConfigureRobtHardware();
 
 
         // Send telemetry message to signify robot waiting;

@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 
 /**
  * Created by Stephen Ogden on 10/10/18.
@@ -16,12 +12,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 @TeleOp(name = "Vision test code", group = "Test")
 public class VisionTest extends LinearOpMode {
 
-    private config robot = new config(this.telemetry);
+    private Config robot = new Config(this);
 
     @Override
     public void runOpMode() {
 
-        robot.setupGoldDetector(this.hardwareMap);
+        robot.setupGoldDetector();
 
         waitForStart();
 

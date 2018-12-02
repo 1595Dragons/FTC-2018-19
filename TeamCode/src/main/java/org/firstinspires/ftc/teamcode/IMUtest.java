@@ -10,9 +10,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 @Disabled
+@Deprecated // Just use justTelemetry...
 @Autonomous(name = "IMUtest", group = "Pushbot")
 public class IMUtest extends LinearOpMode {
-    //private config robot = new config(this.telemetry);
+
+    private Config robot = new Config(this);
     @Override
     public void runOpMode() {
 

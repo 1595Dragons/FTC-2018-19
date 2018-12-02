@@ -74,7 +74,7 @@ public class Auto_LandDriveForward extends LinearOpMode {
     private static final double DRIVE_SPEED = .15, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
 
     // Config for the robot
-    private config robot = new config(this.telemetry);
+    private Config robot = new Config(this);
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -85,7 +85,7 @@ public class Auto_LandDriveForward extends LinearOpMode {
     public void runOpMode() {
 
         // Setup robot hardware
-        robot.ConfigureRobtHardware(this.hardwareMap);
+        robot.ConfigureRobtHardware();
 
 
         // Send telemetry message to signify robot waiting;
