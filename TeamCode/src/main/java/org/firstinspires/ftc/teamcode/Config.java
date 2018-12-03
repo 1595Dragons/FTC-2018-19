@@ -258,9 +258,9 @@ class Config {
         if (this.imu != null) {
             if (this.imu.isGyroCalibrated()) {
                 Orientation angle = this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
-                this.OpMode.telemetry.addData("Robot first angle", angle.firstAngle)
-                        .addData("Robot second angle", angle.secondAngle)
-                        .addData("Robot third angle", angle.thirdAngle);
+                this.OpMode.telemetry.addData("Robot first angle", angle.firstAngle + " " + angle.angleUnit)
+                        .addData("Robot second angle", angle.secondAngle + " " + angle.angleUnit)
+                        .addData("Robot third angle", angle.thirdAngle + " " + angle.angleUnit);
                 this.OpMode.telemetry.addLine();
             }
         }
@@ -364,7 +364,6 @@ class Config {
     }
 
 
-    // TODO: Test
     void armDrive(double speed, int armPos, double timeoutS) {
 
         // Check if the arm motors are RUN_TO_POSITION
@@ -386,64 +385,42 @@ class Config {
 
             // Check to see if the targeted position has been met. If it has, break out of the while loop
             if (this.isThere(5, this.armMotorL, this.armMotorR)) {
-                this.armMotorR.setPower(0);
-                this.armMotorL.setPower(0);
                 break;
             }
 
             // Update telemetry as this is running
             this.updateTelemetry();
         }
+
+
+        this.armMotorR.setPower(0);
+        this.armMotorL.setPower(0);
+
     }
 
 
     // TODO: Test
     void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
 
-        double error, steer, PCoeff = 0.2;
+        double d = 11, currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle,
+                circumference = d * 3.14;
+        
+        int distance = (int) (Math.round(3.14 * (circumference) * (360 - Math.abs(turnToAngle - currentAngle))) / Math.pow(EncoderNumberChangePerInch, 2));
 
+        this.OpMode.telemetry.addData("Distance", distance);
+        this.OpMode.telemetry.update();
+        this.OpMode.sleep(1000);
 
-        // Turn off encoders for this but
-        this.left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        this.left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
-
-
-        // Reset the timer for the timeout
-        this.timer.reset();
-        while (OpMode.opModeIsActive() && this.timer.seconds() < timeoutS && imu.isGyroCalibrated()) {
-
-            // Define/update the error value with the displacement in angle
-            error = Math.abs(turnToAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ,AngleUnit.DEGREES).secondAngle);
-
-
-            // Check if the target has been reached
-            if (error <= 1.0d) {
-
-                // Break out of the while loop early
-                break;
-            } else {
-
-                // Calculate the turn rate
-                steer = Range.clip(error * PCoeff, -1, 1);
-
-                this.right_front.setPower(speed * steer);
-                this.right_back.setPower(speed * steer);
-                this.left_front.setPower(speed * steer * -1);
-                this.left_back.setPower(speed * steer * -1);
-            }
-
-            // Update telemetry as this is running
-            this.updateTelemetry();
-        }
-
-        // Stop all motion, and reset the motors
-        this.resetMotors(this.left_back, this.left_front, this.right_back, this.right_front);
+        this.encoderDrive(speed, -distance, distance, timeoutS);
     }
 
 
-    // TODO: Test
+    void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
+        // Its literally distinctDrive, but with 2 motors
+        this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
+    }
+
+
     void distinctDrive(double speed, int LFInches, int LBInches, int RFInches, int RBInches, double timeoutS) {
 
         // Reset the motor encoders, and set them to RUN_TO_POSITION
@@ -466,7 +443,7 @@ class Config {
         while (OpMode.opModeIsActive() && (this.timer.seconds() < timeoutS)) {
 
             // Check if the target has been reached
-            if (this.isThere(5, this.left_back, this.left_front, this.right_back, this.right_front)) {
+            if (this.isThere(4, this.left_back, this.left_front, this.right_back, this.right_front)) {
                 // Break out of the while loop early
                 break;
             }
@@ -476,13 +453,5 @@ class Config {
 
         // Stop all motion, and reset the motors
         this.resetMotors(this.left_back, this.left_front, this.right_back, this.right_front);
-
-    }
-
-
-    // TODO: Test
-    void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
-        // Its literally distinctDrive, but with 2 motors
-        this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
     }
 }
