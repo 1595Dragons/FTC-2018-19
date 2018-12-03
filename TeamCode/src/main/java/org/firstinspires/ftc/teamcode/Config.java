@@ -5,7 +5,6 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
@@ -15,7 +14,6 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -60,6 +58,7 @@ class Config {
 
     // Create a list of all the Hardware devices, mainly for telemetry :)
     private ArrayList<HardwareDevice> Devices = new ArrayList<>();
+    private ArrayList<String> DeviceNames = new ArrayList<>();
 
 
     // Get the important bits from the opMode
@@ -85,6 +84,7 @@ class Config {
         this.left_front.setMode(RunMode.RUN_USING_ENCODER);
         this.left_front.setDirection(Direction.FORWARD);
         this.Devices.add(left_front);
+        this.DeviceNames.add("Left front");
 
 
         // Declare and setup right_front
@@ -95,6 +95,7 @@ class Config {
         this.right_front.setMode(RunMode.RUN_USING_ENCODER);
         this.right_front.setDirection(Direction.REVERSE);
         this.Devices.add(right_front);
+        this.DeviceNames.add("Right front");
 
 
         // Declare and setup left_back
@@ -105,6 +106,7 @@ class Config {
         this.left_back.setMode(RunMode.RUN_USING_ENCODER);
         this.left_back.setDirection(Direction.FORWARD);
         this.Devices.add(left_back);
+        this.DeviceNames.add("Left back");
 
 
         // Declare and setup right_back
@@ -115,6 +117,7 @@ class Config {
         this.right_back.setMode(RunMode.RUN_USING_ENCODER);
         this.right_back.setDirection(Direction.REVERSE);
         this.Devices.add(right_back);
+        this.DeviceNames.add("Right back");
 
 
         // Declare and setup armMotorL
@@ -125,6 +128,7 @@ class Config {
         this.armMotorL.setMode(RunMode.RUN_USING_ENCODER);
         this.armMotorL.setDirection(Direction.REVERSE);
         this.Devices.add(armMotorL);
+        this.DeviceNames.add("Left arm motor");
 
 
         // Declare and setup armMotorR
@@ -135,7 +139,7 @@ class Config {
         this.armMotorR.setMode(RunMode.RUN_USING_ENCODER);
         this.armMotorR.setDirection(Direction.FORWARD);
         this.Devices.add(armMotorR);
-
+        this.DeviceNames.add("Right arm motor");
 
         // Declare and setup arm extender motor
         this.status("Configuring arm extender");
@@ -145,6 +149,7 @@ class Config {
         this.armMotorExtend.setMode(RunMode.RUN_USING_ENCODER);
         this.armMotorExtend.setDirection(Direction.FORWARD);
         this.Devices.add(armMotorExtend);
+        this.DeviceNames.add("Arm extension motor");
 
 
         // Declare and setup Intake Motor
@@ -155,18 +160,21 @@ class Config {
         this.IO_Motor.setMode(RunMode.RUN_USING_ENCODER);
         this.IO_Motor.setDirection(Direction.FORWARD);
         this.Devices.add(IO_Motor);
+        this.DeviceNames.add("Intake motor");
 
 
         // Declare the left servo for the intake
         this.status("Setting up left servo");
         this.IO_Servo_Left = OpMode.hardwareMap.servo.get("IO Servo Left");
         this.Devices.add(IO_Servo_Left);
+        this.DeviceNames.add("Left servo");
 
 
         // Declare the right servo for the intake
         this.status("Setting up right servo");
         this.IO_Servo_Right = OpMode.hardwareMap.servo.get("IO Servo Right");
         this.Devices.add(IO_Servo_Right);
+        this.DeviceNames.add("Right servo");
 
 
         // Decalre and setup the color sensors
@@ -176,9 +184,13 @@ class Config {
         this.sensorColorRight = OpMode.hardwareMap.colorSensor.get("color sensor right");
         this.sensorDistanceRight = OpMode.hardwareMap.get(DistanceSensor.class, "color sensor right");
         this.Devices.add(sensorColorLeft);
+        this.DeviceNames.add("Left color sensor");
         this.Devices.add(sensorDistanceLeft);
+        this.DeviceNames.add("Left distance sensor");
         this.Devices.add(sensorColorRight);
+        this.DeviceNames.add("Right color sensor");
         this.Devices.add(sensorDistanceRight);
+        this.DeviceNames.add("Right distance sensor");
 
 
         if (setupIMU) {
@@ -229,30 +241,33 @@ class Config {
      */
     void updateTelemetry() {
 
+        int i = 0;
         for (HardwareDevice device : Devices) {
             if (device != null) {
+                String deviceName = DeviceNames.get(i);
                 if (device instanceof DcMotor) {
                     DcMotor motor = (DcMotor) device;
-                    this.OpMode.telemetry.addData(motor.getDeviceName() + " power", String.format(Locale.US, "%.2f", motor.getPower()))
-                            .addData(motor.getDeviceName() + " position", motor.getCurrentPosition())
-                            .addData(motor.getDeviceName() + " target (Displacement)", String.format(Locale.US, "%s (%s)",
+                    this.OpMode.telemetry.addData(deviceName + " power", String.format(Locale.US, "%.2f", motor.getPower()))
+                            .addData(deviceName + " position", motor.getCurrentPosition())
+                            .addData(deviceName + " target (Displacement)", String.format(Locale.US, "%s (%s)",
                                     motor.getTargetPosition(), Math.abs(motor.getCurrentPosition() - motor.getTargetPosition())));
                     this.OpMode.telemetry.addLine();
                 } else if (device instanceof Servo) {
                     Servo servo = (Servo) device;
-                    this.OpMode.telemetry.addData(servo.getDeviceName() + " target position", servo.getPosition());
+                    this.OpMode.telemetry.addData(deviceName + " target position", servo.getPosition());
                     this.OpMode.telemetry.addLine();
                 } else if (device instanceof ColorSensor) {
                     ColorSensor colorSensor = (ColorSensor) device;
-                    this.OpMode.telemetry.addData(colorSensor.getDeviceName() + " R, G, B, A", String.format(Locale.US, "%s, %s, %s, %s",
+                    this.OpMode.telemetry.addData(deviceName + " R, G, B, A", String.format(Locale.US, "%s, %s, %s, %s",
                             colorSensor.red(), colorSensor.green(), colorSensor.blue(), colorSensor.alpha()));
                     this.OpMode.telemetry.addLine();
                 } else if (device instanceof DistanceSensor) {
                     DistanceSensor distanceSensor = (DistanceSensor) device;
-                    this.OpMode.telemetry.addData(distanceSensor.getDeviceName() + " distance", distanceSensor.getDistance(DistanceUnit.INCH));
+                    this.OpMode.telemetry.addData(deviceName + " distance", distanceSensor.getDistance(DistanceUnit.INCH));
                     this.OpMode.telemetry.addLine();
                 }
             }
+            i++;
         }
 
         if (this.imu != null) {
@@ -364,6 +379,13 @@ class Config {
     }
 
 
+    /**
+     * Runs the 2 arm motors to a provided position.
+     *
+     * @param speed    The speed the arm motors are set to run to.
+     * @param armPos   The position that will be set as the motors target positions.
+     * @param timeoutS The duration in seconds the function is allowed to run.
+     */
     void armDrive(double speed, int armPos, double timeoutS) {
 
         // Check if the arm motors are RUN_TO_POSITION
@@ -404,7 +426,7 @@ class Config {
 
         double d = 11, currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle,
                 circumference = d * 3.14;
-        
+
         int distance = (int) (Math.round(3.14 * (circumference) * (360 - Math.abs(turnToAngle - currentAngle))) / Math.pow(EncoderNumberChangePerInch, 2));
 
         this.OpMode.telemetry.addData("Distance", distance);
@@ -415,12 +437,30 @@ class Config {
     }
 
 
+    /**
+     * Runs to a given position in inches via encoders.
+     *
+     * @param speed The max speed allowed for the motors.
+     * @param leftInches The distance in inches that the left side needs to go.
+     * @param rightInches The distance in inches that the right side needs to go.
+     * @param timeoutS The amount of time in seconds that the function is allowed to execute.
+     */
     void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
-        // Its literally distinctDrive, but with 2 motors
+        // Its literally distinctDrive, but with 2 positions
         this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
     }
 
 
+    /**
+     * Sets the target position of the individual drive motors, and then approaches that point.
+     *
+     * @param speed The maximum speed each motor is allowed to run at.
+     * @param LFInches The left front motor's target position in inches.
+     * @param LBInches The left back motor's target position in inches.
+     * @param RFInches The right front motor's target position in inches.
+     * @param RBInches The right back motor's target position in inches.
+     * @param timeoutS The amount of time in seconds that the function is allowed to execute.
+     */
     void distinctDrive(double speed, int LFInches, int LBInches, int RFInches, int RBInches, double timeoutS) {
 
         // Reset the motor encoders, and set them to RUN_TO_POSITION

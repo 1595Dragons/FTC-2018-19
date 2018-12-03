@@ -24,15 +24,13 @@ public class Auto_ImuTest extends LinearOpMode {
 
         robot.distinctDrive(SIDE_SPEED, 9, -9, -9, 9, 4.0);
         robot.turnToDegree(TURN_SPEED, 0, robot.imu, 8);
+
+        // Get telemetry view
         while (opModeIsActive()) {
             robot.updateTelemetry();
         }
 
         //turnToDegree(TURN_SPEED,90,8);
-
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
     }
 }
 
