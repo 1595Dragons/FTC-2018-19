@@ -8,12 +8,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * FTC 6128 | 7935
  * FRC 1595
  */
-@TeleOp(name = "Telemetry", group = "Test")
+@TeleOp(name = "Just telemetry", group = "Test")
 public class justTelemetry extends LinearOpMode {
+    Config robot = new Config(this);
     @Override
     public void runOpMode() {
-        Config robot = new Config(this);
-        robot.ConfigureRobtHardware();
+        robot.ConfigureRobtHardware(true);
+        robot.status("Done");
         waitForStart();
         while (opModeIsActive()) {
             robot.updateTelemetry();

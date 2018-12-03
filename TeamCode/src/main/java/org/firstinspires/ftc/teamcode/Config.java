@@ -5,6 +5,7 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
@@ -50,7 +51,7 @@ class Config {
 
 
     // Gyro / IMU
-    private BNO055IMU imu;
+    BNO055IMU imu;
 
 
     // A timer object
@@ -74,7 +75,7 @@ class Config {
      * Goes through the configuration of the robot, and sets up all the motors and whatnot.
      * Even updating the telemetry :)
      */
-    void ConfigureRobtHardware() {
+    void ConfigureRobtHardware(boolean setupIMU) {
 
         // Declare and setup left_front
         this.status("Configuring left front motor");
@@ -180,9 +181,14 @@ class Config {
         this.Devices.add(sensorDistanceRight);
 
 
-        // Declare the IMU, but don't actually set uit up
-        this.status("Declaring IMU, not actually setting up though...");
-        this.imu = OpMode.hardwareMap.get(BNO055IMU.class, "imu");
+        if (setupIMU) {
+            this.status("Setting up imu...");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
+            this.imu = OpMode.hardwareMap.get(BNO055IMU.class, "imu");
+            this.imu.initialize(parameters);
+        }
 
 
         // Update telemetry to signal done!
@@ -249,20 +255,21 @@ class Config {
             }
         }
 
-
-        if (this.imu.isGyroCalibrated()) {
-            Orientation angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
-            this.OpMode.telemetry.addData("Robot first angle", angle.firstAngle)
-                    .addData("Robot second angle", angle.secondAngle)
-                    .addData("Robot third angle", angle.thirdAngle);
-            this.OpMode.telemetry.addLine();
+        if (this.imu != null) {
+            if (this.imu.isGyroCalibrated()) {
+                Orientation angle = this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
+                this.OpMode.telemetry.addData("Robot first angle", angle.firstAngle)
+                        .addData("Robot second angle", angle.secondAngle)
+                        .addData("Robot third angle", angle.thirdAngle);
+                this.OpMode.telemetry.addLine();
+            }
         }
 
 
-        if (goldDetector != null) {
-            if (goldDetector.isFound()) {
+        if (this.goldDetector != null) {
+            if (this.goldDetector.isFound()) {
                 this.OpMode.telemetry.addData("Gold detector", "Found gold");
-                this.OpMode.telemetry.addData("Gold location", goldDetector.getFoundRect().x + ", " + goldDetector.getFoundRect().y);
+                this.OpMode.telemetry.addData("Gold location", this.goldDetector.getFoundRect().x + ", " + this.goldDetector.getFoundRect().y);
                 this.OpMode.telemetry.addLine();
             } else {
                 this.OpMode.telemetry.addData("Gold detector", "Still searching...");
@@ -273,16 +280,6 @@ class Config {
         // Update the telemetry
         this.OpMode.telemetry.update();
 
-    }
-
-
-    /**
-     * Initializes the IMU. It should be noted that this does take some time.
-     */
-    void initializeIMU() {
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        this.imu.initialize(parameters);
     }
 
 
@@ -401,9 +398,9 @@ class Config {
 
 
     // TODO: Test
-    void turnToDegree(double speed, float turnToAngle, double timeoutS) {
+    void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
 
-        double error, steer, PCoeff = 0.1;
+        double error, steer, PCoeff = 0.2;
 
 
         // Turn off encoders for this but
@@ -415,14 +412,14 @@ class Config {
 
         // Reset the timer for the timeout
         this.timer.reset();
-        while (OpMode.opModeIsActive() && this.timer.seconds() < timeoutS) {
+        while (OpMode.opModeIsActive() && this.timer.seconds() < timeoutS && imu.isGyroCalibrated()) {
 
             // Define/update the error value with the displacement in angle
-            error = turnToAngle - this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+            error = Math.abs(turnToAngle - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ,AngleUnit.DEGREES).secondAngle);
 
 
             // Check if the target has been reached
-            if (error <= 1) {
+            if (error <= 1.0d) {
 
                 // Break out of the while loop early
                 break;
@@ -469,7 +466,7 @@ class Config {
         while (OpMode.opModeIsActive() && (this.timer.seconds() < timeoutS)) {
 
             // Check if the target has been reached
-            if (this.isThere(1, this.left_back, this.left_front, this.right_back, this.right_front)) {
+            if (this.isThere(5, this.left_back, this.left_front, this.right_back, this.right_front)) {
                 // Break out of the while loop early
                 break;
             }

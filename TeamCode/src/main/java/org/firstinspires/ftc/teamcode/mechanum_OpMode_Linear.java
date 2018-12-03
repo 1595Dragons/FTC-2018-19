@@ -22,7 +22,7 @@ public class mechanum_OpMode_Linear extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobtHardware();
+        robot.ConfigureRobtHardware(false);
 
         //IO Servo
         //Servo 位置

@@ -85,7 +85,7 @@ public class Auto_LandDriveForward extends LinearOpMode {
     public void runOpMode() {
 
         // Setup robot hardware
-        robot.ConfigureRobtHardware();
+        robot.ConfigureRobtHardware(false);
 
 
         // Send telemetry message to signify robot waiting;
