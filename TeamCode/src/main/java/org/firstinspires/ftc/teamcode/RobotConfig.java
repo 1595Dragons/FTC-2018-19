@@ -111,20 +111,12 @@ class RobotConfig {
         climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         climber.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Declare and setup the gyro
+        // Declare and setup the gyro FIXME
         /*
         status("Setting up gyro");
         gyro = hardware.get(BNO055IMU.class, "gyro");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = false;
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        while (!gyro.isGyroCalibrated()) {
-            Thread.yield();
-        }
         */
 
         // Update telemetry to signal done!
@@ -214,23 +206,6 @@ class RobotConfig {
                         getAngle().thirdAngle, getAngle().angleUnit.name().toLowerCase()));
             } else {
                 telemetry.addData("Gyro error", "Gyro isn't calibrated");
-            }
-
-            if (gyro.isAccelerometerCalibrated()) {
-                telemetry.addData("Gyro position", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
-                        gyro.getPosition().x, gyro.getPosition().unit.toString(),
-                        gyro.getPosition().y, gyro.getPosition().unit.toString(),
-                        gyro.getPosition().z, gyro.getPosition().unit.toString()));
-                telemetry.addData("Gyro velocity", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
-                        gyro.getVelocity().xVeloc, gyro.getVelocity().unit.toString(),
-                        gyro.getVelocity().yVeloc, gyro.getVelocity().unit.toString(),
-                        gyro.getVelocity().zVeloc, gyro.getVelocity().unit.toString()));
-                telemetry.addData("Gyro acceleration", String.format(Locale.US, "%.3f%s X, %.3f%s Y, %.3f%s Z",
-                        gyro.getAcceleration().xAccel, gyro.getAcceleration().unit.toString(),
-                        gyro.getAcceleration().yAccel, gyro.getAcceleration().unit.toString(),
-                        gyro.getAcceleration().zAccel, gyro.getAcceleration().unit.toString()));
-            } else {
-                telemetry.addData("Gyro error", "Accelerometer isn't calibrated!");
             }
         }
 
