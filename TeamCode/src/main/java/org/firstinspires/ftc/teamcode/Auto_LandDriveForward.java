@@ -40,30 +40,5 @@ public class Auto_LandDriveForward extends LinearOpMode {
         robot.encoderDrive(DRIVE_SPEED, -40, -40, 5);
 
 
-        // Reset the runtime
-        runtime.reset();
-        while(runtime.seconds()<timeoutS && ((angles2.firstAngle-turnToAngle)>=1||(angles2.firstAngle-turnToAngle)<=-1))
-        {
-            angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            if ((lastDifference>0&&(angles2.firstAngle-turnToAngle)<=0)
-                    ||((lastDifference<0&&(angles2.firstAngle-turnToAngle)>=0)))
-            {
-                accumulation=0;
-            }
-            accumulation+=(runtime.seconds()-lastTime)*(angles2.firstAngle-turnToAngle);
-            output=kp*(angles2.firstAngle-turnToAngle)+ki*accumulation+kd*(angles2.firstAngle-lastAngle)/(runtime.seconds()-lastTime);
-            lastTime=runtime.seconds();
-            lastAngle=angles2.firstAngle;
-            lastDifference=angles2.firstAngle-turnToAngle;
-            robot.left_front.setPower(output*speed);
-            robot.left_back.setPower(output*speed);
-            robot.right_front.setPower(-output*speed);
-            robot.right_back.setPower(-output*speed);
-        }
-        // Stop all motion;
-        robot.left_front.setPower(0);
-        robot.left_back.setPower(0);
-        robot.right_front.setPower(0);
-        robot.right_back.setPower(0);
     }
 }
