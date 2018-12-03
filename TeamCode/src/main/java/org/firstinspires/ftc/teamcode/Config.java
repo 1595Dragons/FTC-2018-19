@@ -399,7 +399,7 @@ class Config {
     }
 
 
-    // TODO: Test
+    // FIXME
     void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
 
         double d = 11, currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle,

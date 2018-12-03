@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 
-@TeleOp(name="Mechanum OpMode Linear", group="Test")
-public class mechanum_OpMode_Linear extends LinearOpMode {
+@TeleOp(name="7935 TeleOp", group="Official")
+public class Teleop extends LinearOpMode {
 
     // Declare the Config file, that way we can use the pre-made fictions for cleaner code
     private Config robot = new Config(this);
