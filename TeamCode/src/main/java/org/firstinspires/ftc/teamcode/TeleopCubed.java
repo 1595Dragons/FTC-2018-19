@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 
-@TeleOp(name="7935 TeleOp", group="Official")
-public class Teleop extends LinearOpMode {
+@TeleOp(name="7935 TeleOp Cubed", group="Official")
+public class TeleopCubed extends LinearOpMode {
 
     // Declare the Config file, that way we can use the pre-made fictions for cleaner code
     private Config robot = new Config(this);
@@ -62,8 +62,9 @@ public class Teleop extends LinearOpMode {
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
 
-            double driveForward = gamepad2.left_stick_y*speedForMove, driveRightSide = gamepad2.left_stick_x*speedForSide;
-            double turnRight = -gamepad2.right_stick_x*speedForTurn;
+            double driveForward = gamepad2.left_stick_y*gamepad2.left_stick_y*gamepad2.left_stick_y*speedForMove;
+            double driveRightSide = gamepad2.left_stick_x*gamepad2.left_stick_x*gamepad2.left_stick_x*speedForSide;
+            double turnRight = -gamepad2.right_stick_x*gamepad2.right_stick_x*gamepad2.right_stick_x*speedForTurn;
             double armUp;
             double armExtend=0;
             left1Power=0;
@@ -146,11 +147,11 @@ public class Teleop extends LinearOpMode {
             robot.right_front.setPower(right1Power);
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
-            if (robot.armMotorL.getCurrentPosition()>= (armMaxPosition+armPositionInitial) && armUp>=0 && gamepad1.left_stick_button==false)
+            if (robot.armMotorL.getCurrentPosition()> (armMaxPosition+armPositionInitial) && armUp>=0 && gamepad1.left_stick_button==false)
             {
                 armUp=0;
             }
-            if(robot.armMotorL.getCurrentPosition()<= (armMinPosition+armPositionInitial) && armUp<=0 && gamepad1.left_stick_button==false)
+            if(robot.armMotorL.getCurrentPosition()< (armMinPosition+armPositionInitial) && armUp<=0 && gamepad1.left_stick_button==false)
             {
                 armUp=0;
             }
@@ -281,6 +282,9 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("ArmMaximum",armMaxPosition);
             telemetry.addData("ArmInitial",armPositionInitial);
             telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
+            telemetry.addData("ArmPosition2" , robot.armMotorR.getCurrentPosition());
+            telemetry.addData("a button",gamepad1.a);
+
             telemetry.update();
 
         }
