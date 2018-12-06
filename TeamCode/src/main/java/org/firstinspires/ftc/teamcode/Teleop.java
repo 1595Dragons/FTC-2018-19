@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -16,7 +15,6 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "7935 TeleOp", group = "Official")
 public class Teleop extends LinearOpMode {
 
-    // Declare the Config file, that way we can use the pre-made fictions for cleaner code
     private Config robot = new Config(this);
 
     public void runOpMode() {
@@ -24,15 +22,15 @@ public class Teleop extends LinearOpMode {
         // Initialize the robot
         robot.ConfigureRobtHardware(false);
 
-        //IO Servo
-        //Servo 位置
-        double IOLeftServoClose = 0, IOLeftServoHalfOpen = 0.6, IOLeftServoOpen = 0.80;
-        double IORightServoClose = 0.85, IORightServoHalfOpen = 0.35, IORightServoOpen = 0.15;
+
+        //Servo positions
+        double LeftServoClose = 0.2, LeftServoHalfOpen = 0.6, LeftServoOpen = 0.80;
+        double RightServoClose = 0.7, RightServoHalfOpen = 0.35, RightServoOpen = 0.15;
+
+
         //MOTORS Power
         double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 0.8;
-        // limit position
-        int armPositionInitial = 0;
-        int armMaxPosition = 0, armMinPosition = -680;
+
 
         double left1Power, right1Power, left2Power, right2Power, allPower, armExtend, armUp;
 
@@ -50,14 +48,16 @@ public class Teleop extends LinearOpMode {
             turnRight = (turnRight >= -0.1 && turnRight <= 0.1) ? 0 : turnRight;
 
             // Set the power to half if the bumpers are pressed
-            allPower = (gamepad2.left_bumper || gamepad2.right_bumper) ? 0.5 : 1;
+            allPower = (gamepad2.left_bumper || gamepad2.right_bumper) ? 1 : 0.4;
 
-            if (gamepad2.dpad_up) {//up button actually works for down function
+
+            // Drive with either the D-pad or the joy-sticks
+            if (gamepad2.dpad_up) {
                 left1Power = -1 * speedForMove * allPower;
                 left2Power = -1 * speedForMove * allPower;
                 right1Power = -1 * speedForMove * allPower;
                 right2Power = -1 * speedForMove * allPower;
-            } else if (gamepad2.dpad_down) {//down button actually works for up function
+            } else if (gamepad2.dpad_down) {
                 left1Power = 1 * speedForMove * allPower;
                 left2Power = 1 * speedForMove * allPower;
                 right1Power = 1 * speedForMove * allPower;
@@ -81,7 +81,9 @@ public class Teleop extends LinearOpMode {
 
             armUp = (gamepad1.left_stick_y) * armPower;
 
+
             armExtend = (gamepad1.dpad_up) ? extendPower : (gamepad1.dpad_down ? -extendPower : 0);
+
 
             // Send calculated power to wheels
             robot.left_front.setPower(left1Power);
@@ -89,8 +91,6 @@ public class Teleop extends LinearOpMode {
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
 
-            armUp = (robot.armMotorL.getCurrentPosition() >= (armMaxPosition + armPositionInitial) && armUp >= 0 && !gamepad1.left_stick_button) ?
-                    0 : (robot.armMotorL.getCurrentPosition() <= (armMinPosition + armPositionInitial) && armUp <= 0 && !gamepad1.left_stick_button) ? 0 : armUp;
 
             robot.armMotorL.setPower(armUp);
             robot.armMotorR.setPower(armUp);
@@ -98,76 +98,11 @@ public class Teleop extends LinearOpMode {
 
             robot.armMotorExtend.setPower(armExtend);
 
-            //
-            /*
-            if (gamepad1.b)
-            {
-                if (leftObject==1) {
-                    robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
-                }
-                else if(leftObject==2){
-                    robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
-                }
-                else{
-                    robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                }
-                if (rightObject==1) {
-                    robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
-                }
-                else if(rightObject==2){
-                    robot.IO_Servo_Right.setPosition(IORightServoOpen);
-                }
-                else{
-                    robot.IO_Servo_Right.setPosition(IORightServoClose);
-                }
-            }
-            else{
-                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                robot.IO_Servo_Right.setPosition(IORightServoClose);
-            }
-            */
+
             if (gamepad1.right_bumper) {
                 robot.IO_Motor.setPower(intakePower);
-                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                robot.IO_Servo_Right.setPosition(IORightServoClose);
-                /*
-                Color.RGBToHSV((int) (robot.sensorColorLeft.red() * SCALE_FACTOR),
-                        (int) (robot.sensorColorLeft.green() * SCALE_FACTOR),
-                        (int) (robot.sensorColorLeft.blue() * SCALE_FACTOR),
-                        hsvValuesLeft);//Hue value is hsvValuesLeft[0]
-                Color.RGBToHSV((int) (robot.sensorColorRight.red() * SCALE_FACTOR),
-                        (int) (robot.sensorColorRight.green() * SCALE_FACTOR),
-                        (int) (robot.sensorColorRight.blue() * SCALE_FACTOR),
-                        hsvValuesRight);//Hue value is hsvValuesRight[0]
-
-                leftDistance=robot.sensorDistanceLeft.getDistance(DistanceUnit.CM);
-                rightDistance=robot.sensorDistanceRight.getDistance(DistanceUnit.CM);
-                if (leftDistance<=5.5) {
-                    if (hsvValuesLeft[0]>=25&&hsvValuesLeft[0]<=45)
-                    {
-                        leftObject=1;
-                    }
-                    else
-                    {
-                        leftObject=2;
-                    }
-                }
-                else
-                {
-                    leftObject=0;
-                }
-                if (rightDistance<=5.5) {
-                    if (hsvValuesRight[0] >= 25 && hsvValuesRight[0] <= 45) {
-                        rightObject = 1;
-                    }
-                    else {
-                        rightObject = 2;
-                    }
-                }
-                else{
-                    rightObject=0;
-                }
-                */
+                robot.IO_Servo_Left.setPosition(LeftServoClose);
+                robot.IO_Servo_Right.setPosition(RightServoClose);
             } else {
                 if (gamepad1.left_bumper) {
                     robot.IO_Motor.setPower(-intakePower);
@@ -175,40 +110,26 @@ public class Teleop extends LinearOpMode {
                     robot.IO_Motor.setPower(0);
                 }
             }
+
+
             if (gamepad1.y) {
-                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
-                robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                robot.IO_Servo_Left.setPosition(LeftServoOpen);
+                robot.IO_Servo_Right.setPosition(RightServoOpen);
             }
+
+
             if (gamepad1.x) {
-                robot.IO_Servo_Right.setPosition(IORightServoOpen);
-                robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                robot.IO_Servo_Right.setPosition(RightServoOpen);
+                robot.IO_Servo_Left.setPosition(LeftServoHalfOpen);
             }
+
+
             if (gamepad1.b) {
-                robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
-                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
-            }
-            if (gamepad1.a) {
-                armPositionInitial = robot.armMotorL.getCurrentPosition();
+                robot.IO_Servo_Right.setPosition(RightServoHalfOpen);
+                robot.IO_Servo_Left.setPosition(LeftServoOpen);
             }
             // Update telemetry
-            //robot.updateTelemetry();
-            /*
-            telemetry.addData("ObjectL%7d",leftObject);
-            telemetry.addData("ObjectR%7d",rightObject);
-            telemetry.addData("DistanceL%7d",robot.sensorDistanceLeft.getDistance(DistanceUnit.CM));
-            telemetry.addData("DistanceL%7d", leftDistance);
-            telemetry.addData("DistanceR%7d",robot.sensorDistanceRight.getDistance(DistanceUnit.CM));
-            telemetry.addData("DistanceR%7d",rightDistance);
-
-            telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
-            telemetry.addData("armPower%7d",armUp);
-            telemetry.addData("ExtendPosition%7d",robot.armMotorExtend.getCurrentPosition());
-            telemetry.addData("extendPower%7d", armExtend);
-            */
-            telemetry.addData("ArmMaximum", armMaxPosition);
-            telemetry.addData("ArmInitial", armPositionInitial);
-            telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
-            telemetry.update();
+            robot.updateTelemetry();
 
         }
 
