@@ -20,19 +20,19 @@ public class Teleop extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobtHardware(false);
+        robot.ConfigureRobtHardware(true);
 
 
         //Servo positions
-        double LeftServoClose = 0.2, LeftServoHalfOpen = 0.6, LeftServoOpen = 0.80;
-        double RightServoClose = 0.7, RightServoHalfOpen = 0.35, RightServoOpen = 0.15;
+        double LeftServoClose = 0.1d, LeftServoOpen = 0.7d;
+        double RightServoClose = 0.85d, RightServoOpen = 0.25d;
 
 
-        //MOTORS Power
+        //Motor Power
         double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 0.8;
 
 
-        double left1Power, right1Power, left2Power, right2Power, allPower, armExtend, armUp;
+        double allPower, armExtend;
 
         // Wait for the start button to be pressed
         waitForStart();
@@ -42,58 +42,29 @@ public class Teleop extends LinearOpMode {
             double driveForward = gamepad2.left_stick_y * speedForMove, driveRightSide = gamepad2.left_stick_x * speedForSide,
                     turnRight = -gamepad2.right_stick_x * speedForTurn;
 
+
             //prevent small input from stick
             driveForward = (driveForward >= -0.1 && driveForward <= 0.1) ? 0 : driveForward;
             driveRightSide = (driveRightSide >= -0.1 && driveRightSide <= 0.1) ? 0 : driveRightSide;
             turnRight = (turnRight >= -0.1 && turnRight <= 0.1) ? 0 : turnRight;
 
+
             // Set the power to half if the bumpers are pressed
             allPower = (gamepad2.left_bumper || gamepad2.right_bumper) ? 1 : 0.4;
 
 
-            // Drive with either the D-pad or the joy-sticks
-            if (gamepad2.dpad_up) {
-                left1Power = -1 * speedForMove * allPower;
-                left2Power = -1 * speedForMove * allPower;
-                right1Power = -1 * speedForMove * allPower;
-                right2Power = -1 * speedForMove * allPower;
-            } else if (gamepad2.dpad_down) {
-                left1Power = 1 * speedForMove * allPower;
-                left2Power = 1 * speedForMove * allPower;
-                right1Power = 1 * speedForMove * allPower;
-                right2Power = 1 * speedForMove * allPower;
-            } else if (gamepad2.dpad_right) {
-                left1Power = -1 * speedForSide * allPower;
-                left2Power = 1 * speedForSide * allPower;
-                right1Power = 1 * speedForSide * allPower;
-                right2Power = -1 * speedForSide * allPower;
-            } else if (gamepad2.dpad_left) {
-                left1Power = 1 * speedForSide * allPower;
-                left2Power = -1 * speedForSide * allPower;
-                right1Power = -1 * speedForSide * allPower;
-                right2Power = 1 * speedForSide * allPower;
-            } else {
-                left1Power = Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
-                right1Power = Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
-                left2Power = Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
-                right2Power = Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
-            }
+            // Send calculated power to wheels
+            robot.left_front.setPower(Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0));
+            robot.right_front.setPower(Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0));
+            robot.left_back.setPower(Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0));
+            robot.right_back.setPower(Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0));
 
-            armUp = (gamepad1.left_stick_y) * armPower;
+
+            robot.armMotorL.setPower((gamepad1.left_stick_y) * armPower);
+            robot.armMotorR.setPower((gamepad1.left_stick_y) * armPower);
 
 
             armExtend = (gamepad1.dpad_up) ? extendPower : (gamepad1.dpad_down ? -extendPower : 0);
-
-
-            // Send calculated power to wheels
-            robot.left_front.setPower(left1Power);
-            robot.right_front.setPower(right1Power);
-            robot.left_back.setPower(left2Power);
-            robot.right_back.setPower(right2Power);
-
-
-            robot.armMotorL.setPower(armUp);
-            robot.armMotorR.setPower(armUp);
 
 
             robot.armMotorExtend.setPower(armExtend);
@@ -120,18 +91,21 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.x) {
                 robot.IO_Servo_Right.setPosition(RightServoOpen);
-                robot.IO_Servo_Left.setPosition(LeftServoHalfOpen);
+                robot.IO_Servo_Left.setPosition(Math.round((LeftServoOpen + LeftServoClose) / 2));
             }
 
 
             if (gamepad1.b) {
-                robot.IO_Servo_Right.setPosition(RightServoHalfOpen);
+                robot.IO_Servo_Right.setPosition(Math.round((RightServoOpen + RightServoClose) / 2));
                 robot.IO_Servo_Left.setPosition(LeftServoOpen);
             }
-            // Update telemetry
-            robot.updateTelemetry();
+
+            // Update telemetry with the gyro angles
+            telemetry.addData("Robot first angle", Math.round(robot.getAngles().firstAngle) + " " + robot.getAngles().angleUnit)
+                    .addData("Robot second angle", Math.round(robot.getAngles().secondAngle) + " " + robot.getAngles().angleUnit)
+                    .addData("Robot third angle", Math.round(robot.getAngles().thirdAngle) + " " + robot.getAngles().angleUnit);
+            telemetry.update();
 
         }
-
     }
 }

@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -37,11 +38,6 @@ class Config {
     private final int EncoderNumberChangePerInch = 34;
     DcMotor left_front, right_front, left_back, right_back, IO_Motor, armMotorL, armMotorR, armMotorExtend;
     Servo IO_Servo_Left, IO_Servo_Right;
-
-
-    // Version 2 color sensor
-    ColorSensor sensorColorLeft, sensorColorRight;
-    DistanceSensor sensorDistanceLeft, sensorDistanceRight;
 
 
     // Gold detector object
@@ -151,7 +147,6 @@ class Config {
         this.Devices.add(armMotorExtend);
         this.DeviceNames.add("Arm extension motor");
 
-
         // Declare and setup Intake Motor
         this.status("Configuring Intake Motor");
         this.IO_Motor = OpMode.hardwareMap.dcMotor.get("IO motor");
@@ -177,30 +172,11 @@ class Config {
         this.DeviceNames.add("Right servo");
 
 
-        // Decalre and setup the color sensors
-        this.status("Setting up color sensor");
-        this.sensorColorLeft = OpMode.hardwareMap.colorSensor.get("color sensor left");
-        this.sensorDistanceLeft = OpMode.hardwareMap.get(DistanceSensor.class, "color sensor left");
-        this.sensorColorRight = OpMode.hardwareMap.colorSensor.get("color sensor right");
-        this.sensorDistanceRight = OpMode.hardwareMap.get(DistanceSensor.class, "color sensor right");
-        this.Devices.add(sensorColorLeft);
-        this.DeviceNames.add("Left color sensor");
-        this.Devices.add(sensorDistanceLeft);
-        this.DeviceNames.add("Left distance sensor");
-        this.Devices.add(sensorColorRight);
-        this.DeviceNames.add("Right color sensor");
-        this.Devices.add(sensorDistanceRight);
-        this.DeviceNames.add("Right distance sensor");
-
-
         if (setupIMU) {
             this.status("Setting up imu...");
-            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            parameters.mode = BNO055IMU.SensorMode.IMU;
-            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.NORMAL;
-            parameters.accelPowerMode = BNO055IMU.AccelPowerMode.NORMAL;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
             this.imu = OpMode.hardwareMap.get(BNO055IMU.class, "imu");
             this.imu.initialize(parameters);
         }
@@ -242,7 +218,7 @@ class Config {
      * <p>
      * And the gold detector displays if and where it found gold.
      */
-    void updateTelemetry() {
+    void updateTelemetry() { // FIXME This is really slow...
 
         int i = 0;
         for (HardwareDevice device : Devices) {
@@ -259,15 +235,6 @@ class Config {
                     Servo servo = (Servo) device;
                     this.OpMode.telemetry.addData(deviceName + " target position", servo.getPosition());
                     this.OpMode.telemetry.addLine();
-                } else if (device instanceof ColorSensor) {
-                    ColorSensor colorSensor = (ColorSensor) device;
-                    this.OpMode.telemetry.addData(deviceName + " R, G, B, A", String.format(Locale.US, "%s, %s, %s, %s",
-                            colorSensor.red(), colorSensor.green(), colorSensor.blue(), colorSensor.alpha()));
-                    this.OpMode.telemetry.addLine();
-                } else if (device instanceof DistanceSensor) {
-                    DistanceSensor distanceSensor = (DistanceSensor) device;
-                    this.OpMode.telemetry.addData(deviceName + " distance", distanceSensor.getDistance(DistanceUnit.INCH));
-                    this.OpMode.telemetry.addLine();
                 }
             }
             i++;
@@ -275,10 +242,9 @@ class Config {
 
         if (this.imu != null) {
             if (this.imu.isGyroCalibrated()) {
-                Orientation angle = this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES);
-                this.OpMode.telemetry.addData("Robot first angle", angle.firstAngle + " " + angle.angleUnit)
-                        .addData("Robot second angle", angle.secondAngle + " " + angle.angleUnit)
-                        .addData("Robot third angle", angle.thirdAngle + " " + angle.angleUnit);
+                this.OpMode.telemetry.addData("Robot first angle", Math.round(this.getAngles().firstAngle) + " " + this.getAngles().angleUnit)
+                        .addData("Robot second angle", Math.round(this.getAngles().secondAngle) + " " + this.getAngles().angleUnit)
+                        .addData("Robot third angle", Math.round(this.getAngles().thirdAngle) + " " + this.getAngles().angleUnit);
                 this.OpMode.telemetry.addLine();
             }
         }
@@ -342,10 +308,7 @@ class Config {
         this.status("Applying color deviation scoring");
         this.goldDetector.areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
 
-        this.status("Starting detector");
-        this.goldDetector.enable();
-
-        this.status("Ready!");
+        this.status("Done!");
 
     }
 
@@ -379,6 +342,11 @@ class Config {
     void status(String string) {
         this.OpMode.telemetry.addData("Status", string);
         this.OpMode.telemetry.update();
+    }
+
+
+    Orientation getAngles() {
+        return this.imu.isGyroCalibrated() ? this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES) : null;
     }
 
 
@@ -427,28 +395,33 @@ class Config {
     // FIXME
     void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
 
-        double d = 11, currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle,
-                circumference = d * 3.14;
+        double error, steer, P = 0.15d;
 
-        int distance = (int) (Math.round(3.14 * (circumference) * (360 - Math.abs(turnToAngle - currentAngle))) / Math.pow(EncoderNumberChangePerInch, 2));
+        //this.righ
 
-        this.OpMode.telemetry.addData("Distance", distance);
-        this.OpMode.telemetry.update();
-        this.OpMode.sleep(1000);
+        this.timer.reset();
+        while (this.OpMode.opModeIsActive() && this.timer.seconds() <= timeoutS) {
+            error = turnToAngle - this.getAngles().secondAngle;
 
-        this.encoderDrive(speed, -distance, distance, timeoutS);
+            steer = Range.clip(error * P, -1, 1);
+
+
+
+
+        }
     }
 
 
     /**
      * Runs to a given position in inches via encoders.
      *
-     * @param speed The max speed allowed for the motors.
-     * @param leftInches The distance in inches that the left side needs to go.
+     * @param speed       The max speed allowed for the motors.
+     * @param leftInches  The distance in inches that the left side needs to go.
      * @param rightInches The distance in inches that the right side needs to go.
-     * @param timeoutS The amount of time in seconds that the function is allowed to execute.
+     * @param timeoutS    The amount of time in seconds that the function is allowed to execute.
      */
     void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
+        // TODO: Drive using IMU so the heading is kept
         // Its literally distinctDrive, but with 2 positions
         this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
     }
@@ -457,7 +430,7 @@ class Config {
     /**
      * Sets the target position of the individual drive motors, and then approaches that point.
      *
-     * @param speed The maximum speed each motor is allowed to run at.
+     * @param speed    The maximum speed each motor is allowed to run at.
      * @param LFInches The left front motor's target position in inches.
      * @param LBInches The left back motor's target position in inches.
      * @param RFInches The right front motor's target position in inches.

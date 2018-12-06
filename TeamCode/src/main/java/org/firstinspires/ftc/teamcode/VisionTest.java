@@ -21,6 +21,8 @@ public class VisionTest extends LinearOpMode {
 
         waitForStart();
 
+        robot.goldDetector.enable();
+
         while (opModeIsActive()) {
 
             robot.updateTelemetry();

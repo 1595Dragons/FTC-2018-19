@@ -15,20 +15,35 @@ public class EncoderPosition extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        boolean rightSelected = false;
-        double position = 0.0;
+        boolean rightSelected = false, isPressed = false;
+        double position = 0.5;
         robot.ConfigureRobtHardware(false);
         waitForStart();
         while (opModeIsActive()) {
-            if ((gamepad1.dpad_up || gamepad2.dpad_up) && position < 1) {
-                position += 0.05;
-            } else if ((gamepad1.dpad_up || gamepad2.dpad_up) && position > 0) {
-                position -= 0.05;
+
+            if (gamepad1.dpad_up || gamepad2.dpad_up) {
+                if (!isPressed) {
+                    position += 0.05;
+                }
+            } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
+                if (!isPressed) {
+                    position -= 0.05;
+                }
+            }
+
+            if (position > 1) {
+                position = 1;
+            } else if (position < 0) {
+                position = 0;
             }
 
             if (gamepad1.dpad_left || gamepad1.dpad_right || gamepad2.dpad_right || gamepad2.dpad_left) {
-                rightSelected = !rightSelected;
+                if (!isPressed) {
+                    rightSelected = !rightSelected;
+                }
             }
+
+            isPressed = (gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right);
 
             if (rightSelected) {
                 robot.IO_Servo_Right.setPosition(position);
