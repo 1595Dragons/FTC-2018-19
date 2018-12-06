@@ -210,7 +210,7 @@ public class TeleopCubed extends LinearOpMode {
                 armPositionInitial = robot.armMotorL.getCurrentPosition();
             }
             // Update telemetry
-            //robot.updateTelemetry();
+            //robot.updateAutonomousTelemetry();
             /*
             telemetry.addData("ObjectL%7d",leftObject);
             telemetry.addData("ObjectR%7d",rightObject);

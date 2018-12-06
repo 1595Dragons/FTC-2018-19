@@ -16,7 +16,7 @@ public class justTelemetry extends LinearOpMode {
         robot.ConfigureRobtHardware(true);
         waitForStart();
         while (opModeIsActive()) {
-            robot.updateTelemetry();
+            robot.updateAutonomousTelemetry();
         }
     }
 }

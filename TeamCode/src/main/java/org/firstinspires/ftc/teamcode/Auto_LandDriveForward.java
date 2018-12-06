@@ -20,7 +20,7 @@ public class Auto_LandDriveForward extends LinearOpMode {
 
 
         // Send telemetry message to signify robot waiting;
-        robot.resetMotors(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
+        robot.resetMotorsForAutonomous(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
 
 
         // Wait for the game to start (driver presses PLAY)

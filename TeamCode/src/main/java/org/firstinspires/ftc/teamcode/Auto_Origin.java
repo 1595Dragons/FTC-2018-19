@@ -21,7 +21,7 @@ public class Auto_Origin extends LinearOpMode {
 
         // Send telemetry message to signify robot waiting;
         robot.status("Resetting motors");
-        robot.resetMotors(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
+        robot.resetMotorsForAutonomous(robot.left_back, robot.left_front, robot.right_back, robot.right_front, robot.armMotorL, robot.armMotorR);
 
 
         // Wait for the game to start (driver presses PLAY)

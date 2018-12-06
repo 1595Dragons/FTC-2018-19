@@ -5,12 +5,10 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,7 +17,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.opencv.core.Size;
 
@@ -77,7 +74,7 @@ class Config {
         this.left_front = OpMode.hardwareMap.dcMotor.get("left front");
         this.left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.left_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.left_front.setMode(RunMode.RUN_USING_ENCODER);
+        this.left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.left_front.setDirection(Direction.FORWARD);
         this.Devices.add(left_front);
         this.DeviceNames.add("Left front");
@@ -88,7 +85,7 @@ class Config {
         this.right_front = OpMode.hardwareMap.dcMotor.get("right front");
         this.right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.right_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.right_front.setMode(RunMode.RUN_USING_ENCODER);
+        this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.right_front.setDirection(Direction.REVERSE);
         this.Devices.add(right_front);
         this.DeviceNames.add("Right front");
@@ -99,7 +96,7 @@ class Config {
         this.left_back = OpMode.hardwareMap.dcMotor.get("left back");
         this.left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.left_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.left_back.setMode(RunMode.RUN_USING_ENCODER);
+        this.left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.left_back.setDirection(Direction.FORWARD);
         this.Devices.add(left_back);
         this.DeviceNames.add("Left back");
@@ -110,7 +107,7 @@ class Config {
         this.right_back = OpMode.hardwareMap.dcMotor.get("right back");
         this.right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.right_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.right_back.setMode(RunMode.RUN_USING_ENCODER);
+        this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.right_back.setDirection(Direction.REVERSE);
         this.Devices.add(right_back);
         this.DeviceNames.add("Right back");
@@ -152,7 +149,7 @@ class Config {
         this.IO_Motor = OpMode.hardwareMap.dcMotor.get("IO motor");
         this.IO_Motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.IO_Motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.IO_Motor.setMode(RunMode.RUN_USING_ENCODER);
+        this.IO_Motor.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.IO_Motor.setDirection(Direction.FORWARD);
         this.Devices.add(IO_Motor);
         this.DeviceNames.add("Intake motor");
@@ -192,7 +189,7 @@ class Config {
      *
      * @param motors Any given DcMotors that need to be reset
      */
-    void resetMotors(DcMotor... motors) {
+    void resetMotorsForAutonomous(DcMotor... motors) {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
@@ -217,8 +214,10 @@ class Config {
      * IMU (If the gyro is calibrated) displays the XYZ angles in degrees.
      * <p>
      * And the gold detector displays if and where it found gold.
+     *
      */
-    void updateTelemetry() { // FIXME This is really slow...
+    @Deprecated
+    void updateAutonomousTelemetry() {
 
         int i = 0;
         for (HardwareDevice device : Devices) {
@@ -324,7 +323,7 @@ class Config {
         while (this.timer.milliseconds() < milliseconds && this.OpMode.opModeIsActive()) {
             this.OpMode.telemetry.addData("Elapsed time", this.timer.milliseconds());
             this.OpMode.telemetry.addLine();
-            this.updateTelemetry();
+            this.updateAutonomousTelemetry();
             if (this.goldDetector.isFound()) {
                 return true;
             }
@@ -382,7 +381,7 @@ class Config {
             }
 
             // Update telemetry as this is running
-            this.updateTelemetry();
+            this.updateAutonomousTelemetry();
         }
 
 
@@ -395,20 +394,36 @@ class Config {
     // FIXME
     void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
 
-        double error, steer, P = 0.15d;
+        double error, steer, P = 0.005d;
 
-        //this.righ
+        this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
 
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() <= timeoutS) {
-            error = turnToAngle - this.getAngles().secondAngle;
+            error = turnToAngle - Math.round(this.getAngles().secondAngle);
 
             steer = Range.clip(error * P, -1, 1);
 
+            if (Math.abs(error) < 2) {
+                break;
+            } else {
+                left_front.setPower(-steer * speed);
+                left_back.setPower(-steer * speed);
+                right_front.setPower(steer * speed);
+                right_back.setPower(steer * speed);
 
-
-
+                this.OpMode.telemetry.addData("Turning to degree", turnToAngle);
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Current angle", Math.round(this.getAngles().secondAngle));
+                this.OpMode.telemetry.update();
+            }
         }
+
+        // Stop all motion, and reset the motors
+        this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
     }
 
 
@@ -440,7 +455,7 @@ class Config {
     void distinctDrive(double speed, int LFInches, int LBInches, int RFInches, int RBInches, double timeoutS) {
 
         // Reset the motor encoders, and set them to RUN_TO_POSITION
-        this.resetMotors(this.left_front, this.left_back, this.right_front, this.right_back);
+        this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
 
         // Set the individual drive motor positions
         this.left_front.setTargetPosition(LFInches * EncoderNumberChangePerInch);
@@ -464,10 +479,10 @@ class Config {
                 break;
             }
 
-            this.updateTelemetry();
+            this.updateAutonomousTelemetry();
         }
 
         // Stop all motion, and reset the motors
-        this.resetMotors(this.left_back, this.left_front, this.right_back, this.right_front);
+        this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
     }
 }
