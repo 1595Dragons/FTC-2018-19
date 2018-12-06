@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 
-@TeleOp(name="7935 TeleOp", group="Official")
+@TeleOp(name = "7935 TeleOp", group = "Official")
 public class Teleop extends LinearOpMode {
 
     // Declare the Config file, that way we can use the pre-made fictions for cleaner code
@@ -26,140 +26,77 @@ public class Teleop extends LinearOpMode {
 
         //IO Servo
         //Servo 位置
-        double IOLeftServoClose = 0.2,IOLeftServoHalfOpen = 0.6, IOLeftServoOpen = 0.80;
-        double IORightServoClose = 0.7, IORightServoHalfOpen = 0.35, IORightServoOpen = 0.15;
+        double IOLeftServoClose = 0, IOLeftServoHalfOpen = 0.6, IOLeftServoOpen = 0.80;
+        double IORightServoClose = 0.85, IORightServoHalfOpen = 0.35, IORightServoOpen = 0.15;
         //MOTORS Power
-        double speedForTurn = 0.4, speedForMove =0.5, speedForSide = 0.7;
-        double intakePower = 1;
-        double armPower =1;
-        double extendPower = 0.8;
+        double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 0.8;
         // limit position
-        int armPositionInitial=0;
+        int armPositionInitial = 0;
         int armMaxPosition = 0, armMinPosition = -680;
-        robot.armMotorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.armMotorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.armMotorExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.armMotorExtend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //ColorSensor
-        final double SCALE_FACTOR = 255;
-        float hsvValuesLeft[] = {0F, 0F, 0F};
-        float hsvValuesRight[] = {0F, 0F, 0F};
-        int leftObject=0, rightObject=0;//0 means nothing, 1 means yellow, 2 means white
+
+        double left1Power, right1Power, left2Power, right2Power, allPower, armExtend, armUp;
+
         // Wait for the start button to be pressed
         waitForStart();
 
-        // Code that we want to run repeatedly
         while (opModeIsActive()) {
 
-            // Copy paste from Henry's Iterative program, with some formatting changes :)
+            double driveForward = gamepad2.left_stick_y * speedForMove, driveRightSide = gamepad2.left_stick_x * speedForSide,
+                    turnRight = -gamepad2.right_stick_x * speedForTurn;
 
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double left1Power, right1Power, left2Power, right2Power, allPower = 1;
-            double leftDistance=10,rightDistance=10;
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-
-            double driveForward = gamepad2.left_stick_y*speedForMove, driveRightSide = gamepad2.left_stick_x*speedForSide;
-            double turnRight = -gamepad2.right_stick_x*speedForTurn;
-            double armUp;
-            double armExtend=0;
-            left1Power=0;
-            left2Power=0;
-            right1Power=0;
-            right2Power=0;
             //prevent small input from stick
-            if (driveForward>=-0.1&&driveForward<=0.1){
-                driveForward=0;
-            }
-            if (driveRightSide>=-0.1&&driveRightSide<=0.1){
-                driveRightSide=0;
-            }
-            if (turnRight>=-0.1&&turnRight<=0.1){
-                turnRight=0;
-            }
+            driveForward = (driveForward >= -0.1 && driveForward <= 0.1) ? 0 : driveForward;
+            driveRightSide = (driveRightSide >= -0.1 && driveRightSide <= 0.1) ? 0 : driveRightSide;
+            turnRight = (turnRight >= -0.1 && turnRight <= 0.1) ? 0 : turnRight;
 
-            if(gamepad2.dpad_down==false&&gamepad2.dpad_left==false&&gamepad2.dpad_right==false&&gamepad2.dpad_up==false)
-            {
-                left1Power = Range.clip((-driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
-                right1Power = Range.clip((driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
-                left2Power = Range.clip((driveRightSide + driveForward+turnRight)*allPower, -1.0, 1.0) ;
-                right2Power = Range.clip((-driveRightSide + driveForward-turnRight)*allPower, -1.0, 1.0) ;
-            }
-            else
-            {
-                if(gamepad2.dpad_up){//up button actually works for down function
-                    left1Power=-1*speedForMove*allPower;
-                    left2Power=-1*speedForMove*allPower;
-                    right1Power=-1*speedForMove*allPower;
-                    right2Power=-1*speedForMove*allPower;
-                }
-                else if(gamepad2.dpad_down){//down button actually works for up function
-                    left1Power=1*speedForMove*allPower;
-                    left2Power=1*speedForMove*allPower;
-                    right1Power=1*speedForMove*allPower;
-                    right2Power=1*speedForMove*allPower;
-                }
-                else if(gamepad2.dpad_right){
-                    left1Power=-1*speedForSide*allPower;
-                    left2Power=1*speedForSide*allPower;
-                    right1Power=1*speedForSide*allPower;
-                    right2Power=-1*speedForSide*allPower;
-                }
-                else if(gamepad2.dpad_left){
-                    left1Power=1*speedForSide*allPower;
-                    left2Power=-1*speedForSide*allPower;
-                    right1Power=-1*speedForSide*allPower;
-                    right2Power=1*speedForSide*allPower;
-                }
+            // Set the power to half if the bumpers are pressed
+            allPower = (gamepad2.left_bumper || gamepad2.right_bumper) ? 0.5 : 1;
+
+            if (gamepad2.dpad_up) {//up button actually works for down function
+                left1Power = -1 * speedForMove * allPower;
+                left2Power = -1 * speedForMove * allPower;
+                right1Power = -1 * speedForMove * allPower;
+                right2Power = -1 * speedForMove * allPower;
+            } else if (gamepad2.dpad_down) {//down button actually works for up function
+                left1Power = 1 * speedForMove * allPower;
+                left2Power = 1 * speedForMove * allPower;
+                right1Power = 1 * speedForMove * allPower;
+                right2Power = 1 * speedForMove * allPower;
+            } else if (gamepad2.dpad_right) {
+                left1Power = -1 * speedForSide * allPower;
+                left2Power = 1 * speedForSide * allPower;
+                right1Power = 1 * speedForSide * allPower;
+                right2Power = -1 * speedForSide * allPower;
+            } else if (gamepad2.dpad_left) {
+                left1Power = 1 * speedForSide * allPower;
+                left2Power = -1 * speedForSide * allPower;
+                right1Power = -1 * speedForSide * allPower;
+                right2Power = 1 * speedForSide * allPower;
+            } else {
+                left1Power = Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
+                right1Power = Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
+                left2Power = Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
+                right2Power = Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
             }
 
-            armUp=(gamepad1.left_stick_y)*armPower;
-            if (gamepad1.dpad_up)
-            {
-                armExtend=extendPower;
-            }
-            else{
-                if (gamepad1.dpad_down)
-                {
-                    armExtend=-extendPower;
-                }
-                else
-                {
-                    armExtend=0;
-                }
-            }
+            armUp = (gamepad1.left_stick_y) * armPower;
 
-
-
-
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+            armExtend = (gamepad1.dpad_up) ? extendPower : (gamepad1.dpad_down ? -extendPower : 0);
 
             // Send calculated power to wheels
             robot.left_front.setPower(left1Power);
             robot.right_front.setPower(right1Power);
             robot.left_back.setPower(left2Power);
             robot.right_back.setPower(right2Power);
-            if (robot.armMotorL.getCurrentPosition()>= (armMaxPosition+armPositionInitial) && armUp>=0 && gamepad1.left_stick_button==false)
-            {
-                armUp=0;
-            }
-            if(robot.armMotorL.getCurrentPosition()<= (armMinPosition+armPositionInitial) && armUp<=0 && gamepad1.left_stick_button==false)
-            {
-                armUp=0;
-            }
+
+            armUp = (robot.armMotorL.getCurrentPosition() >= (armMaxPosition + armPositionInitial) && armUp >= 0 && !gamepad1.left_stick_button) ?
+                    0 : (robot.armMotorL.getCurrentPosition() <= (armMinPosition + armPositionInitial) && armUp <= 0 && !gamepad1.left_stick_button) ? 0 : armUp;
+
             robot.armMotorL.setPower(armUp);
             robot.armMotorR.setPower(armUp);
 
 
             robot.armMotorExtend.setPower(armExtend);
-
 
             //
             /*
@@ -189,8 +126,7 @@ public class Teleop extends LinearOpMode {
                 robot.IO_Servo_Right.setPosition(IORightServoClose);
             }
             */
-            if(gamepad1.right_bumper)
-            {
+            if (gamepad1.right_bumper) {
                 robot.IO_Motor.setPower(intakePower);
                 robot.IO_Servo_Left.setPosition(IOLeftServoClose);
                 robot.IO_Servo_Right.setPosition(IORightServoClose);
@@ -232,36 +168,27 @@ public class Teleop extends LinearOpMode {
                     rightObject=0;
                 }
                 */
-            }
-            else
-            {
-                if (gamepad1.left_bumper)
-                {
+            } else {
+                if (gamepad1.left_bumper) {
                     robot.IO_Motor.setPower(-intakePower);
-                }
-                else
-                {
+                } else {
                     robot.IO_Motor.setPower(0);
                 }
             }
-            if (gamepad1.y)
-            {
+            if (gamepad1.y) {
                 robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
                 robot.IO_Servo_Right.setPosition(IORightServoOpen);
             }
-            if (gamepad1.x)
-            {
+            if (gamepad1.x) {
                 robot.IO_Servo_Right.setPosition(IORightServoOpen);
                 robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
             }
-            if (gamepad1.b)
-            {
+            if (gamepad1.b) {
                 robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
                 robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
             }
-            if (gamepad1.a)
-            {
-                armPositionInitial=robot.armMotorL.getCurrentPosition();
+            if (gamepad1.a) {
+                armPositionInitial = robot.armMotorL.getCurrentPosition();
             }
             // Update telemetry
             //robot.updateTelemetry();
@@ -278,8 +205,8 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("ExtendPosition%7d",robot.armMotorExtend.getCurrentPosition());
             telemetry.addData("extendPower%7d", armExtend);
             */
-            telemetry.addData("ArmMaximum",armMaxPosition);
-            telemetry.addData("ArmInitial",armPositionInitial);
+            telemetry.addData("ArmMaximum", armMaxPosition);
+            telemetry.addData("ArmInitial", armPositionInitial);
             telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
             telemetry.update();
 

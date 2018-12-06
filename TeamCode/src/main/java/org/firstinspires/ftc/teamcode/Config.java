@@ -125,7 +125,7 @@ class Config {
         this.armMotorL = OpMode.hardwareMap.dcMotor.get("arm motor left");
         this.armMotorL.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.armMotorL.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.armMotorL.setMode(RunMode.RUN_USING_ENCODER);
+        this.armMotorL.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorL.setDirection(Direction.REVERSE);
         this.Devices.add(armMotorL);
         this.DeviceNames.add("Left arm motor");
@@ -136,7 +136,7 @@ class Config {
         this.armMotorR = OpMode.hardwareMap.dcMotor.get("arm motor right");
         this.armMotorR.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.armMotorR.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.armMotorR.setMode(RunMode.RUN_USING_ENCODER);
+        this.armMotorR.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorR.setDirection(Direction.FORWARD);
         this.Devices.add(armMotorR);
         this.DeviceNames.add("Right arm motor");
@@ -146,7 +146,7 @@ class Config {
         this.armMotorExtend = OpMode.hardwareMap.dcMotor.get("arm motor extend");
         this.armMotorExtend.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.armMotorExtend.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.armMotorExtend.setMode(RunMode.RUN_USING_ENCODER);
+        this.armMotorExtend.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorExtend.setDirection(Direction.FORWARD);
         this.Devices.add(armMotorExtend);
         this.DeviceNames.add("Arm extension motor");
@@ -196,8 +196,11 @@ class Config {
         if (setupIMU) {
             this.status("Setting up imu...");
             BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.mode = BNO055IMU.SensorMode.IMU;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
+            parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.NORMAL;
+            parameters.accelPowerMode = BNO055IMU.AccelPowerMode.NORMAL;
             this.imu = OpMode.hardwareMap.get(BNO055IMU.class, "imu");
             this.imu.initialize(parameters);
         }
