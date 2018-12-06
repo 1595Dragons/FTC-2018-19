@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -14,179 +12,68 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 
-@Disabled
-@TeleOp(name = "7935 TeleOp Cubed", group = "Official")
+@TeleOp(name = "7935 TeleOp cubed", group = "Official")
 public class TeleopCubed extends LinearOpMode {
 
-    // Declare the Config file, that way we can use the pre-made fictions for cleaner code
     private Config robot = new Config(this);
 
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobtHardware(false);
+        robot.ConfigureRobtHardware(true);
 
-        //IO Servo
-        //Servo 位置
-        double IOLeftServoClose = 0.2, IOLeftServoHalfOpen = 0.6, IOLeftServoOpen = 0.80;
-        double IORightServoClose = 0.7, IORightServoHalfOpen = 0.35, IORightServoOpen = 0.15;
-        //MOTORS Power
+
+        //Servo positions
+        double LeftServoClose = 0.1d, LeftServoOpen = 0.7d;
+        double RightServoClose = 0.85d, RightServoOpen = 0.25d;
+
+
+        //Motor Power
         double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 0.8;
-        // limit position
-        int armPositionInitial = 0;
-        int armMaxPosition = 0, armMinPosition = -680;
+
+
+        double allPower, armExtend;
 
         // Wait for the start button to be pressed
         waitForStart();
 
-        // Code that we want to run repeatedly
         while (opModeIsActive()) {
 
-            // Copy paste from Henry's Iterative program, with some formatting changes :)
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double left1Power, right1Power, left2Power, right2Power, allPower = 1;
+            double driveForward = Math.pow(gamepad2.left_stick_y, 3) * speedForMove, driveRightSide = Math.pow(gamepad2.left_stick_x, 3) * speedForSide,
+                    turnRight = -Math.pow(gamepad2.right_stick_x, 3) * speedForTurn;
 
 
-            double driveForward = gamepad2.left_stick_y * gamepad2.left_stick_y * gamepad2.left_stick_y * speedForMove;
-            double driveRightSide = gamepad2.left_stick_x * gamepad2.left_stick_x * gamepad2.left_stick_x * speedForSide;
-            double turnRight = -gamepad2.right_stick_x * gamepad2.right_stick_x * gamepad2.right_stick_x * speedForTurn;
-            double armUp;
-            double armExtend = 0;
             //prevent small input from stick
             driveForward = (driveForward >= -0.1 && driveForward <= 0.1) ? 0 : driveForward;
             driveRightSide = (driveRightSide >= -0.1 && driveRightSide <= 0.1) ? 0 : driveRightSide;
             turnRight = (turnRight >= -0.1 && turnRight <= 0.1) ? 0 : turnRight;
 
 
-            if (gamepad2.dpad_up) {//up button actually works for down function
-                left1Power = -1 * speedForMove * allPower;
-                left2Power = -1 * speedForMove * allPower;
-                right1Power = -1 * speedForMove * allPower;
-                right2Power = -1 * speedForMove * allPower;
-            } else if (gamepad2.dpad_down) {//down button actually works for up function
-                left1Power = 1 * speedForMove * allPower;
-                left2Power = 1 * speedForMove * allPower;
-                right1Power = 1 * speedForMove * allPower;
-                right2Power = 1 * speedForMove * allPower;
-            } else if (gamepad2.dpad_right) {
-                left1Power = -1 * speedForSide * allPower;
-                left2Power = 1 * speedForSide * allPower;
-                right1Power = 1 * speedForSide * allPower;
-                right2Power = -1 * speedForSide * allPower;
-            } else if (gamepad2.dpad_left) {
-                left1Power = 1 * speedForSide * allPower;
-                left2Power = -1 * speedForSide * allPower;
-                right1Power = -1 * speedForSide * allPower;
-                right2Power = 1 * speedForSide * allPower;
-            } else {
-                left1Power = Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
-                right1Power = Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
-                left2Power = Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0);
-                right2Power = Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0);
-            }
-
-
-            armUp = (gamepad1.left_stick_y) * armPower;
-            if (gamepad1.dpad_up) {
-                armExtend = extendPower;
-            } else {
-                if (gamepad1.dpad_down) {
-                    armExtend = -extendPower;
-                } else {
-                    armExtend = 0;
-                }
-            }
+            // Set the power to half if the bumpers are pressed
+            allPower = (gamepad2.left_bumper || gamepad2.right_bumper) ? 1 : 0.4;
 
 
             // Send calculated power to wheels
-            robot.left_front.setPower(left1Power);
-            robot.right_front.setPower(right1Power);
-            robot.left_back.setPower(left2Power);
-            robot.right_back.setPower(right2Power);
-            if (robot.armMotorL.getCurrentPosition() > (armMaxPosition + armPositionInitial) && armUp >= 0 && gamepad1.left_stick_button == false) {
-                armUp = 0;
-            }
-            if (robot.armMotorL.getCurrentPosition() < (armMinPosition + armPositionInitial) && armUp <= 0 && gamepad1.left_stick_button == false) {
-                armUp = 0;
-            }
-            robot.armMotorL.setPower(armUp);
-            robot.armMotorR.setPower(armUp);
+            robot.left_front.setPower(Range.clip((-driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0));
+            robot.right_front.setPower(Range.clip((driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0));
+            robot.left_back.setPower(Range.clip((driveRightSide + driveForward + turnRight) * allPower, -1.0, 1.0));
+            robot.right_back.setPower(Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0));
+
+
+            robot.armMotorL.setPower((gamepad1.left_stick_y) * armPower);
+            robot.armMotorR.setPower((gamepad1.left_stick_y) * armPower);
+
+
+            armExtend = (gamepad1.dpad_up) ? extendPower : (gamepad1.dpad_down ? -extendPower : 0);
 
 
             robot.armMotorExtend.setPower(armExtend);
 
 
-            //
-            /*
-            if (gamepad1.b)
-            {
-                if (leftObject==1) {
-                    robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
-                }
-                else if(leftObject==2){
-                    robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
-                }
-                else{
-                    robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                }
-                if (rightObject==1) {
-                    robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
-                }
-                else if(rightObject==2){
-                    robot.IO_Servo_Right.setPosition(IORightServoOpen);
-                }
-                else{
-                    robot.IO_Servo_Right.setPosition(IORightServoClose);
-                }
-            }
-            else{
-                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                robot.IO_Servo_Right.setPosition(IORightServoClose);
-            }
-            */
             if (gamepad1.right_bumper) {
                 robot.IO_Motor.setPower(intakePower);
-                robot.IO_Servo_Left.setPosition(IOLeftServoClose);
-                robot.IO_Servo_Right.setPosition(IORightServoClose);
-                /*
-                Color.RGBToHSV((int) (robot.sensorColorLeft.red() * SCALE_FACTOR),
-                        (int) (robot.sensorColorLeft.green() * SCALE_FACTOR),
-                        (int) (robot.sensorColorLeft.blue() * SCALE_FACTOR),
-                        hsvValuesLeft);//Hue value is hsvValuesLeft[0]
-                Color.RGBToHSV((int) (robot.sensorColorRight.red() * SCALE_FACTOR),
-                        (int) (robot.sensorColorRight.green() * SCALE_FACTOR),
-                        (int) (robot.sensorColorRight.blue() * SCALE_FACTOR),
-                        hsvValuesRight);//Hue value is hsvValuesRight[0]
-
-                leftDistance=robot.sensorDistanceLeft.getDistance(DistanceUnit.CM);
-                rightDistance=robot.sensorDistanceRight.getDistance(DistanceUnit.CM);
-                if (leftDistance<=5.5) {
-                    if (hsvValuesLeft[0]>=25&&hsvValuesLeft[0]<=45)
-                    {
-                        leftObject=1;
-                    }
-                    else
-                    {
-                        leftObject=2;
-                    }
-                }
-                else
-                {
-                    leftObject=0;
-                }
-                if (rightDistance<=5.5) {
-                    if (hsvValuesRight[0] >= 25 && hsvValuesRight[0] <= 45) {
-                        rightObject = 1;
-                    }
-                    else {
-                        rightObject = 2;
-                    }
-                }
-                else{
-                    rightObject=0;
-                }
-                */
+                robot.IO_Servo_Left.setPosition(LeftServoClose);
+                robot.IO_Servo_Right.setPosition(RightServoClose);
             } else {
                 if (gamepad1.left_bumper) {
                     robot.IO_Motor.setPower(-intakePower);
@@ -194,45 +81,31 @@ public class TeleopCubed extends LinearOpMode {
                     robot.IO_Motor.setPower(0);
                 }
             }
+
+
             if (gamepad1.y) {
-                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
-                robot.IO_Servo_Right.setPosition(IORightServoOpen);
+                robot.IO_Servo_Left.setPosition(LeftServoOpen);
+                robot.IO_Servo_Right.setPosition(RightServoOpen);
             }
+
+
             if (gamepad1.x) {
-                robot.IO_Servo_Right.setPosition(IORightServoOpen);
-                robot.IO_Servo_Left.setPosition(IOLeftServoHalfOpen);
+                robot.IO_Servo_Right.setPosition(RightServoOpen);
+                robot.IO_Servo_Left.setPosition(Math.round((LeftServoOpen + LeftServoClose) / 2));
             }
+
+
             if (gamepad1.b) {
-                robot.IO_Servo_Right.setPosition(IORightServoHalfOpen);
-                robot.IO_Servo_Left.setPosition(IOLeftServoOpen);
+                robot.IO_Servo_Right.setPosition(Math.round((RightServoOpen + RightServoClose) / 2));
+                robot.IO_Servo_Left.setPosition(LeftServoOpen);
             }
-            if (gamepad1.a) {
-                armPositionInitial = robot.armMotorL.getCurrentPosition();
-            }
-            // Update telemetry
-            //robot.updateAutonomousTelemetry();
-            /*
-            telemetry.addData("ObjectL%7d",leftObject);
-            telemetry.addData("ObjectR%7d",rightObject);
-            telemetry.addData("DistanceL%7d",robot.sensorDistanceLeft.getDistance(DistanceUnit.CM));
-            telemetry.addData("DistanceL%7d", leftDistance);
-            telemetry.addData("DistanceR%7d",robot.sensorDistanceRight.getDistance(DistanceUnit.CM));
-            telemetry.addData("DistanceR%7d",rightDistance);
 
-            telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
-            telemetry.addData("armPower%7d",armUp);
-            telemetry.addData("ExtendPosition%7d",robot.armMotorExtend.getCurrentPosition());
-            telemetry.addData("extendPower%7d", armExtend);
-            */
-            telemetry.addData("ArmMaximum", armMaxPosition);
-            telemetry.addData("ArmInitial", armPositionInitial);
-            telemetry.addData("ArmPosition%7d", robot.armMotorL.getCurrentPosition());
-            telemetry.addData("ArmPosition2", robot.armMotorR.getCurrentPosition());
-            telemetry.addData("a button", gamepad1.a);
-
+            // Update telemetry with the gyro angles
+            telemetry.addData("Robot first angle", Math.round(robot.getAngles().firstAngle) + " " + robot.getAngles().angleUnit)
+                    .addData("Robot second angle", Math.round(robot.getAngles().secondAngle) + " " + robot.getAngles().angleUnit)
+                    .addData("Robot third angle", Math.round(robot.getAngles().thirdAngle) + " " + robot.getAngles().angleUnit);
             telemetry.update();
 
         }
-
     }
 }

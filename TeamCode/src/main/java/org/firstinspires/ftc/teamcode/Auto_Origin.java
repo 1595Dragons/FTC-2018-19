@@ -28,7 +28,7 @@ public class Auto_Origin extends LinearOpMode {
         waitForStart();
 
         //PlanA
-        robot.armDrive(ARM_SPEED, 680, 3.0);
+        robot.armDrive(ARM_SPEED, 680, 3);
         sleep(200);
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3.0);
         sleep(200);

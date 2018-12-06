@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Path;
+
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.internal.camera.names.BuiltinCameraNameImpl;
 import org.opencv.core.Size;
 
 import java.util.ArrayList;
@@ -42,7 +45,7 @@ class Config {
 
 
     // Gyro / IMU
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
 
     // A timer object
@@ -214,7 +217,6 @@ class Config {
      * IMU (If the gyro is calibrated) displays the XYZ angles in degrees.
      * <p>
      * And the gold detector displays if and where it found gold.
-     *
      */
     @Deprecated
     void updateAutonomousTelemetry() {
@@ -356,7 +358,7 @@ class Config {
      * @param armPos   The position that will be set as the motors target positions.
      * @param timeoutS The duration in seconds the function is allowed to run.
      */
-    void armDrive(double speed, int armPos, double timeoutS) {
+    void armDrive(double speed, int armPos, int timeoutS) {
 
         // Check if the arm motors are RUN_TO_POSITION
         if (!this.armMotorL.getMode().equals(RunMode.RUN_TO_POSITION)) {
@@ -391,10 +393,9 @@ class Config {
     }
 
 
-    // FIXME
-    void turnToDegree(double speed, float turnToAngle, BNO055IMU imu, double timeoutS) {
+    void autoTurnToDegree(double speed, int turnToAngle, int timeoutS) {
 
-        double error, steer, P = 0.005d;
+        double error, steer, P = 0.025d;
 
         this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
@@ -403,17 +404,18 @@ class Config {
 
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() <= timeoutS) {
-            error = turnToAngle - Math.round(this.getAngles().secondAngle);
+            error = this.getError(turnToAngle);
 
-            steer = Range.clip(error * P, -1, 1);
+            steer = getSteer(error, P);
 
-            if (Math.abs(error) < 2) {
+            if (Math.abs(error) < 1) {
+                this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
                 break;
             } else {
-                left_front.setPower(-steer * speed);
-                left_back.setPower(-steer * speed);
-                right_front.setPower(steer * speed);
-                right_back.setPower(steer * speed);
+                this.left_front.setPower(-steer * speed);
+                this.left_back.setPower(-steer * speed);
+                this.right_front.setPower(steer * speed);
+                this.right_back.setPower(steer * speed);
 
                 this.OpMode.telemetry.addData("Turning to degree", turnToAngle);
                 this.OpMode.telemetry.addLine();
@@ -421,9 +423,57 @@ class Config {
                 this.OpMode.telemetry.update();
             }
         }
+    }
 
-        // Stop all motion, and reset the motors
-        this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
+
+    void autoDriveForward(double speed, int inches, int timeoutS, int currentAngle) {
+
+        int ticks = inches * EncoderNumberChangePerInch;
+
+        this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
+
+        double rightSpeed, leftSpeed, error, steer, P = 0.025d;
+
+        this.left_front.setTargetPosition(-ticks);
+        this.right_front.setTargetPosition(-ticks);
+        this.left_back.setTargetPosition(-ticks);
+        this.right_back.setTargetPosition(-ticks);
+
+
+        this.timer.reset();
+        while (this.OpMode.opModeIsActive() && this.timer.seconds() <= timeoutS) {
+
+            if (isThere(EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
+                this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
+                break;
+            }
+
+            error = getError(currentAngle);
+
+            steer = getSteer(error, P);
+
+            // If driving in reverse, the motor correction also needs to be reversed
+            steer = steer < 0 ? steer * -1 : steer;
+
+            leftSpeed = Range.clip(speed - steer, -speed, speed);
+            rightSpeed = Range.clip(speed + steer, -speed, speed);
+
+            this.left_front.setPower(leftSpeed);
+            this.right_front.setPower(rightSpeed);
+            this.left_back.setPower(leftSpeed);
+            this.right_back.setPower(rightSpeed);
+
+        }
+    }
+
+
+    private double getError(int desiredAngle) {
+        return this.imu.isGyroCalibrated() ? Math.round(desiredAngle - Math.round(this.getAngles().secondAngle)) : 0;
+    }
+
+
+    private double getSteer(double error, double PCoeff) {
+        return Range.clip(error * PCoeff, -1, 1);
     }
 
 
@@ -435,6 +485,7 @@ class Config {
      * @param rightInches The distance in inches that the right side needs to go.
      * @param timeoutS    The amount of time in seconds that the function is allowed to execute.
      */
+    @Deprecated
     void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
         // TODO: Drive using IMU so the heading is kept
         // Its literally distinctDrive, but with 2 positions
@@ -452,6 +503,7 @@ class Config {
      * @param RBInches The right back motor's target position in inches.
      * @param timeoutS The amount of time in seconds that the function is allowed to execute.
      */
+    @Deprecated
     void distinctDrive(double speed, int LFInches, int LBInches, int RFInches, int RBInches, double timeoutS) {
 
         // Reset the motor encoders, and set them to RUN_TO_POSITION

@@ -28,7 +28,7 @@ public class Auto_LandDriveForward extends LinearOpMode {
 
 
         //PlanA
-        robot.armDrive(ARM_SPEED, 680, 3.0);
+        robot.armDrive(ARM_SPEED, 660, 3);
         sleep(300);
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3);
         sleep(300);

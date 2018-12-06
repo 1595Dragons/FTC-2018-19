@@ -27,11 +27,11 @@ public class Auto_SetUpIntake extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        robot.armDrive(ARM_SPEED, 680, 4.0);
+        robot.armDrive(ARM_SPEED, 680, 4);
         sleep(200);
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 4.0);
         sleep(200);
-        robot.armDrive(ARM_SPEED, -350, 3.0);
+        robot.armDrive(ARM_SPEED, -350, 3);
         sleep(200);
         robot.armMotorL.setPower(-ARM_DROP);
         robot.armMotorR.setPower(-ARM_DROP);
@@ -39,7 +39,7 @@ public class Auto_SetUpIntake extends LinearOpMode {
         robot.armMotorL.setPower(0);
         robot.armMotorR.setPower(0);
 
-        robot.armDrive(ARM_SPEED, 500, 4.0);
+        robot.armDrive(ARM_SPEED, 500, 4);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
