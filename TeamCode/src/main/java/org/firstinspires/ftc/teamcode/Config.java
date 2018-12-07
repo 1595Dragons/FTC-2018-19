@@ -293,8 +293,7 @@ class Config {
 
     }
 
-
-    // TODO: Test this
+    
     void autoTurnToDegree(double speed, int turnToAngle, int timeoutS) {
 
         double error, steer, P = 0.025d, I = 1, D = 1;
@@ -310,7 +309,7 @@ class Config {
 
             steer = getSteer(error, P);
 
-            if (Math.abs(error) < 1) {
+            if (Math.abs(error) <= 2) {
                 this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
                 break;
             } else {
@@ -431,8 +430,16 @@ class Config {
 
 
     private double getError(int desiredAngle) {
-        // Ge the error. Add 180 to make sure nothing weird happens around 0 or below
-        return this.imu.isGyroCalibrated() ? Math.round((desiredAngle) - (this.getAngle())) : 0;
+        double error = this.imu.isGyroCalibrated() ? Math.round((desiredAngle) - (this.getAngle())) : 0;
+
+        while (error > 180) {
+            error -= 360;
+        }
+        while (error <= -180) {
+            error += 360;
+        }
+
+        return error;
     }
 
 

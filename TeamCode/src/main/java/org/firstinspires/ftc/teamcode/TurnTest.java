@@ -23,8 +23,7 @@ public class TurnTest extends LinearOpMode {
         sleep(1000);
         robot.autoTurnToDegree(.5,180,7);
         sleep(1000);
-        robot.autoTurnToDegree(.5,270,7);
-        sleep(1000);
+        robot.autoTurnToDegree(.5,-90,7);
 
     }
 }
