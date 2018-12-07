@@ -3,9 +3,14 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Turn 90", group = "Test")
-public class TurnTest extends LinearOpMode {
+/**
+ * Created by Stephen Ogden on 12/7/18.
+ * FTC 6128 | 7935
+ * FRC 1595
+ */
 
+@Autonomous(name = "Drive sideways", group = "Test")
+public class DriveSidewaysTest extends LinearOpMode {
     // Config for the robot
     private Config robot = new Config(this);
 
@@ -19,13 +24,10 @@ public class TurnTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.autoTurnToDegree(.5d, 90, 7);
+        robot.autoDriveSideways(.25d, 12, robot.getAngle(), 10);
         sleep(1000);
-        robot.autoTurnToDegree(.5,180,7);
-        sleep(1000);
-        robot.autoTurnToDegree(.5,-90,7);
+        robot.autoDriveSideways(.25d, -12, robot.getAngle(), 10);
         sleep(1000);
 
     }
 }
-

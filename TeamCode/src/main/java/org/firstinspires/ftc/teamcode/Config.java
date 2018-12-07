@@ -293,7 +293,7 @@ class Config {
 
     }
 
-    
+
     void autoTurnToDegree(double speed, int turnToAngle, int timeoutS) {
 
         double error, steer, P = 0.025d, I = 1, D = 1;
@@ -327,7 +327,6 @@ class Config {
     }
 
 
-    // TODO: Test this
     void autoDriveStraight(double speed, int inches, int currentAngle, int timeoutS) {
 
         int ticks = -inches * this.EncoderNumberChangePerInch;
@@ -379,7 +378,7 @@ class Config {
     }
 
     // TODO: Test this
-    void autoDriveSideways(double speed, int inches, int timeoutS, int currentAngle) {
+    void autoDriveSideways(double speed, int inches, int currentAngle, int timeoutS) {
 
         int ticks = inches * this.EncoderNumberChangePerInch;
 
@@ -411,9 +410,9 @@ class Config {
             backSpeed = Range.clip(speed + steer, -speed, speed);
 
             this.left_front.setPower(frontSpeed);
-            this.right_front.setPower(-frontSpeed);
+            this.right_front.setPower(frontSpeed);
             this.left_back.setPower(backSpeed);
-            this.right_back.setPower(-backSpeed);
+            this.right_back.setPower(backSpeed);
 
             this.OpMode.telemetry.addData("Front power", String.format(Locale.US, "%.4f", frontSpeed))
                     .addData("Rear power", String.format(Locale.US, "%.4f", backSpeed));

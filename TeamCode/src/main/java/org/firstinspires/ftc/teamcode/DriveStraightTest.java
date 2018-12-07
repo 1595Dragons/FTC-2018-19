@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Drive straight", group = "Test")
+@Autonomous(name = "Drive forward", group = "Test")
 public class DriveStraightTest extends LinearOpMode {
 
     // Config for the robot
@@ -19,9 +19,10 @@ public class DriveStraightTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.autoDriveStraight(.5d, 12, robot.getAngle(), 10);
+        robot.autoDriveStraight(.25d, 16, robot.getAngle(), 10);
         sleep(1000);
-        robot.autoDriveStraight(.5d, -12, robot.getAngle(), 10);
+        robot.autoDriveStraight(.25d, -16, robot.getAngle(), 10);
+        sleep(1000);
 
     }
 }
