@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -19,7 +18,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.opencv.core.Size;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -41,17 +39,11 @@ class Config {
 
 
     // Gyro / IMU
-    private BNO055IMU imu;
-    //private BNO055IMU.Parameters = new BNO055IMU.Parameters();
+    BNO055IMU imu;
 
 
     // A timer object
     private ElapsedTime timer = new ElapsedTime();
-
-
-    // Create a list of all the Hardware devices, mainly for telemetry :)
-    private ArrayList<HardwareDevice> Devices = new ArrayList<>();
-    private ArrayList<String> DeviceNames = new ArrayList<>();
 
 
     // Get the important bits from the opMode
@@ -76,8 +68,6 @@ class Config {
         this.left_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.left_front.setMode(RunMode.RUN_USING_ENCODER);
         this.left_front.setDirection(Direction.FORWARD);
-        this.Devices.add(left_front);
-        this.DeviceNames.add("Left front");
 
 
         // Declare and setup right_front
@@ -87,8 +77,6 @@ class Config {
         this.right_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.right_front.setMode(RunMode.RUN_USING_ENCODER);
         this.right_front.setDirection(Direction.REVERSE);
-        this.Devices.add(right_front);
-        this.DeviceNames.add("Right front");
 
 
         // Declare and setup left_back
@@ -98,8 +86,6 @@ class Config {
         this.left_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.left_back.setMode(RunMode.RUN_USING_ENCODER);
         this.left_back.setDirection(Direction.FORWARD);
-        this.Devices.add(left_back);
-        this.DeviceNames.add("Left back");
 
 
         // Declare and setup right_back
@@ -109,8 +95,6 @@ class Config {
         this.right_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.right_back.setMode(RunMode.RUN_USING_ENCODER);
         this.right_back.setDirection(Direction.REVERSE);
-        this.Devices.add(right_back);
-        this.DeviceNames.add("Right back");
 
 
         // Declare and setup armMotorL
@@ -120,8 +104,6 @@ class Config {
         this.armMotorL.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.armMotorL.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorL.setDirection(Direction.REVERSE);
-        this.Devices.add(armMotorL);
-        this.DeviceNames.add("Left arm motor");
 
 
         // Declare and setup armMotorR
@@ -131,8 +113,7 @@ class Config {
         this.armMotorR.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.armMotorR.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorR.setDirection(Direction.FORWARD);
-        this.Devices.add(armMotorR);
-        this.DeviceNames.add("Right arm motor");
+
 
         // Declare and setup arm extender motor
         this.status("Configuring arm extender");
@@ -141,8 +122,7 @@ class Config {
         this.armMotorExtend.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.armMotorExtend.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.armMotorExtend.setDirection(Direction.FORWARD);
-        this.Devices.add(armMotorExtend);
-        this.DeviceNames.add("Arm extension motor");
+
 
         // Declare and setup Intake Motor
         this.status("Configuring Intake Motor");
@@ -151,22 +131,16 @@ class Config {
         this.IO_Motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
         this.IO_Motor.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.IO_Motor.setDirection(Direction.FORWARD);
-        this.Devices.add(IO_Motor);
-        this.DeviceNames.add("Intake motor");
 
 
         // Declare the left servo for the intake
         this.status("Setting up left servo");
         this.IO_Servo_Left = OpMode.hardwareMap.servo.get("IO Servo Left");
-        this.Devices.add(IO_Servo_Left);
-        this.DeviceNames.add("Left servo");
 
 
         // Declare the right servo for the intake
         this.status("Setting up right servo");
         this.IO_Servo_Right = OpMode.hardwareMap.servo.get("IO Servo Right");
-        this.Devices.add(IO_Servo_Right);
-        this.DeviceNames.add("Right servo");
 
 
         if (setupIMU) {
@@ -200,77 +174,13 @@ class Config {
 
 
     /**
-     * Updates the telemetry automatically output of all important objects, if they are not null.
-     * <p>
-     * <p>
-     * DcMotors display power, encoder values, and targets.
-     * <p>
-     * Servos display targets.
-     * <p>
-     * Color sensors display their current RGBA values.
-     * <p>
-     * Distance sensors display their distance in inches.
-     * <p>
-     * IMU (If the gyro is calibrated) displays the XYZ angles in degrees.
-     * <p>
-     * And the gold detector displays if and where it found gold.
-     */
-    @Deprecated
-    void updateAutonomousTelemetry() {
-
-        int i = 0;
-        for (HardwareDevice device : Devices) {
-            if (device != null) {
-                String deviceName = DeviceNames.get(i);
-                if (device instanceof DcMotor) {
-                    DcMotor motor = (DcMotor) device;
-                    this.OpMode.telemetry.addData(deviceName + " power", String.format(Locale.US, "%.2f", motor.getPower()))
-                            .addData(deviceName + " position", motor.getCurrentPosition())
-                            .addData(deviceName + " target (Displacement)", String.format(Locale.US, "%s (%s)",
-                                    motor.getTargetPosition(), Math.abs(motor.getCurrentPosition() - motor.getTargetPosition())));
-                    this.OpMode.telemetry.addLine();
-                } else if (device instanceof Servo) {
-                    Servo servo = (Servo) device;
-                    this.OpMode.telemetry.addData(deviceName + " target position", servo.getPosition());
-                    this.OpMode.telemetry.addLine();
-                }
-            }
-            i++;
-        }
-
-        if (this.imu != null) {
-            if (this.imu.isGyroCalibrated()) {
-                this.OpMode.telemetry.addData("Robot rotation", this.getAngle());
-                this.OpMode.telemetry.addLine();
-            }
-        }
-
-
-        if (this.goldDetector != null) {
-            if (this.goldDetector.isFound()) {
-                this.OpMode.telemetry.addData("Gold detector", "Found gold");
-                this.OpMode.telemetry.addData("Gold location", this.goldDetector.getFoundRect().x + ", " + this.goldDetector.getFoundRect().y);
-                this.OpMode.telemetry.addLine();
-            } else {
-                this.OpMode.telemetry.addData("Gold detector", "Still searching...");
-            }
-        }
-
-
-        // Update the telemetry
-        this.OpMode.telemetry.update();
-
-    }
-
-
-    /**
      * Returns if <i>any</i> of the provided motors are within its provided margin of error.
      *
      * @param error  The margin of error its allowed (in encoder ticks).
      * @param motors The motors to check.
      * @return Returns true if any of the motors are within its given margin of error. If all of them are outside the margin of error then it returns false.
      */
-    boolean isThere(int error, DcMotor... motors) {
+    private boolean isThere(int error, DcMotor... motors) {
         boolean reached = false;
         for (DcMotor motor : motors) {
             int delta = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
@@ -320,7 +230,6 @@ class Config {
         while (this.timer.milliseconds() < milliseconds && this.OpMode.opModeIsActive()) {
             this.OpMode.telemetry.addData("Elapsed time", this.timer.milliseconds());
             this.OpMode.telemetry.addLine();
-            this.updateAutonomousTelemetry();
             if (this.goldDetector.isFound()) {
                 return true;
             }
@@ -343,11 +252,6 @@ class Config {
 
     int getAngle() {
         return this.imu.isGyroCalibrated() ? Math.round(this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
-    }
-
-
-    int getAngle(BNO055IMU imu) {
-        return imu.isGyroCalibrated() ? Math.round(imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
     }
 
 
@@ -381,9 +285,6 @@ class Config {
             if (this.isThere(5, this.armMotorL, this.armMotorR)) {
                 break;
             }
-
-            // Update telemetry as this is running
-            this.updateAutonomousTelemetry();
         }
 
 
@@ -393,9 +294,10 @@ class Config {
     }
 
 
+    // TODO: Test this
     void autoTurnToDegree(double speed, int turnToAngle, int timeoutS) {
 
-        double error, steer, P = 0.025d;
+        double error, steer, P = 0.025d, I = 1, D = 1;
 
         this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
@@ -426,24 +328,25 @@ class Config {
     }
 
 
-    void autoDriveForward(double speed, int inches, int timeoutS, int currentAngle) {
+    // TODO: Test this
+    void autoDriveStraight(double speed, int inches, int currentAngle, int timeoutS) {
 
-        int ticks = inches * EncoderNumberChangePerInch;
+        int ticks = -inches * this.EncoderNumberChangePerInch;
 
         this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
 
         double rightSpeed, leftSpeed, error, steer, P = 0.025d;
 
-        this.left_front.setTargetPosition(-ticks);
-        this.right_front.setTargetPosition(-ticks);
-        this.left_back.setTargetPosition(-ticks);
-        this.right_back.setTargetPosition(-ticks);
+        this.left_front.setTargetPosition(ticks);
+        this.right_front.setTargetPosition(ticks);
+        this.left_back.setTargetPosition(ticks);
+        this.right_back.setTargetPosition(ticks);
 
 
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() <= timeoutS) {
 
-            if (isThere(EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
+            if (this.isThere(this.EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
                 this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
                 break;
             }
@@ -463,17 +366,79 @@ class Config {
             this.left_back.setPower(leftSpeed);
             this.right_back.setPower(rightSpeed);
 
+            this.OpMode.telemetry.addData("Left power", String.format(Locale.US, "%.4f", leftSpeed))
+                    .addData("Right power", String.format(Locale.US, "%.4f", rightSpeed));
+            this.OpMode.telemetry.addLine();
+            this.OpMode.telemetry.addData("Target", ticks);
+            this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
+                    .addData("Left back position", this.left_back.getCurrentPosition())
+                    .addData("Right front position", this.right_front.getCurrentPosition())
+                    .addData("Right back position", this.right_back.getCurrentPosition());
+            this.OpMode.telemetry.update();
+
         }
+    }
+
+    // TODO: Test this
+    void autoDriveSideways(double speed, int inches, int timeoutS, int currentAngle) {
+
+        int ticks = inches * this.EncoderNumberChangePerInch;
+
+        this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
+
+        double frontSpeed, backSpeed, error, steer, P = 0.025d;
+
+        this.left_front.setTargetPosition(ticks);
+        this.right_front.setTargetPosition(ticks);
+        this.left_back.setTargetPosition(ticks);
+        this.right_back.setTargetPosition(ticks);
+
+        this.timer.reset();
+        while (this.OpMode.opModeIsActive() && this.timer.seconds() < timeoutS) {
+
+            if (this.isThere(this.EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
+                this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
+                break;
+            }
+
+            error = getError(currentAngle);
+
+            steer = getSteer(error, P);
+
+            // If driving in reverse, the motor correction also needs to be reversed
+            steer = steer < 0 ? steer * -1 : steer;
+
+            frontSpeed = Range.clip(speed - steer, -speed, speed);
+            backSpeed = Range.clip(speed + steer, -speed, speed);
+
+            this.left_front.setPower(frontSpeed);
+            this.right_front.setPower(-frontSpeed);
+            this.left_back.setPower(backSpeed);
+            this.right_back.setPower(-backSpeed);
+
+            this.OpMode.telemetry.addData("Front power", String.format(Locale.US, "%.4f", frontSpeed))
+                    .addData("Rear power", String.format(Locale.US, "%.4f", backSpeed));
+            this.OpMode.telemetry.addLine();
+            this.OpMode.telemetry.addData("Target", ticks);
+            this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
+                    .addData("Left back position", this.left_back.getCurrentPosition())
+                    .addData("Right front position", this.right_front.getCurrentPosition())
+                    .addData("Right back position", this.right_back.getCurrentPosition());
+            this.OpMode.telemetry.update();
+        }
+
     }
 
 
     private double getError(int desiredAngle) {
-        return this.imu.isGyroCalibrated() ? Math.round(desiredAngle - this.getAngle()) : 0;
+        // Ge the error. Add 180 to make sure nothing weird happens around 0 or below
+        return this.imu.isGyroCalibrated() ? Math.round((desiredAngle) - (this.getAngle())) : 0;
     }
 
 
     private double getSteer(double error, double PCoeff) {
-        return Range.clip(error * PCoeff, -1, 1);
+        // Find the steer value. Subtract 180 to get the direction in case its actually negative
+        return Range.clip((error) * PCoeff, -1, 1);
     }
 
 
@@ -487,7 +452,6 @@ class Config {
      */
     @Deprecated
     void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
-        // TODO: Drive using IMU so the heading is kept
         // Its literally distinctDrive, but with 2 positions
         this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
     }
@@ -530,8 +494,6 @@ class Config {
                 // Break out of the while loop early
                 break;
             }
-
-            this.updateAutonomousTelemetry();
         }
 
         // Stop all motion, and reset the motors

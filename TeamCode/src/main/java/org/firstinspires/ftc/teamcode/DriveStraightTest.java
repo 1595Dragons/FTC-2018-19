@@ -19,9 +19,9 @@ public class DriveStraightTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.autoDriveForward(.5d, 12, 10, robot.getAngle());
+        robot.autoDriveStraight(.5d, 12, robot.getAngle(), 10);
         sleep(1000);
-        robot.autoDriveForward(.5d, -12, 10, robot.getAngle());
+        robot.autoDriveStraight(.5d, -12, robot.getAngle(), 10);
 
     }
 }

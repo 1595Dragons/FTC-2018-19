@@ -19,9 +19,12 @@ public class TurnTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.autoTurnToDegree(.5d, 90, 10);
+        robot.autoTurnToDegree(.5d, 90, 7);
         sleep(1000);
-        robot.autoTurnToDegree(.55d,2,15);
+        robot.autoTurnToDegree(.5,180,7);
+        sleep(1000);
+        robot.autoTurnToDegree(.5,270,7);
+        sleep(1000);
 
     }
 }
