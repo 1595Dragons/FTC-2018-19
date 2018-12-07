@@ -20,7 +20,7 @@ public class Teleop extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the robot
-        robot.ConfigureRobtHardware(true);
+        robot.ConfigureRobtHardware(false);
 
 
         //Servo positions
@@ -101,9 +101,10 @@ public class Teleop extends LinearOpMode {
             }
 
             // Update telemetry with the gyro angles
-            telemetry.addData("Robot first angle", Math.round(robot.getAngles().firstAngle) + " " + robot.getAngles().angleUnit)
-                    .addData("Robot second angle", Math.round(robot.getAngles().secondAngle) + " " + robot.getAngles().angleUnit)
-                    .addData("Robot third angle", Math.round(robot.getAngles().thirdAngle) + " " + robot.getAngles().angleUnit);
+            telemetry.addData("Lf power", robot.left_front.getPower())
+                    .addData("Rf power", robot.right_front.getPower())
+                    .addData("Lb power", robot.left_back.getPower())
+                    .addData("Rb power", robot.right_back.getPower());
             telemetry.update();
 
         }

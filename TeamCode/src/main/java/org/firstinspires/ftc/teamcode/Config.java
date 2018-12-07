@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Path;
-
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldDetector;
@@ -19,8 +17,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.internal.camera.names.BuiltinCameraNameImpl;
 import org.opencv.core.Size;
 
 import java.util.ArrayList;
@@ -46,6 +42,7 @@ class Config {
 
     // Gyro / IMU
     private BNO055IMU imu;
+    //private BNO055IMU.Parameters = new BNO055IMU.Parameters();
 
 
     // A timer object
@@ -77,7 +74,7 @@ class Config {
         this.left_front = OpMode.hardwareMap.dcMotor.get("left front");
         this.left_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.left_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.left_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.left_front.setMode(RunMode.RUN_USING_ENCODER);
         this.left_front.setDirection(Direction.FORWARD);
         this.Devices.add(left_front);
         this.DeviceNames.add("Left front");
@@ -88,7 +85,7 @@ class Config {
         this.right_front = OpMode.hardwareMap.dcMotor.get("right front");
         this.right_front.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.right_front.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.right_front.setMode(RunMode.RUN_USING_ENCODER);
         this.right_front.setDirection(Direction.REVERSE);
         this.Devices.add(right_front);
         this.DeviceNames.add("Right front");
@@ -99,7 +96,7 @@ class Config {
         this.left_back = OpMode.hardwareMap.dcMotor.get("left back");
         this.left_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.left_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.left_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.left_back.setMode(RunMode.RUN_USING_ENCODER);
         this.left_back.setDirection(Direction.FORWARD);
         this.Devices.add(left_back);
         this.DeviceNames.add("Left back");
@@ -110,7 +107,7 @@ class Config {
         this.right_back = OpMode.hardwareMap.dcMotor.get("right back");
         this.right_back.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         this.right_back.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
+        this.right_back.setMode(RunMode.RUN_USING_ENCODER);
         this.right_back.setDirection(Direction.REVERSE);
         this.Devices.add(right_back);
         this.DeviceNames.add("Right back");
@@ -243,9 +240,7 @@ class Config {
 
         if (this.imu != null) {
             if (this.imu.isGyroCalibrated()) {
-                this.OpMode.telemetry.addData("Robot first angle", Math.round(this.getAngles().firstAngle) + " " + this.getAngles().angleUnit)
-                        .addData("Robot second angle", Math.round(this.getAngles().secondAngle) + " " + this.getAngles().angleUnit)
-                        .addData("Robot third angle", Math.round(this.getAngles().thirdAngle) + " " + this.getAngles().angleUnit);
+                this.OpMode.telemetry.addData("Robot rotation", this.getAngle());
                 this.OpMode.telemetry.addLine();
             }
         }
@@ -346,8 +341,13 @@ class Config {
     }
 
 
-    Orientation getAngles() {
-        return this.imu.isGyroCalibrated() ? this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES) : null;
+    int getAngle() {
+        return this.imu.isGyroCalibrated() ? Math.round(this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
+    }
+
+
+    int getAngle(BNO055IMU imu) {
+        return imu.isGyroCalibrated() ? Math.round(imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
     }
 
 
@@ -419,7 +419,7 @@ class Config {
 
                 this.OpMode.telemetry.addData("Turning to degree", turnToAngle);
                 this.OpMode.telemetry.addLine();
-                this.OpMode.telemetry.addData("Current angle", Math.round(this.getAngles().secondAngle));
+                this.OpMode.telemetry.addData("Current angle", this.getAngle());
                 this.OpMode.telemetry.update();
             }
         }
@@ -468,7 +468,7 @@ class Config {
 
 
     private double getError(int desiredAngle) {
-        return this.imu.isGyroCalibrated() ? Math.round(desiredAngle - Math.round(this.getAngles().secondAngle)) : 0;
+        return this.imu.isGyroCalibrated() ? Math.round(desiredAngle - this.getAngle()) : 0;
     }
 
 
