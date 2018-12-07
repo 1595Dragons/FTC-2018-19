@@ -29,7 +29,7 @@ public class Teleop extends LinearOpMode {
 
 
         //Motor Power
-        double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 0.8;
+        double speedForTurn = 0.4, speedForMove = 0.5, speedForSide = 0.7, intakePower = 1, armPower = 1, extendPower = 1;
 
 
         double allPower, armExtend;
@@ -60,11 +60,11 @@ public class Teleop extends LinearOpMode {
             robot.right_back.setPower(Range.clip((-driveRightSide + driveForward - turnRight) * allPower, -1.0, 1.0));
 
 
-            robot.armMotorL.setPower((gamepad1.left_stick_y) * armPower);
-            robot.armMotorR.setPower((gamepad1.left_stick_y) * armPower);
+            robot.armMotorL.setPower((gamepad1.right_stick_y) * armPower);
+            robot.armMotorR.setPower((gamepad1.right_stick_y) * armPower);
 
 
-            armExtend = (gamepad1.dpad_up) ? extendPower : (gamepad1.dpad_down ? -extendPower : 0);
+            armExtend = gamepad1.left_stick_y*extendPower;
 
 
             robot.armMotorExtend.setPower(armExtend);
