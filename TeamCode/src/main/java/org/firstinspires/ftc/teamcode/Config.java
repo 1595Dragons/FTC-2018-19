@@ -351,12 +351,17 @@ class Config {
 
             if (this.isThere(this.EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
                 this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
+
+                if (Math.abs(this.getError(currentAngle)) > 2) {
+                    this.autoTurnToDegree(.5, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
+                }
+
                 break;
             } else {
 
-                error = getError(currentAngle);
+                error = this.getError(currentAngle);
 
-                steer = getSteer(error, P);
+                steer = this.getSteer(error, P);
 
                 // If driving in reverse, the motor correction also needs to be reversed
                 steer = steer < 0 ? steer * -1 : steer;
@@ -386,7 +391,7 @@ class Config {
         }
     }
 
-
+    // FIXME
     void autoDriveSideways(double speed, int inches, int currentAngle, int timeoutS) {
 
         int ticks = inches * this.EncoderNumberChangePerInch;
@@ -408,7 +413,7 @@ class Config {
                 this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
 
                 if (Math.abs(this.getError(currentAngle)) > 2) {
-                    this.autoTurnToDegree(.5, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
+                    this.autoTurnToDegree(.6, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
                 }
 
                 break;
@@ -416,7 +421,7 @@ class Config {
 
                 error = this.getError(currentAngle);
 
-                steer = Range.clip((error) * P, 0, 1);
+                steer = this.getSteer(error, P);
 
                 // If driving in reverse, the motor correction also needs to be reversed
                 steer = steer < 0 ? -steer : steer;
@@ -424,8 +429,8 @@ class Config {
                 leftFrontPower = Range.clip(speed - steer, -speed, speed);
                 rightBackPower = Range.clip(speed + steer, -speed, speed);
 
-                rightFrontPower = Range.clip(speed + steer, -speed, speed);
-                leftBackPower = Range.clip(speed - steer, -speed, speed);
+                rightFrontPower = -rightBackPower;
+                leftBackPower = -leftFrontPower;
 
                 this.left_front.setPower(leftFrontPower);
                 this.right_back.setPower(rightBackPower);
