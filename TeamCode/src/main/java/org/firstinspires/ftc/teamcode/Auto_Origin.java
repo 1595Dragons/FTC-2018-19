@@ -56,6 +56,7 @@ public class Auto_Origin extends LinearOpMode {
             }
         }
         */
+        robot.goldDetector.enable();
         for (int i = 0; i <= 7; i++) {
             if (robot.searchForGold(1000)) {
                 robot.encoderDrive(DRIVE_SPEED, -30, -30, 3.0);

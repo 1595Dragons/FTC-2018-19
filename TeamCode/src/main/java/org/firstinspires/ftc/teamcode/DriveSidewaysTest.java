@@ -24,9 +24,9 @@ public class DriveSidewaysTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.autoDriveSideways(.25d, 12, robot.getAngle(), 10);
+        robot.autoDriveSideways(.15d, 24, robot.getAngle(), 10);
         sleep(1000);
-        robot.autoDriveSideways(.25d, -12, robot.getAngle(), 10);
+        robot.autoDriveSideways(.15d, -24, robot.getAngle(), 10);
         sleep(1000);
 
     }
