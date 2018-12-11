@@ -250,6 +250,11 @@ class Config {
     }
 
 
+    /**
+     * Gets the current angle of the robot from the built in IMU. We use the Y axis for this.
+     *
+     * @return The robot's current angle in degrees. This is rounded to the nearest whole number.
+     */
     int getAngle() {
         return this.imu.isGyroCalibrated() ? Math.round(this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
     }
@@ -296,7 +301,7 @@ class Config {
 
     void autoTurnToDegree(double speed, int turnToAngle, int timeoutS) {
 
-        double error, steer, P = 0.025d, I = 1, D = 1;
+        double error, steer, P = 0.025d;
 
         this.right_back.setMode(RunMode.RUN_WITHOUT_ENCODER);
         this.right_front.setMode(RunMode.RUN_WITHOUT_ENCODER);
@@ -347,84 +352,105 @@ class Config {
             if (this.isThere(this.EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
                 this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
                 break;
+            } else {
+
+                error = getError(currentAngle);
+
+                steer = getSteer(error, P);
+
+                // If driving in reverse, the motor correction also needs to be reversed
+                steer = steer < 0 ? steer * -1 : steer;
+
+                leftSpeed = Range.clip(speed - steer, -speed, speed);
+                rightSpeed = Range.clip(speed + steer, -speed, speed);
+
+                this.left_front.setPower(leftSpeed);
+                this.right_front.setPower(rightSpeed);
+                this.left_back.setPower(leftSpeed);
+                this.right_back.setPower(rightSpeed);
+
+                this.OpMode.telemetry.addData("Angle", this.getAngle());
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Left power", String.format(Locale.US, "%.4f", leftSpeed))
+                        .addData("Right power", String.format(Locale.US, "%.4f", rightSpeed));
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Target", ticks);
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
+                        .addData("Left back position", this.left_back.getCurrentPosition())
+                        .addData("Right front position", this.right_front.getCurrentPosition())
+                        .addData("Right back position", this.right_back.getCurrentPosition());
+                this.OpMode.telemetry.update();
+
             }
-
-            error = getError(currentAngle);
-
-            steer = getSteer(error, P);
-
-            // If driving in reverse, the motor correction also needs to be reversed
-            steer = steer < 0 ? steer * -1 : steer;
-
-            leftSpeed = Range.clip(speed - steer, -speed, speed);
-            rightSpeed = Range.clip(speed + steer, -speed, speed);
-
-            this.left_front.setPower(leftSpeed);
-            this.right_front.setPower(rightSpeed);
-            this.left_back.setPower(leftSpeed);
-            this.right_back.setPower(rightSpeed);
-
-            this.OpMode.telemetry.addData("Left power", String.format(Locale.US, "%.4f", leftSpeed))
-                    .addData("Right power", String.format(Locale.US, "%.4f", rightSpeed));
-            this.OpMode.telemetry.addLine();
-            this.OpMode.telemetry.addData("Target", ticks);
-            this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
-                    .addData("Left back position", this.left_back.getCurrentPosition())
-                    .addData("Right front position", this.right_front.getCurrentPosition())
-                    .addData("Right back position", this.right_back.getCurrentPosition());
-            this.OpMode.telemetry.update();
-
         }
     }
 
-    // TODO: Test this
+
     void autoDriveSideways(double speed, int inches, int currentAngle, int timeoutS) {
 
         int ticks = inches * this.EncoderNumberChangePerInch;
 
-        this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
+        this.resetMotorsForAutonomous(this.left_front, this.right_back);
 
-        double frontSpeed, backSpeed, error, steer, P = 0.025d;
+        double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .5;
 
-        this.left_front.setTargetPosition(ticks);
+        this.left_front.setTargetPosition(-ticks);
+        this.right_back.setTargetPosition(-ticks);
         this.right_front.setTargetPosition(ticks);
         this.left_back.setTargetPosition(ticks);
-        this.right_back.setTargetPosition(ticks);
+
 
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() < timeoutS) {
 
-            if (this.isThere(this.EncoderNumberChangePerInch, this.left_front, this.left_back, this.right_front, this.right_back)) {
-                this.resetMotorsForAutonomous(this.left_back, this.right_back, this.right_front, this.left_front);
+            if (this.isThere(2, this.left_front, this.left_back, this.right_front, this.right_back)) {
+                this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
+
+                if (Math.abs(this.getError(currentAngle)) > 2) {
+                    this.autoTurnToDegree(.5, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
+                }
+
                 break;
+            } else {
+
+                error = this.getError(currentAngle);
+
+                steer = Range.clip((error) * P, 0, 1);
+
+                // If driving in reverse, the motor correction also needs to be reversed
+                steer = steer < 0 ? -steer : steer;
+
+                leftFrontPower = Range.clip(speed - steer, -speed, speed);
+                rightBackPower = Range.clip(speed + steer, -speed, speed);
+
+                rightFrontPower = Range.clip(speed + steer, -speed, speed);
+                leftBackPower = Range.clip(speed - steer, -speed, speed);
+
+                this.left_front.setPower(leftFrontPower);
+                this.right_back.setPower(rightBackPower);
+
+                this.right_front.setPower(rightFrontPower);
+                this.left_back.setPower(leftBackPower);
+
+
+                this.OpMode.telemetry.addData("Angle", this.getAngle())
+                        .addData("Steer", steer);
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Left front power", String.format(Locale.US, "%.4f", leftFrontPower))
+                        .addData("Right back power", String.format(Locale.US, "%.4f", rightBackPower))
+                        .addData("Right front power", String.format(Locale.US, "%.4f", rightFrontPower))
+                        .addData("Left back power", String.format(Locale.US, "%.4f", leftBackPower));
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Target", ticks);
+                this.OpMode.telemetry.addLine();
+                this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
+                        .addData("Left back position", this.left_back.getCurrentPosition())
+                        .addData("Right front position", this.right_front.getCurrentPosition())
+                        .addData("Right back position", this.right_back.getCurrentPosition());
+                this.OpMode.telemetry.update();
             }
-
-            error = getError(currentAngle);
-
-            steer = getSteer(error, P);
-
-            // If driving in reverse, the motor correction also needs to be reversed
-            steer = steer < 0 ? steer * -1 : steer;
-
-            frontSpeed = Range.clip(speed - steer, -speed, speed);
-            backSpeed = Range.clip(speed + steer, -speed, speed);
-
-            this.left_front.setPower(frontSpeed);
-            this.right_front.setPower(frontSpeed);
-            this.left_back.setPower(backSpeed);
-            this.right_back.setPower(backSpeed);
-
-            this.OpMode.telemetry.addData("Front power", String.format(Locale.US, "%.4f", frontSpeed))
-                    .addData("Rear power", String.format(Locale.US, "%.4f", backSpeed));
-            this.OpMode.telemetry.addLine();
-            this.OpMode.telemetry.addData("Target", ticks);
-            this.OpMode.telemetry.addData("Left front position", this.left_front.getCurrentPosition())
-                    .addData("Left back position", this.left_back.getCurrentPosition())
-                    .addData("Right front position", this.right_front.getCurrentPosition())
-                    .addData("Right back position", this.right_back.getCurrentPosition());
-            this.OpMode.telemetry.update();
         }
-
     }
 
 
