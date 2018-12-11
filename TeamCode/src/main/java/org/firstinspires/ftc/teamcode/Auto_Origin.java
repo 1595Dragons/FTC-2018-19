@@ -34,9 +34,9 @@ public class Auto_Origin extends LinearOpMode {
         sleep(200);
         robot.encoderDrive(DRIVE_SPEED, 4, -4, 3);
         sleep(200);
-        robot.encoderDrive(DRIVE_SPEED, -5, -5, 3);
+        robot.encoderDrive(DRIVE_SPEED, -8, -8, 3);
         sleep(200);
-        robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3.0);
+        robot.distinctDrive(SIDE_SPEED, 14, -14, -14, 14, 3.0);
         //robot.turnToDegree(TURN_SPEED,0,imu,3);
         robot.setupGoldDetector();
         /*
