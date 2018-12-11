@@ -67,7 +67,7 @@ public class Teleop extends LinearOpMode {
             armExtend = gamepad1.left_stick_y*extendPower;
 
 
-            robot.armMotorExtend.setPower(armExtend);
+            robot.armMotorExtend.setPower(-armExtend);
 
 
             if (gamepad1.right_bumper) {
@@ -98,6 +98,11 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.b) {
                 robot.IO_Servo_Right.setPosition(Math.round((RightServoOpen + RightServoClose) / 2));
                 robot.IO_Servo_Left.setPosition(LeftServoOpen);
+            }
+
+            if (gamepad1.a){
+                robot.IO_Servo_Right.setPosition(Math.round((RightServoOpen + RightServoClose) / 2));
+                robot.IO_Servo_Left.setPosition(Math.round((LeftServoOpen + LeftServoClose) / 2));
             }
 
             // Update telemetry with the gyro angles

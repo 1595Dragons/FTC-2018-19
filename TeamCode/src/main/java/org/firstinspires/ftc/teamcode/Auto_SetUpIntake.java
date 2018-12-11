@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //try to set up the intake in auto
+@Disabled
 @Autonomous(name = "SetUpIntake", group = "Official")
 public class Auto_SetUpIntake extends LinearOpMode {
 
