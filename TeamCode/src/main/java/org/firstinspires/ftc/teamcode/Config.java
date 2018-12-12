@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -488,7 +489,7 @@ class Config {
      * @param timeoutS    The amount of time in seconds that the function is allowed to execute.
      */
     @Deprecated
-    void encoderDrive(double speed, int leftInches, int rightInches, double timeoutS) {
+    void encoderDrive(double speed, double leftInches, double rightInches, double timeoutS) {
         // Its literally distinctDrive, but with 2 positions
         this.distinctDrive(speed, leftInches, leftInches, rightInches, rightInches, timeoutS);
     }
@@ -505,16 +506,16 @@ class Config {
      * @param timeoutS The amount of time in seconds that the function is allowed to execute.
      */
     @Deprecated
-    void distinctDrive(double speed, int LFInches, int LBInches, int RFInches, int RBInches, double timeoutS) {
+    void distinctDrive(double speed, double LFInches, double LBInches, double RFInches, double RBInches, double timeoutS) {
 
         // Reset the motor encoders, and set them to RUN_TO_POSITION
         this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
 
         // Set the individual drive motor positions
-        this.left_front.setTargetPosition(LFInches * EncoderNumberChangePerInch);
-        this.right_front.setTargetPosition(RFInches * EncoderNumberChangePerInch);
-        this.left_back.setTargetPosition(LBInches * EncoderNumberChangePerInch);
-        this.right_back.setTargetPosition(RBInches * EncoderNumberChangePerInch);
+        this.left_front.setTargetPosition((int)Math.round(LFInches * EncoderNumberChangePerInch));
+        this.right_front.setTargetPosition((int)Math.round(RFInches * EncoderNumberChangePerInch));
+        this.left_back.setTargetPosition((int)Math.round(LBInches * EncoderNumberChangePerInch));
+        this.right_back.setTargetPosition((int)Math.round(RBInches * EncoderNumberChangePerInch));
 
         // Set the motor speeds
         this.left_front.setPower(speed);
@@ -535,5 +536,11 @@ class Config {
 
         // Stop all motion, and reset the motors
         this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
+    }
+    void TurnByImu(double speed,int target, double timeOut)
+    {
+        double error =this.getError(target);
+        double magicNumber = 0.27;
+        encoderDrive(speed,-error*magicNumber, error*magicNumber, timeOut);
     }
 }

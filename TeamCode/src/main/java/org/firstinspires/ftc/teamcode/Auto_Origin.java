@@ -30,41 +30,37 @@ public class Auto_Origin extends LinearOpMode {
         //PlanA
         robot.armDrive(ARM_SPEED, 680, 3);
         sleep(200);
+        //go left 10
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3.0);
         sleep(200);
-        robot.encoderDrive(DRIVE_SPEED, 4, -4, 3);
-        sleep(200);
+        //forward 8
         robot.encoderDrive(DRIVE_SPEED, -8, -8, 3);
         sleep(200);
-        robot.distinctDrive(SIDE_SPEED, 14, -14, -14, 14, 3.0);
+        //turn left 4
+        robot.encoderDrive(DRIVE_SPEED, 4, -4, 3);
+        sleep(200);
+        //left 13
+        robot.distinctDrive(SIDE_SPEED, 13, -13, -13, 13, 3.0);
         //robot.turnToDegree(TURN_SPEED,0,imu,3);
         robot.setupGoldDetector();
-        /*
-        if (robot.searchForGold(1000)) {//check left 1 position
-            // Do whatever when found
-            robot.encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-        } else {
-            robot.distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
-            robot.turnToDegree(TURN_SPEED,0,imu,3);
-            if (robot.searchForGold(1000)) {//check left 2 position
-                // Do whatever when found
-                encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-            } else {
-                robot.distinctDrive(SIDE_SPEED,-15,15,15,-15,4.0);
-                robot.turnToDegree(TURN_SPEED,0,imu,3);
-                robot.encoderDrive(DRIVE_SPEED,-30,-30,4.0);
-            }
-        }
-        */
         robot.goldDetector.enable();
-        for (int i = 0; i <= 7; i++) {
+        int moveCount=0;
+        for (int i = 0; i <= 6; i++) {
             if (robot.searchForGold(1000)) {
                 robot.encoderDrive(DRIVE_SPEED, -30, -30, 3.0);
                 break;
             }
             robot.distinctDrive(SIDE_SPEED, -7, 7, 7, -7, 2.0);
-            robot.encoderDrive(DRIVE_SPEED, -1, 1, 1);
+            robot.encoderDrive(DRIVE_SPEED, -1.8, 1.8, 1);
+            moveCount++;
         }
+        /*
+        switch(moveCount){
+
+        }
+        */
+
+
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
