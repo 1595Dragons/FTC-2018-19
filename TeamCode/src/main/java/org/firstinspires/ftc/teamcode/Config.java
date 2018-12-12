@@ -422,7 +422,6 @@ class Config {
                 if (Math.abs(this.getError(currentAngle)) > 2) {
                     this.autoTurnToDegree(.6, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
                 }
-
                 break;
             } else {
 
@@ -434,8 +433,8 @@ class Config {
                 // If driving in reverse, the motor correction also needs to be reversed
                 steer = steer < 0 ? -steer : steer;
 
-                leftFrontPower = Range.clip(speed - steer, -speed, speed);
-                rightBackPower = Range.clip(speed + steer, -speed, speed);
+                leftFrontPower = Range.clip(speed - steer, -1, 1);
+                rightBackPower = Range.clip(speed + steer, -1, 1);
 
                 rightFrontPower = -rightBackPower;
                 leftBackPower = -leftFrontPower;
