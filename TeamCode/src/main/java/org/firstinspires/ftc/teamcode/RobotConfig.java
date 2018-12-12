@@ -33,8 +33,9 @@ class RobotConfig {
     int maxClimberPos = 8400, minClimberPos = 0, minArmPos = 0, adjustedArmPos = 300, topArmPos = 4700;
 
 
-    // TODO: Setup servos
     Servo leftServo, rightServo;
+
+    final double leftServoClose = 0.0d, leftServoOpen = 0.6d, rightServoClose = 0.8d, rightServoOpen = 0.23d;
 
 
     GoldDetector goldDetector;
@@ -59,63 +60,68 @@ class RobotConfig {
     void configureRobot(HardwareMap hardware) {
 
         // Declare and setup left1
-        status("Setting up left1");
-        left1 = hardware.dcMotor.get("left1");
-        left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left1.setTargetPosition(0);
-        left1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left1.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.status("Setting up left1");
+        this.left1 = hardware.dcMotor.get("left1");
+        this.left1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.left1.setTargetPosition(0);
+        this.left1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.left1.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         // Declare and setup right1
-        status("Setting up right1");
-        right1 = hardware.dcMotor.get("right1");
-        right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right1.setTargetPosition(0);
-        right1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right1.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.status("Setting up right1");
+        this.right1 = hardware.dcMotor.get("right1");
+        this.right1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.right1.setTargetPosition(0);
+        this.right1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.right1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup left2
-        status("Setting up left2");
-        left2 = hardware.dcMotor.get("left2");
-        left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left2.setTargetPosition(0);
-        left2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left2.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.status("Setting up left2");
+        this.left2 = hardware.dcMotor.get("left2");
+        this.left2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.left2.setTargetPosition(0);
+        this.left2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.left2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Declare and setup right2
-        status("Setting up right2");
-        right2 = hardware.dcMotor.get("right2");
-        right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right2.setTargetPosition(0);
-        right2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right2.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.status("Setting up right2");
+        this.right2 = hardware.dcMotor.get("right2");
+        this.right2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.right2.setTargetPosition(0);
+        this.right2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.right2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the intake
-        status("Setting up intake");
-        intake = hardware.dcMotor.get("intake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.status("Setting up intake");
+        this.intake = hardware.dcMotor.get("intake");
+        this.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        this.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup the arm
-        status("Setting up arm");
-        arm = hardware.dcMotor.get("arm");
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.status("Setting up arm");
+        this.arm = hardware.dcMotor.get("arm");
+        this.arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.arm.setTargetPosition(0);
+        this.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declare and setup climber motor
-        status("Setting up climber motor");
-        climber = hardware.dcMotor.get("climb");
-        climber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        climber.setTargetPosition(0);
-        climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        climber.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.status("Setting up climber motor");
+        this.climber = hardware.dcMotor.get("climb");
+        this.climber.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.climber.setTargetPosition(0);
+        this.climber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.climber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.climber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.climber.setDirection(DcMotorSimple.Direction.REVERSE);
 
+
+        // Servos
+        this.status("Setting up servos");
+        this.leftServo = hardware.servo.get("leftservo");
+        this.rightServo = hardware.servo.get("rightservo");
         // Declare and setup the gyro FIXME
         /*
         status("Setting up gyro");
@@ -125,7 +131,7 @@ class RobotConfig {
         */
 
         // Update telemetry to signal done!
-        status("Ready!");
+        this.status("Ready!");
 
     }
 

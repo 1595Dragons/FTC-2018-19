@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,6 +12,8 @@ import com.qualcomm.robotcore.util.Range;
  * FRC 1595
  */
 
+@Deprecated
+@Disabled
 @TeleOp(name = "6128 TeleOp (Only 1 controller)", group = "Official")
 public class TeleOpSingleController extends LinearOpMode {
 

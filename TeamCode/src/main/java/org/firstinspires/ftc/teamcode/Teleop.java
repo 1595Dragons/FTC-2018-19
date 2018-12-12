@@ -61,6 +61,21 @@ public class Teleop extends LinearOpMode {
                 robot.climber.setPower(-1*gamepad2.right_stick_y);
             }
 
+
+            if (gamepad2.dpad_right) {
+                robot.rightServo.setPosition(robot.rightServoOpen);
+                robot.leftServo.setPosition(robot.leftServoClose);
+            } else if (gamepad2.dpad_left) {
+                robot.rightServo.setPosition(robot.rightServoClose);
+                robot.leftServo.setPosition(robot.leftServoOpen);
+            } else if (gamepad2.dpad_up) {
+                robot.rightServo.setPosition(robot.rightServoClose);
+                robot.leftServo.setPosition(robot.leftServoClose);
+            } else if (gamepad2.dpad_down) {
+                robot.rightServo.setPosition(robot.rightServoOpen);
+                robot.leftServo.setPosition(robot.leftServoOpen);
+            }
+
             robot.arm.setPower(Range.clip(gamepad2.left_stick_y, -0.6, 0.6));
 
             // Set the intake to the power left trigger compared to the right trigger
