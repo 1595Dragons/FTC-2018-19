@@ -397,14 +397,20 @@ class Config {
 
         int ticks = inches * this.EncoderNumberChangePerInch;
 
-        this.resetMotorsForAutonomous(this.left_front, this.right_back);
+        this.resetMotorsForAutonomous(this.left_front, this.right_back, this.right_front, this.left_back);
 
         double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .5;
 
+        // TODO: Fix, as RUN_TO_POSITION cannot be used here.
+        // Time to reinvent the wheel, and implement it based on RUN_WITHOUT_ENCODER,
+        // and pass raw powers due to turning
+
+        /*
         this.left_front.setTargetPosition(-ticks);
         this.right_back.setTargetPosition(-ticks);
         this.right_front.setTargetPosition(ticks);
         this.left_back.setTargetPosition(ticks);
+        */
 
 
         this.timer.reset();
@@ -423,6 +429,7 @@ class Config {
                 error = this.getError(currentAngle);
 
                 steer = this.getSteer(error, P);
+
 
                 // If driving in reverse, the motor correction also needs to be reversed
                 steer = steer < 0 ? -steer : steer;
