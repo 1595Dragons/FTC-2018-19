@@ -398,7 +398,7 @@ class Config {
 
         this.resetMotorsForAutonomous(this.left_front, this.right_back, this.right_front, this.left_back);
 
-        double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .25;
+        double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .45;
 
 
         this.left_front.setTargetPosition(ticks);
@@ -410,7 +410,7 @@ class Config {
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() < timeoutS) {
 
-            if (this.isThere(5, this.right_front, this.left_back)) {
+            if (this.isThere(5, this.left_back) && this.isThere(5, this.left_front) && this.isThere(5, this.right_back) && this.isThere(5, this.right_front)) {
                 this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
                 break;
             } else {
