@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -392,56 +391,53 @@ class Config {
         }
     }
 
-    // FIXME
+
     void autoDriveSideways(double speed, int inches, int currentAngle, int timeoutS) {
 
-        int ticks = inches * this.EncoderNumberChangePerInch;
+        int ticks = -inches * this.EncoderNumberChangePerInch;
 
         this.resetMotorsForAutonomous(this.left_front, this.right_back, this.right_front, this.left_back);
 
-        double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .5;
+        double leftFrontPower, rightBackPower, rightFrontPower, leftBackPower, error, steer, P = .25;
 
-        // TODO: Fix, as RUN_TO_POSITION cannot be used here.
-        // Time to reinvent the wheel, and implement it based on RUN_WITHOUT_ENCODER,
-        // and pass raw powers due to turning
 
-        /*
-        this.left_front.setTargetPosition(-ticks);
-        this.right_back.setTargetPosition(-ticks);
-        this.right_front.setTargetPosition(ticks);
-        this.left_back.setTargetPosition(ticks);
-        */
+        this.left_front.setTargetPosition(ticks);
+        this.right_back.setTargetPosition(ticks);
+        this.right_front.setTargetPosition(-ticks);
+        this.left_back.setTargetPosition(-ticks);
 
 
         this.timer.reset();
         while (this.OpMode.opModeIsActive() && this.timer.seconds() < timeoutS) {
 
-            if (this.isThere(2, this.left_front, this.left_back, this.right_front, this.right_back)) {
+            if (this.isThere(5, this.right_front, this.left_back)) {
                 this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
-
-                if (Math.abs(this.getError(currentAngle)) > 2) {
-                    this.autoTurnToDegree(.6, currentAngle, (int) Math.round(timeoutS - this.timer.seconds()));
-                }
                 break;
             } else {
 
                 error = this.getError(currentAngle);
 
+
                 steer = this.getSteer(error, P);
 
+                steer = (ticks < 0) ? -steer : steer;
 
-                // If driving in reverse, the motor correction also needs to be reversed
-                steer = steer < 0 ? -steer : steer;
+                leftFrontPower = speed;
+                rightBackPower = speed;
 
-                leftFrontPower = Range.clip(speed - steer, -1, 1);
-                rightBackPower = Range.clip(speed + steer, -1, 1);
+                // Check if there needs to be a correction
+                if (steer > 0.2d) {
+                    leftFrontPower = Range.clip(speed + steer, -1, 1);
+                } else if (steer < -0.2d) {
+                    rightBackPower = Range.clip(speed - steer, -1, 1);
+                }
 
-                rightFrontPower = -rightBackPower;
-                leftBackPower = -leftFrontPower;
+                rightFrontPower = speed;
+                leftBackPower = speed;
+
 
                 this.left_front.setPower(leftFrontPower);
                 this.right_back.setPower(rightBackPower);
-
                 this.right_front.setPower(rightFrontPower);
                 this.left_back.setPower(leftBackPower);
 
@@ -518,10 +514,10 @@ class Config {
         this.resetMotorsForAutonomous(this.left_front, this.left_back, this.right_front, this.right_back);
 
         // Set the individual drive motor positions
-        this.left_front.setTargetPosition((int)Math.round(LFInches * EncoderNumberChangePerInch));
-        this.right_front.setTargetPosition((int)Math.round(RFInches * EncoderNumberChangePerInch));
-        this.left_back.setTargetPosition((int)Math.round(LBInches * EncoderNumberChangePerInch));
-        this.right_back.setTargetPosition((int)Math.round(RBInches * EncoderNumberChangePerInch));
+        this.left_front.setTargetPosition((int) Math.round(LFInches * EncoderNumberChangePerInch));
+        this.right_front.setTargetPosition((int) Math.round(RFInches * EncoderNumberChangePerInch));
+        this.left_back.setTargetPosition((int) Math.round(LBInches * EncoderNumberChangePerInch));
+        this.right_back.setTargetPosition((int) Math.round(RBInches * EncoderNumberChangePerInch));
 
         // Set the motor speeds
         this.left_front.setPower(speed);
@@ -543,10 +539,10 @@ class Config {
         // Stop all motion, and reset the motors
         this.resetMotorsForAutonomous(this.left_back, this.left_front, this.right_back, this.right_front);
     }
-    void TurnByImu(double speed,int target, double timeOut)
-    {
-        double error =this.getError(target);
+
+    void TurnByImu(double speed, int target, double timeOut) {
+        double error = this.getError(target);
         double magicNumber = 0.27;
-        encoderDrive(speed,-error*magicNumber, error*magicNumber, timeOut);
+        encoderDrive(speed, -error * magicNumber, error * magicNumber, timeOut);
     }
 }
