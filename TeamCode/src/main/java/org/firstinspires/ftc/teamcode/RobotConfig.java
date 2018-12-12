@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,6 +31,10 @@ class RobotConfig {
     DcMotor left1, right1, left2, right2, climber, intake, arm;
 
     int maxClimberPos = 8400, minClimberPos = 0, minArmPos = 0, adjustedArmPos = 300, topArmPos = 4700;
+
+
+    // TODO: Setup servos
+    Servo leftServo, rightServo;
 
 
     GoldDetector goldDetector;
@@ -144,6 +149,7 @@ class RobotConfig {
     /**
      * Updates the telemetry to display each of the position for all the motors and sensors (if they aren't null that is)
      */
+    @Deprecated
     void updateTelemetry() {
 
         if (left1 != null) {
