@@ -462,7 +462,7 @@ class Config {
     }
 
 
-    private double getError(int desiredAngle) {
+    double getError(int desiredAngle) {
         double error = this.imu.isGyroCalibrated() ? Math.round((desiredAngle) - (this.getAngle())) : 0;
 
         while (error > 180) {
@@ -542,7 +542,10 @@ class Config {
 
     void TurnByImu(double speed, int target, double timeOut) {
         double error = this.getError(target);
-        double magicNumber = 0.27;
+        double magicNumber = 0.25;
         encoderDrive(speed, -error * magicNumber, error * magicNumber, timeOut);
+        this.OpMode.telemetry.addData("error", error);
+        this.OpMode.telemetry.addData("leftmove", -error*magicNumber);
+        this.OpMode.telemetry.update();
     }
 }
