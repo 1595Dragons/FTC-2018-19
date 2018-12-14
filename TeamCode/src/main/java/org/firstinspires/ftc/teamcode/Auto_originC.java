@@ -4,10 +4,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Auto B", group = "Test")
-public class Auto_originB extends LinearOpMode {
+@Autonomous(name = "Auto C", group = "Test")
+public class Auto_originC extends LinearOpMode {
 
-    private static final double DRIVE_SPEED = .15, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
+    private static final double DRIVE_SPEED = .12, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
 
     // Config for the robot
     private Config robot = new Config(this);
@@ -41,7 +41,7 @@ public class Auto_originB extends LinearOpMode {
         sleep(200);
         //turn by imu
         //turn left 6
-        //robot.encoderDrive(DRIVE_SPEED, 6, -6, 3);
+        robot.encoderDrive(DRIVE_SPEED, 6, -6, 3);
         robot.TurnByImu(DRIVE_SPEED,0,3.0);
         sleep(200);
         //forward 7

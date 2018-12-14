@@ -148,6 +148,7 @@ class Config {
             final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
             parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.mode = BNO055IMU.SensorMode.IMU;
             this.imu = OpMode.hardwareMap.get(BNO055IMU.class, "imu");
             this.imu.initialize(parameters);
         }
@@ -256,7 +257,7 @@ class Config {
      * @return The robot's current angle in degrees. This is rounded to the nearest whole number.
      */
     int getAngle() {
-        return this.imu.isGyroCalibrated() ? Math.round(this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).secondAngle) : 0;
+        return this.imu.isGyroCalibrated() ? Math.round(this.imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) : 0;
     }
 
 
@@ -543,7 +544,7 @@ class Config {
     void TurnByImu(double speed, int target, double timeOut) {
         double error = this.getError(target);
         double magicNumber = 0.24;
-        encoderDrive(speed, -error * magicNumber, error * magicNumber, timeOut);
+        encoderDrive(speed, error * magicNumber, -error * magicNumber, timeOut);
         this.OpMode.telemetry.addData("error", error);
         this.OpMode.telemetry.addData("leftmove", -error*magicNumber);
         this.OpMode.telemetry.update();
