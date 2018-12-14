@@ -542,7 +542,7 @@ class Config {
 
     void TurnByImu(double speed, int target, double timeOut) {
         double error = this.getError(target);
-        double magicNumber = 0.25;
+        double magicNumber = 0.24;
         encoderDrive(speed, -error * magicNumber, error * magicNumber, timeOut);
         this.OpMode.telemetry.addData("error", error);
         this.OpMode.telemetry.addData("leftmove", -error*magicNumber);

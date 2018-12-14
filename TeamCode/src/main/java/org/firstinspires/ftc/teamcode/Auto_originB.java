@@ -40,27 +40,29 @@ public class Auto_originB extends LinearOpMode {
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3.0);
         sleep(200);
         //turn by imu
-        robot.TurnByImu(DRIVE_SPEED,0,4.0);
+        //turn left 6
+        robot.encoderDrive(DRIVE_SPEED, 6, -6, 3);
+        robot.TurnByImu(DRIVE_SPEED,0,3.0);
         sleep(1000);
         //forward 7
         robot.encoderDrive(DRIVE_SPEED, -7, -7, 3);
         sleep(200);
+        //left 13
+        robot.distinctDrive(SIDE_SPEED, 16, -16, -16, 16, 3.0);
         //turn left 4
         robot.encoderDrive(DRIVE_SPEED, 4, -4, 3);
         sleep(200);
-        //left 13
-        robot.distinctDrive(SIDE_SPEED, 16, -16, -16, 16, 3.0);
         //robot.turnToDegree(TURN_SPEED,0,imu,3);
         robot.setupGoldDetector();
         robot.goldDetector.enable();
         int moveCount=0;
-        for (int i = 0; i <= 6; i++) {
-            if (robot.searchForGold(1000)) {
-                robot.encoderDrive(DRIVE_SPEED, -30, -30, 3.0);
+        for (int i = 0; i <= 7; i++) {
+            if (robot.searchForGold(800)) {
+                robot.encoderDrive(DRIVE_SPEED, -35, -35, 3.0);
                 break;
             }
-            robot.distinctDrive(SIDE_SPEED, -7, 7, 7, -7, 2.0);
-            robot.encoderDrive(DRIVE_SPEED, -1.8, 1.8, 1);
+            robot.distinctDrive(SIDE_SPEED, -5, 5, 5, -5, 2.0);
+            robot.encoderDrive(DRIVE_SPEED, -1.2, 1.2, 1);
             moveCount++;
         }
         /*
