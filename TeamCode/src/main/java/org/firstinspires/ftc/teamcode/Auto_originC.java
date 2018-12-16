@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "Auto C", group = "Test")
 public class Auto_originC extends LinearOpMode {
 
-    private static final double DRIVE_SPEED = .12, TURN_SPEED = 1, ARM_SPEED = .8, SIDE_SPEED = .25;
+    private static final double DRIVE_SPEED = .2, TURN_SPEED = 1, ARM_SPEED = 1, SIDE_SPEED = .2;
 
     // Config for the robot
     private Config robot = new Config(this);
@@ -30,46 +30,44 @@ public class Auto_originC extends LinearOpMode {
 
         //PlanA
         robot.armDrive(ARM_SPEED, 680, 3);
-        sleep(200);
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        robot.imu.initialize(parameters);
-        sleep(300);
         //go left 10
         robot.distinctDrive(SIDE_SPEED, 10, -10, -10, 10, 3.0);
-        sleep(200);
         //turn by imu
-        //turn left 6
-        robot.encoderDrive(DRIVE_SPEED, 6, -6, 3);
-        robot.TurnByImu(DRIVE_SPEED,0,3.0);
-        sleep(200);
+        robot.TurnByImu(DRIVE_SPEED,0,2.0);
         //forward 7
-        robot.encoderDrive(DRIVE_SPEED, -7, -7, 3);
-        sleep(200);
+        robot.encoderDrive(DRIVE_SPEED, -5, -5, 3);
         //left 13
-        robot.distinctDrive(SIDE_SPEED, 16, -16, -16, 16, 3.0);
-        //turn left 4
-        robot.encoderDrive(DRIVE_SPEED, 4, -4, 3);
+        robot.distinctDrive(SIDE_SPEED, 9, -9, -9, 9, 2.0);
         sleep(200);
+        robot.TurnByImu(DRIVE_SPEED,0,2.0);
+        sleep(200);
+        robot.distinctDrive(SIDE_SPEED, 8, -8, -8, 8, 2.0);
+        sleep(200);
+        robot.TurnByImu(DRIVE_SPEED,0,2.0);
         //robot.turnToDegree(TURN_SPEED,0,imu,3);
         robot.setupGoldDetector();
         robot.goldDetector.enable();
+        sleep(1000);
         int moveCount=0;
         for (int i = 0; i <= 7; i++) {
-            if (robot.searchForGold(600)) {
+            if (robot.searchForGold(500)) {
                 robot.encoderDrive(DRIVE_SPEED, -35, -35, 3.0);
                 break;
             }
-            robot.distinctDrive(SIDE_SPEED, -5, 5, 5, -5, 2.0);
-            robot.encoderDrive(DRIVE_SPEED, -1.2, 1.2, 1);
+            robot.distinctDrive(SIDE_SPEED, -6, 6, 6, -6, 2.0);
+            robot.TurnByImu(DRIVE_SPEED,0,1.0);
             moveCount++;
         }
-        /*
-        switch(moveCount){
-
+        if (moveCount>=8)
+        {
+            robot.encoderDrive(DRIVE_SPEED, -30, -30, 3.0);
         }
-        */
+
+        robot.TurnByImu(DRIVE_SPEED,-90,2);
+        robot.encoderDrive(DRIVE_SPEED, -4*moveCount, -4*moveCount,3);
+        robot.TurnByImu(DRIVE_SPEED,-135,2 );
+        robot.encoderDrive(DRIVE_SPEED,-70,-70,3);
+
 
 
         telemetry.addData("Path", "Complete");

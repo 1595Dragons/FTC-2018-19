@@ -38,6 +38,7 @@ class Config {
     GoldDetector goldDetector;
 
 
+
     // Gyro / IMU
     BNO055IMU imu;
 
